@@ -22,7 +22,7 @@ var facebook = require('../controllers/api/facebook.js');
 //   });
 //   return token;
 // };
-
+//
 // router.get('/', async function (req, res, next) {
 //   console.log(req.headers.cookie);
 //   // res.header("token",req.headers.cookie.split('; ')[2].slice(4))
