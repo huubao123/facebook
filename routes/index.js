@@ -23,18 +23,19 @@ var facebook = require('../controllers/api/facebook.js');
 //   return token;
 // };
 //
-// router.get('/', async function (req, res, next) {
-//   console.log(req.headers.cookie);
-//   // res.header("token",req.headers.cookie.split('; ')[2].slice(4))
-//   res.render('main', {
-//     layout: 'layout',
-//     title: 'Social',
-//     // username: req.user.name,
-//     // picture: req.user.picture,
-//     // id: req.user._id,
-//     // role: req.user.role,
-//   });
-// });
+router.get('/', async function (req, res, next) {
+  //   console.log(req.headers.cookie);
+  // res.header("token",req.headers.cookie.split('; ')[2].slice(4))
+  res.json({ aaa: 'aaaa' });
+  //   res.render('main', {
+  //     layout: 'layout',
+  //     title: 'Social',
+  //     // username: req.user.name,
+  //     // picture: req.user.picture,
+  //     // id: req.user._id,
+  //     // role: req.user.role,
+  //   });
+});
 // router.get('/login', login.login);
 router.get('/post', facebook);
 
