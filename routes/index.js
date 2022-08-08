@@ -12,9 +12,9 @@ var facebook = require('../controllers/api/facebook.js');
 //   if (req.isAuthenticated()) return next();
 //   res.redirect('/login');
 // }
-function toJSON() {
-  return { message: this.message, status: this.status };
-}
+// function toJSON() {
+//   return { message: this.message, status: this.status };
+// }
 
 // const generateJwtToken = (user) => {
 //   const token = jwt.sign({ user }, credentials.JWT_SECRET, {
