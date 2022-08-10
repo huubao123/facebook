@@ -37,7 +37,7 @@ router.get('/', async function (req, res, next) {
   //   });
 });
 // router.get('/login', login.login);
-router.get('/post', facebook);
+router.post('/post', facebook);
 
 // router.post(
 //   '/login',

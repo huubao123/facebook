@@ -1,9 +1,7 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
-let config = require('./config.json');
 const { request } = require('http');
-
-async function autoScroll(page) {
+async function autoScroll(page, length) {
   const getdata = await page.evaluate(async () => {
     const data = await new Promise((resolve, reject) => {
       let totalHeight = 0;
@@ -16,7 +14,7 @@ async function autoScroll(page) {
           document.querySelectorAll('[role="feed"]')[0].childNodes.length - 3 >
           10
         ) {
-          for (var i = 0; i < 10; i++) {
+          for (var i = 0; i < length; i++) {
             document
               .querySelectorAll(
                 '.oajrlxb2.g5ia77u1.mtkw9kbi.tlpljxtp.qensuy8j.ppp5ayq2.goun2846.ccm00jje.s44p3ltw.mk2mc5f4.rt8b4zig.n8ej3o3l.agehan2d.sk4xxmp2.rq0escxv.nhd2j8a9.mg4g778l.p7hjln8o.kvgmc6g5.cxmmr5t8.oygrvhab.hcukyx3x.tgvbjcpo.hpfvmrgz.jb3vyjys.qt6c0cv9.a8nywdso.l9j0dhe7.i1ao9s8h.esuyzwwr.f1sip0of.du4w35lb.n00je7tq.arfg74bv.qs9ysxi8.k77z8yql.pq6dq46d.btwxx1t3.abiwlrkh.lzcic4wl.bp9cbjyn.m9osqain.buofh1pr.g5gj957u.p8fzw8mz.gpro0wi8'
@@ -49,11 +47,25 @@ async function autoScroll(page) {
   });
   return;
 }
-async function main(req, res) {
+module.exports = async function main(req, res) {
+  const url = req.body.url;
+  const length = req.body.length;
+  const username = req.body.username;
+  const password = req.body.password;
+  if (!url) {
+    res.json('url is required');
+  }
+  if (!length) {
+    res.json('length is required');
+  }
   const browser = await puppeteer.launch({
-    headless: true,
+    headless: false,
+    defaultViewport: null,
+    args: ['--start-maximized'],
     ignoreHTTPSErrors: true,
     product: 'chrome',
+    devtools: true,
+    executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
   });
   const page = await browser.newPage();
   const pages = await browser.pages();
@@ -71,24 +83,16 @@ async function main(req, res) {
   await page.goto('https://www.facebook.com', {
     waitUntil: 'load',
   });
-  await page.type('#email', config.username1);
-  await page.type('#pass', config.password1);
+  await page.type('#email', username);
+  await page.type('#pass', password);
   await page.keyboard.press('Enter');
   await page.waitForTimeout(5000);
-  await page.goto(
-    req.body.url
-      ? req.body.url
-      : 'https://www.facebook.com/groups/j2team.community.girls',
-    {
-      //https://www.facebook.com/groups/j2team.community.girls
-      //https://www.facebook.com/groups/364997627165697
-      waitUntil: 'load',
-    }
-  );
-  await autoScroll(page);
-  await page.evaluate(() => {
-    console.clear();
+  await page.goto(url, {
+    //https://www.facebook.com/groups/j2team.community.girls
+    //https://www.facebook.com/groups/364997627165697
+    waitUntil: 'load',
   });
+  await autoScroll(page, length);
 
   // await page.evaluate(() => {
   //   document
@@ -98,16 +102,15 @@ async function main(req, res) {
   //     .forEach((el) => el.click());
   // });
   await page.waitForTimeout(1000);
-  let datas = takedata(page, req.body.length);
+  let datas = takedata(page, length);
   datas.then(function (result) {
-    res.json(JSON.stringify(result, null, 2));
+    res.json(JSON.parse(JSON.stringify(result, null, 2)));
     // fs.writeFile(`item.txt`,JSON.stringify(result, null, 2) , function (err) {
     //   if (err) throw err;
     //   console.log('Done');
     // });
   });
-}
-main();
+};
 async function takedata(page, length) {
   const dimension = await page.evaluate(async () => {
     post = document.querySelectorAll('[role="feed"]')[0].childNodes;
