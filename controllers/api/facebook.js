@@ -1,7 +1,8 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
-// let config = require('./config.json');
-const e = require('express');
+let config = require('./config.json');
+const { request } = require('http');
+
 async function autoScroll(page) {
   const getdata = await page.evaluate(async () => {
     const data = await new Promise((resolve, reject) => {
@@ -13,16 +14,31 @@ async function autoScroll(page) {
         totalHeight += distance;
         if (
           document.querySelectorAll('[role="feed"]')[0].childNodes.length - 3 >
-          20
+          10
         ) {
+          for (var i = 0; i < 10; i++) {
+            document
+              .querySelectorAll(
+                '.oajrlxb2.g5ia77u1.mtkw9kbi.tlpljxtp.qensuy8j.ppp5ayq2.goun2846.ccm00jje.s44p3ltw.mk2mc5f4.rt8b4zig.n8ej3o3l.agehan2d.sk4xxmp2.rq0escxv.nhd2j8a9.mg4g778l.p7hjln8o.kvgmc6g5.cxmmr5t8.oygrvhab.hcukyx3x.tgvbjcpo.hpfvmrgz.jb3vyjys.qt6c0cv9.a8nywdso.l9j0dhe7.i1ao9s8h.esuyzwwr.f1sip0of.du4w35lb.n00je7tq.arfg74bv.qs9ysxi8.k77z8yql.pq6dq46d.btwxx1t3.abiwlrkh.lzcic4wl.bp9cbjyn.m9osqain.buofh1pr.g5gj957u.p8fzw8mz.gpro0wi8'
+              )
+              .forEach((el) => el.click());
+          }
           clearInterval(timer);
           resolve();
         }
+
+        document
+          .querySelectorAll('.j83agx80.buofh1pr.jklb3kyz.l9j0dhe7')
+          .forEach((el) => el.click());
         document
           .querySelectorAll(
-            '.oajrlxb2.g5ia77u1.mtkw9kbi.tlpljxtp.qensuy8j.ppp5ayq2.goun2846.ccm00jje.s44p3ltw.mk2mc5f4.rt8b4zig.n8ej3o3l.agehan2d.sk4xxmp2.rq0escxv.nhd2j8a9.mg4g778l.p7hjln8o.kvgmc6g5.cxmmr5t8.oygrvhab.hcukyx3x.tgvbjcpo.hpfvmrgz.jb3vyjys.qt6c0cv9.a8nywdso.l9j0dhe7.i1ao9s8h.esuyzwwr.f1sip0of.du4w35lb.n00je7tq.arfg74bv.qs9ysxi8.k77z8yql.pq6dq46d.btwxx1t3.abiwlrkh.lzcic4wl.bp9cbjyn.m9osqain.buofh1pr.g5gj957u.p8fzw8mz.gpro0wi8'
+            '.oajrlxb2.g5ia77u1.qu0x051f.esr5mh6w.e9989ue4.r7d6kgcz.rq0escxv.nhd2j8a9.nc684nl6.p7hjln8o.kvgmc6g5.cxmmr5t8.oygrvhab.hcukyx3x.jb3vyjys.rz4wbd8a.qt6c0cv9.a8nywdso.i1ao9s8h.esuyzwwr.f1sip0of.lzcic4wl.gpro0wi8.oo9gr5id.lrazzd5p'
           )
-          .forEach((el) => el.click());
+          .forEach((el) => {
+            if (el.nodeName == 'DIV') {
+              el.click();
+            }
+          }); // document.querySelector('[aria-label="OK"]').click();
 
         if (totalHeight >= scrollHeight) {
           clearInterval(timer);
@@ -34,44 +50,46 @@ async function autoScroll(page) {
   return;
 }
 async function main(req, res) {
-  fs.readFile('controllers/api/item.txt', 'utf8', (err, data) => {
-    if (err) throw err;
-    res.json(JSON.parse(data));
+  const browser = await puppeteer.launch({
+    headless: true,
+    ignoreHTTPSErrors: true,
+    product: 'chrome',
+  });
+  const page = await browser.newPage();
+  const pages = await browser.pages();
+  if (pages.length > 1) {
+    await pages[0].close();
+  }
+  await page.setRequestInterception(true);
+  page.on('request', (request) => {
+    if (/google|cloudflare/.test(request.url())) {
+      request.abort();
+    } else {
+      request.continue();
+    }
+  });
+  await page.goto('https://www.facebook.com', {
+    waitUntil: 'load',
+  });
+  await page.type('#email', config.username1);
+  await page.type('#pass', config.password1);
+  await page.keyboard.press('Enter');
+  await page.waitForTimeout(5000);
+  await page.goto(
+    req.body.url
+      ? req.body.url
+      : 'https://www.facebook.com/groups/j2team.community.girls',
+    {
+      //https://www.facebook.com/groups/j2team.community.girls
+      //https://www.facebook.com/groups/364997627165697
+      waitUntil: 'load',
+    }
+  );
+  await autoScroll(page);
+  await page.evaluate(() => {
+    console.clear();
   });
 
-  //   const browser = await puppeteer.launch({
-  //     headless: true,
-  //     defaultViewport: null,
-  //     args: ['--start-maximized'],
-  //     ignoreHTTPSErrors: true,
-  //     product: 'chrome',
-  //     devtools: true,
-  //     executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
-  //   });
-  //   const page = await browser.newPage();
-  //   const pages = await browser.pages();
-  //   if (pages.length > 1) {
-  //     await pages[0].close();
-  //   }
-  //   await page.setRequestInterception(true);
-  //   page.on('request', (request) => {
-  //     if (/google|cloudflare/.test(request.url())) {
-  //       request.abort();
-  //     } else {
-  //       request.continue();
-  //     }
-  //   });
-  //   await page.goto('https://www.facebook.com', {
-  //     waitUntil: 'load',
-  //   });
-  //   await page.type('#email', config.username, { delay: 100 });
-  //   await page.type('#pass', config.password, { delay: 100 });
-  //   await page.keyboard.press('Enter');
-  //   await page.waitForTimeout(5000);
-  //   await page.goto('https://www.facebook.com/groups/697332711026460', {
-  //     waitUntil: 'load',
-  //   });
-  //   await autoScroll(page);
   // await page.evaluate(() => {
   //   document
   //     .querySelectorAll(
@@ -79,12 +97,18 @@ async function main(req, res) {
   //     )
   //     .forEach((el) => el.click());
   // });
-  //   let datas = takedata(page);
-  //   datas.then(function (result) {
-  //     res.json(result);
-  //   });
+  await page.waitForTimeout(1000);
+  let datas = takedata(page, req.body.length);
+  datas.then(function (result) {
+    res.json(JSON.stringify(result, null, 2));
+    // fs.writeFile(`item.txt`,JSON.stringify(result, null, 2) , function (err) {
+    //   if (err) throw err;
+    //   console.log('Done');
+    // });
+  });
 }
-async function takedata(page) {
+main();
+async function takedata(page, length) {
   const dimension = await page.evaluate(async () => {
     post = document.querySelectorAll('[role="feed"]')[0].childNodes;
     let video = new Array();
@@ -95,7 +119,6 @@ async function takedata(page) {
       (user_name =
       content =
       categori =
-      imagehref =
       likes =
       count_comments =
       shares =
@@ -103,15 +126,22 @@ async function takedata(page) {
       videohref =
       user_id =
       post_id =
+      cotent_cmt =
+      user_cmt_id =
+      user_name_cmt =
+      user_cmt_href =
+      cotent_cmtchild =
+      user_cmtchild_id =
+      user_name_cmtchild =
+      user_cmtchild_href =
         '');
     let data = [];
-    for (let i = 1; i < post.length - 3; i++) {
+    for (let i = 1; i < length + 1; i++) {
       try {
         let contens =
           post[i].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
             .childNodes[0].childNodes[0].childNodes[0].childNodes[0]
             .childNodes[0].childNodes[1];
-
         contens.childNodes[0].childNodes[1].childNodes[0].childNodes[1].childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes.forEach(
           (ele) => {
             if (ele.className == '') {
@@ -123,14 +153,17 @@ async function takedata(page) {
         contens.childNodes[0].childNodes[1].childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes.forEach(
           (element) => {
             if (element.nodeName == 'SPAN') {
-              userhref = element.childNodes[0].childNodes[0].href;
-              user_name = element.childNodes[0].innerText;
-              user_id = element.childNodes[0].childNodes[0].href.split('/')[6];
-            } else {
-              userhref = element.childNodes[0].childNodes[0].innerText;
-              user_name = element.childNodes[0].innerText;
-              user_id =
-                element.childNodes[0].childNodes[0].innerText.split('/')[6];
+              userhref = element.childNodes[0].childNodes[0].href
+                ? element.childNodes[0].childNodes[0].href
+                : element.childNodes[0].childNodes[0].childNodes[0].href;
+              user_name = element.childNodes[0].innerText
+                ? element.childNodes[0].innerText
+                : element.childNodes[0].childNodes[0].childNodes[0].innerText;
+              user_id = element.childNodes[0].childNodes[0].href
+                ? element.childNodes[0].childNodes[0].href.split('/')[6]
+                : element.childNodes[0].childNodes[0].childNodes[0].href.split(
+                    '/'
+                  )[6];
             }
           }
         );
@@ -214,11 +247,28 @@ async function takedata(page) {
                         element.childNodes[0].childNodes[0].currentSrc
                       );
                     } else {
-                      for (let k = 0; k < element.childNodes.length; k++) {
-                        image_href.push(
-                          element.childNodes[0].childNodes[0].childNodes[0]
-                            .childNodes[0].childNodes[0].href
-                        );
+                      if (element.childNodes.length == 3) {
+                        for (let k = 0; k < element.childNodes.length; k++) {
+                          image_href.push(
+                            element.childNodes[0].childNodes[0].childNodes[0]
+                              .childNodes[0].childNodes[0].href
+                          );
+                        }
+                      } else {
+                        element.childNodes.forEach(function (element) {
+                          if (element.childNodes.length == 2) {
+                            element.childNodes.forEach(function (element) {
+                              image_href.push(
+                                element.childNodes[0].childNodes[0]
+                                  .childNodes[0].href
+                              );
+                            });
+                          } else {
+                            image_href.push(
+                              element.childNodes[0].childNodes[0].href
+                            );
+                          }
+                        });
                       }
                     }
                   }
@@ -233,10 +283,9 @@ async function takedata(page) {
           ) {
             element.childNodes[0].childNodes.forEach(function (node) {
               if (node.nodeName == 'SPAN') {
-                content = node.innerHTML;
+                content = node.childNodes[0].innerHTML;
               } else {
-                content =
-                  node.childNodes[0].childNodes[0].childNodes[0].innerHTML;
+                content = node.innerHTML;
               }
             });
           } else if (element.nodeName == 'BLOCKQUOTE') {
@@ -315,34 +364,252 @@ async function takedata(page) {
         try {
           divcommment.forEach((element) => {
             if (element.nodeName == 'UL') {
-              console.log(element.childNodes);
-              element.childNodes.forEach((element) => {
-                if (element.childNodes.length == 2) {
-                  commmets.push({
-                    cotents:
-                      element.childNodes[0].childNodes[1].childNodes[1]
-                        .childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                        .childNodes[0].childNodes[0].childNodes[1].childNodes[0]
-                        .childNodes[0].innerHTML,
-                  });
-                } else {
-                  commmets.push({
-                    cotents:
-                      element.children[0].childNodes[0].childNodes[1]
-                        .childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                        .childNodes[0].childNodes[0].childNodes[1].childNodes[0]
-                        .childNodes[0].innerHTML,
-                  });
-                }
-              });
-              // [0].childNodes[1].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[1].childNodes[0].childNodes[0].innerHTML
-              // [0].childNodes[1].childNodes[1].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[1].childNodes[0].childNodes[0].innerHTML
+              element.childNodes.forEach((elementss) => {
+                console.log(elementss);
+                if (elementss.childNodes[0].childNodes.length == 2) {
+                  if (
+                    elementss.childNodes[0].childNodes[1].childNodes[1]
+                      .childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                      .childNodes.length == 3 ||
+                    elementss.childNodes[0].childNodes[1].childNodes[1]
+                      .childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                      .childNodes.length == 2
+                  ) {
+                    elementss.childNodes[0].childNodes[1].childNodes[1].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes.forEach(
+                      (cmt) => {
+                        if (cmt.nodeName == 'SPAN' && cmt.className == '') {
+                          user_cmt_href = cmt.childNodes[0].childNodes[0].href;
+                          user_name_cmt =
+                            cmt.childNodes[0].childNodes[0].innerText;
+                          user_cmt_id =
+                            cmt.childNodes[0].childNodes[0].href.split('/')[6];
+                        } else if (cmt.nodeName == 'DIV') {
+                          cotent_cmt =
+                            cmt.childNodes[0].childNodes[0].innerHTML;
+                        }
+                      }
+                    );
+                  } else {
+                    elementss.childNodes[0].childNodes[1].childNodes[1].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes.forEach(
+                      (child) => {
+                        if (child.nodeName == 'SPAN' && child.className == '') {
+                          user_cmt_href =
+                            child.childNodes[0].childNodes[0].href;
+                          user_name_cmt =
+                            child.childNodes[0].childNodes[0].innerText;
+                          user_cmt_id =
+                            child.childNodes[0].childNodes[0].href.split(
+                              '/'
+                            )[6];
+                        } else if (child.nodeName == 'DIV') {
+                          cotent_cmt =
+                            child.childNodes[0].childNodes[0].innerHTML;
+                        }
+                      }
+                    );
+                  }
 
-              // console.log(element.childNodes); // comment con [0].childNodes[1].childNodes[0].childNodes
+                  elementss.childNodes[1].childNodes[0].childNodes.forEach(
+                    (elementsss) => {
+                      if (elementsss.nodeName == 'UL') {
+                        for (let m = 0; m < elementsss.childNodes.length; m++) {
+                          try {
+                            children_div =
+                              elementsss.childNodes[m].childNodes[0].childNodes[
+                                elementsss.childNodes[m].childNodes[0]
+                                  .childNodes.length - 1
+                              ].childNodes[1].childNodes[0].childNodes[0]
+                                .childNodes[0].childNodes[0].childNodes;
+                            if (
+                              children_div.length == 3 ||
+                              children_div.length == 2
+                            ) {
+                              children_div.forEach((child) => {
+                                if (
+                                  child.nodeName == 'SPAN' &&
+                                  child.className == ''
+                                ) {
+                                  user_cmtchild_href =
+                                    child.childNodes[0].childNodes[0].href;
+                                  user_name_cmtchild =
+                                    child.childNodes[0].childNodes[0].innerText;
+                                  user_cmtchild_id =
+                                    child.childNodes[0].childNodes[0].href.split(
+                                      '/'
+                                    )[6];
+                                } else if (child.nodeName == 'DIV') {
+                                  cotent_cmtchild =
+                                    child.childNodes[0].childNodes[0].innerHTML;
+                                }
+                              });
+                            } else {
+                              children_div[0].childNodes[0].childNodes.forEach(
+                                (child) => {
+                                  if (
+                                    child.nodeName == 'SPAN' &&
+                                    child.className == ''
+                                  ) {
+                                    user_cmtchild_href =
+                                      child.childNodes[0].childNodes[0].href;
+                                    user_name_cmtchild =
+                                      child.childNodes[0].childNodes[0]
+                                        .innerText;
+                                    user_cmtchild_id =
+                                      child.childNodes[0].childNodes[0].href.split(
+                                        '/'
+                                      )[6];
+                                  } else if (child.nodeName == 'DIV') {
+                                    cotent_cmtchild =
+                                      child.childNodes[0].childNodes[0]
+                                        .innerHTML;
+                                  }
+                                }
+                              );
+                            }
+                            // if (
+                            //   elementsss.childNodes[m].childNodes[1]
+                            //     .className == ''
+                            // ) {
+                            //   children2 =
+                            //     elementsss.childNodes[m].childNodes[1]
+                            //       .childNodes[0].childNodes;
+                            //   for (let n = 0; n < children2.length; n++) {
+                            //     children2[n].childNodes[0].childNodes[
+                            //       children2[n].childNodes[0].childNodes.length -
+                            //         1
+                            //     ].childNodes[1].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes.forEach(
+                            //       (child) => {
+                            //         if (child.nodeName == 'SPAN') {
+                            //           user_cmtchild_href =
+                            //             child.childNodes[0].childNodes[0].href;
+                            //           user_name_cmtchild =
+                            //             child.childNodes[0].childNodes[0]
+                            //               .innerText;
+                            //           user_cmtchild_id =
+                            //             child.childNodes[0].childNodes[0].href.split(
+                            //               '/'
+                            //             )[6];
+                            //         } else if (child.nodeName == 'DIV') {
+                            //           cotent_cmtchild =
+                            //             child.childNodes[0].childNodes[0]
+                            //               .innerHTML;
+                            //         }
+                            //       }
+                            //     );
+                            //   }
+                            // }
+                            children.push({
+                              user_cmtchild_href: user_cmtchild_href,
+                              user_name_cmtchild: user_name_cmtchild,
+                              user_cmtchild_id: user_cmtchild_id,
+                              cotent_cmtchild: cotent_cmtchild,
+                            });
+                            user_cmtchild_href =
+                              user_name_cmtchild =
+                              user_cmtchild_id =
+                              cotent_cmtchild =
+                                '';
+                          } catch (e) {
+                            console.log('children error');
+                            console.log(e);
+                            children.push({
+                              user_cmtchild_href: user_cmtchild_href
+                                ? user_cmtchild_href
+                                : '',
+                              user_name_cmtchild: user_name_cmtchild
+                                ? user_name_cmtchild
+                                : '',
+                              user_cmtchild_id: user_cmtchild_id
+                                ? user_cmtchild_id
+                                : '',
+                              cotent_cmtchild: cotent_cmtchild
+                                ? cotent_cmtchild
+                                : '',
+                              statusbar_cmtchild: '',
+                            });
+                            user_cmtchild_href =
+                              user_name_cmtchild =
+                              user_cmtchild_id =
+                              cotent_cmtchild =
+                                '';
+                          }
+                        }
+                      }
+                    }
+                  );
+                } else {
+                  divcommment =
+                    elementss.childNodes[0].childNodes[0].childNodes[1]
+                      .childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                      .childNodes;
+
+                  if (divcommment.length == 2) {
+                    divcommment.forEach((elements) => {
+                      if (
+                        elements.nodeName == 'SPAN' &&
+                        elements.className == ''
+                      ) {
+                        user_cmt_href =
+                          elements.childNodes[0].childNodes[0].href;
+                        user_name_cmt =
+                          elements.childNodes[0].childNodes[0].innerText;
+                        user_cmt_id =
+                          elements.childNodes[0].childNodes[0].href.split(
+                            '/'
+                          )[6];
+                      } else if (elements.nodeName == 'DIV') {
+                        cotent_cmt =
+                          elements.childNodes[0].childNodes[0].innerHTML;
+                      }
+                    });
+                  } else {
+                    divcommment[0].childNodes[0].childNodes.forEach(
+                      (element) => {
+                        if (
+                          element.nodeName == 'SPAN' &&
+                          element.className == ''
+                        ) {
+                          user_cmt_href =
+                            element.childNodes[0].childNodes[0].href;
+                          user_name_cmt =
+                            element.childNodes[0].childNodes[0].innerText;
+                          user_cmt_id =
+                            element.childNodes[0].childNodes[0].href.split(
+                              '/'
+                            )[6];
+                        } else if (element.nodeName == 'DIV') {
+                          cotent_cmt =
+                            element.childNodes[0].childNodes[0].innerHTML;
+                        }
+                      }
+                    );
+                  }
+                }
+                commmets.push({
+                  cotent_cmt: cotent_cmt,
+                  user_name_cmt: user_name_cmt,
+                  user_cmt_id: user_cmt_id,
+                  user_cmt_href: user_cmt_href,
+                  children: children,
+                });
+                cotent_cmt = user_cmt_id = user_name_cmt = user_cmt_href = '';
+                children = [];
+              });
             }
           });
-        } catch (e) {
-          console.log(e);
+        } catch (error) {
+          console.log('error cmt');
+          console.log(error);
+          commmets.push({
+            cotent_cmt: cotent_cmt ? cotent_cmt : '',
+            user_name_cmt: user_name_cmt ? user_name_cmt : '',
+            user_cmt_id: user_cmt_id ? user_cmt_id : '',
+            user_cmt_href: user_cmt_href ? user_cmt_href : '',
+            children: children ? children : [],
+            statusbar_cmt: '',
+          });
+          cotent_cmt = user_cmt_id = user_name_cmt = user_cmt_href = '';
+          children = [];
         }
 
         data.push({
@@ -365,7 +632,7 @@ async function takedata(page) {
           user_id =
           content =
           categori =
-          imagehref =
+          image_href =
           likes =
           count_comments =
           shares =
@@ -376,6 +643,7 @@ async function takedata(page) {
         commmets = [];
         image_href = [];
       } catch (error) {
+        console.log(error);
         data.push({
           statusbar: 'error',
         });
@@ -383,7 +651,7 @@ async function takedata(page) {
           user_name =
           content =
           categori =
-          imagehref =
+          image_href =
           likes =
           count_comments =
           user_id =
@@ -401,4 +669,3 @@ async function takedata(page) {
   });
   return dimension;
 }
-module.exports = main;
