@@ -59,13 +59,13 @@ module.exports = async function main(req, res) {
     res.json('length is required');
   }
   const browser = await puppeteer.launch({
-    headless: false,
-    defaultViewport: null,
-    args: ['--start-maximized'],
+    headless: true,
+    // defaultViewport: null,
+    // args: ['--start-maximized'],
     ignoreHTTPSErrors: true,
-    product: 'chrome',
-    devtools: true,
-    executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
+    // product: 'chrome',
+    // devtools: true,
+    // executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
   });
   const page = await browser.newPage();
   const pages = await browser.pages();
