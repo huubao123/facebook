@@ -110,10 +110,10 @@ module.exports = async function main(req, res) {
   let datas = await takedata(page, length);
   await datas.then(function (result) {
     res.json(JSON.parse(JSON.stringify(result, null, 2)));
-    // fs.writeFile(`item.txt`,JSON.stringify(result, null, 2) , function (err) {
-    //   if (err) throw err;
-    //   console.log('Done');
-    // });
+    fs.writeFile(`item.txt`, JSON.stringify(result, null, 2), function (err) {
+      if (err) throw err;
+      console.log('Done');
+    });
   });
   await browser.close();
 };
