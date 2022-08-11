@@ -59,7 +59,6 @@ module.exports = async function main(req, res) {
     res.json('length is required');
   }
   const browser = await puppeteer.launch({
-    headless: true,
     // defaultViewport: null,
     // args: ['--start-maximized'],
     ignoreHTTPSErrors: true,
@@ -108,15 +107,15 @@ module.exports = async function main(req, res) {
   //     .forEach((el) => el.click());
   // });
   await page.waitForTimeout(1000);
-  let datas = takedata(page, length);
-  datas.then(function (result) {
+  let datas = await takedata(page, length);
+  await datas.then(function (result) {
     res.json(JSON.parse(JSON.stringify(result, null, 2)));
     // fs.writeFile(`item.txt`,JSON.stringify(result, null, 2) , function (err) {
     //   if (err) throw err;
     //   console.log('Done');
     // });
   });
-  browser.close();
+  await browser.close();
 };
 async function takedata(page, length) {
   const dimension = await page.evaluate(async () => {
