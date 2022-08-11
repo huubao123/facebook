@@ -39,7 +39,7 @@ router.get('/', async function (req, res, next) {
   //   });
 });
 // router.get('/login', login.login);
-router.post('/post', timeout('60s'), facebook);
+router.post('/post', timeout('120s'), facebook);
 
 // router.post(
 //   '/login',
