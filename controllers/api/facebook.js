@@ -111,6 +111,7 @@ module.exports = async function main(req, res) {
     //   console.log('Done');
     // });
   });
+  browser.close();
 };
 async function takedata(page, length) {
   const dimension = await page.evaluate(async () => {
