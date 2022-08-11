@@ -61,6 +61,7 @@ module.exports = async function main(req, res) {
     // defaultViewport: null,
     // args: ['--start-maximized'],
     ignoreHTTPSErrors: true,
+    ignoreDefaultArgs: ['--disable-extensions'],
     args: [
       '--no-sandbox',
       '--disable-setuid-sandbox',
