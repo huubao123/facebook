@@ -49,6 +49,7 @@ async function autoScroll(page, _length) {
   return;
 }
 module.exports = async function main(req, res) {
+  req.setTimeout(500000);
   const url = req.body.url;
   const lengths = req.body.length;
   const username = req.body.username;
