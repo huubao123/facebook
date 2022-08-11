@@ -63,7 +63,12 @@ module.exports = async function main(req, res) {
     // defaultViewport: null,
     // args: ['--start-maximized'],
     ignoreHTTPSErrors: true,
-    args: ['--no-sandbox'],
+    args: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-dev-shm-usage',
+      '--single-process',
+    ],
     // product: 'chrome',
     // devtools: true,
     // executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
