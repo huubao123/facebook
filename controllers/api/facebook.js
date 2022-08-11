@@ -103,6 +103,7 @@ module.exports = async function main(req, res) {
   await page.waitForTimeout(5000);
   console.log(lengths);
   await autoScroll(page, (length = lengths));
+  console.log('scroll done');
   await takedata(page, (length = lengths)).then(async function (result) {
     res.json(JSON.parse(JSON.stringify(result, null, 2)));
     fs.writeFile(`item.txt`, JSON.stringify(result, null, 2), function (err) {
