@@ -80,14 +80,14 @@ module.exports = async function main(req, res) {
   if (pages.length > 1) {
     await pages[0].close();
   }
-  await page.setRequestInterception(true);
-  page.on('request', (request) => {
-    if (/google|cloudflare/.test(request.url())) {
-      request.abort();
-    } else {
-      request.continue();
-    }
-  });
+  // await page.setRequestInterception(true);
+  // page.on('request', (request) => {
+  //   if (/google|cloudflare/.test(request.url())) {
+  //     request.abort();
+  //   } else {
+  //     request.continue();
+  //   }
+  // });
   await page.goto('https://www.facebook.com', {
     waitUntil: 'load',
   });
