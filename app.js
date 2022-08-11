@@ -19,7 +19,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(timeout(120000));
+app.use(timeout(300000));
 app.use(haltOnTimedout);
 
 function haltOnTimedout(req, res, next) {
