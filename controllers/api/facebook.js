@@ -57,6 +57,7 @@ module.exports = async function main(req, res) {
     res.json('length is required');
   }
   const browser = await puppeteer.launch({
+    headless: false,
     // defaultViewport: null,
     // args: ['--start-maximized'],
     ignoreHTTPSErrors: true,
