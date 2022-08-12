@@ -101,7 +101,7 @@ module.exports = async function main(req, res) {
     //https://www.facebook.com/groups/364997627165697
     waitUntil: 'load',
   });
-  await page.waitForTimeout(5000);
+  await page.waitForTimeout(3000);
   console.log(lengths);
   await autoScroll(page, (length = lengths));
   console.log('scroll done');
