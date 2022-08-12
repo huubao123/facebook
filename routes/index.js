@@ -4,6 +4,8 @@ var router = express.Router();
 const bodyParser = require('body-parser');
 router.use(bodyParser.urlencoded({ extended: true }));
 var facebook = require('../controllers/api/facebook.js');
+var timeout = require('connect-timeout');
+
 // require('../controllers/api/local.js')(passport);
 // var csrf = require('csurf');
 // var csrfProtection = csrf({ cookie: true });

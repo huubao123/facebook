@@ -1,59 +1,63 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 const { request } = require('http');
-async function autoScroll(page, length) {
-  const getdata = await page.evaluate(async () => {
-    let totalHeight = 0;
-    let distance = 500;
-    let timer = setInterval(() => {
-      let scrollHeight = document.body.scrollHeight;
-      window.scrollBy(0, distance);
-      totalHeight += distance;
-      if (
-        document.querySelectorAll('[role="feed"]')[0].childNodes.length - 3 >
-        10
-      ) {
-        for (var i = 0; i < length; i++) {
-          document
-            .querySelectorAll(
-              '.oajrlxb2.g5ia77u1.mtkw9kbi.tlpljxtp.qensuy8j.ppp5ayq2.goun2846.ccm00jje.s44p3ltw.mk2mc5f4.rt8b4zig.n8ej3o3l.agehan2d.sk4xxmp2.rq0escxv.nhd2j8a9.mg4g778l.p7hjln8o.kvgmc6g5.cxmmr5t8.oygrvhab.hcukyx3x.tgvbjcpo.hpfvmrgz.jb3vyjys.qt6c0cv9.a8nywdso.l9j0dhe7.i1ao9s8h.esuyzwwr.f1sip0of.du4w35lb.n00je7tq.arfg74bv.qs9ysxi8.k77z8yql.pq6dq46d.btwxx1t3.abiwlrkh.lzcic4wl.bp9cbjyn.m9osqain.buofh1pr.g5gj957u.p8fzw8mz.gpro0wi8'
-            )
-            .forEach((el) => el.click());
-        }
-        clearInterval(timer);
-        resolve();
-      }
+async function autoScroll(page, _length) {
+  const getdata = await page.evaluate(async (_length) => {
+    const data = await new Promise((resolve, reject) => {
+      let totalHeight = 0;
+      let distance = 500;
+      let timer = setInterval(() => {
+        let scrollHeight = document.body.scrollHeight;
+        window.scrollBy(0, distance);
+        totalHeight += distance;
+        let post_length =
+          document.querySelectorAll('[role="feed"]')[0].childNodes.length;
+        if (post_length - 3 > _length) {
+          console.log(post_length, _length);
 
-      document
-        .querySelectorAll('.j83agx80.buofh1pr.jklb3kyz.l9j0dhe7')
-        .forEach((el) => el.click());
-      document
-        .querySelectorAll(
-          '.oajrlxb2.g5ia77u1.qu0x051f.esr5mh6w.e9989ue4.r7d6kgcz.rq0escxv.nhd2j8a9.nc684nl6.p7hjln8o.kvgmc6g5.cxmmr5t8.oygrvhab.hcukyx3x.jb3vyjys.rz4wbd8a.qt6c0cv9.a8nywdso.i1ao9s8h.esuyzwwr.f1sip0of.lzcic4wl.gpro0wi8.oo9gr5id.lrazzd5p'
-        )
-        .forEach((el) => {
-          if (el.nodeName == 'DIV') {
-            el.click();
+          for (var i = 0; i < _length; i++) {
+            document
+              .querySelectorAll(
+                '.oajrlxb2.g5ia77u1.mtkw9kbi.tlpljxtp.qensuy8j.ppp5ayq2.goun2846.ccm00jje.s44p3ltw.mk2mc5f4.rt8b4zig.n8ej3o3l.agehan2d.sk4xxmp2.rq0escxv.nhd2j8a9.mg4g778l.p7hjln8o.kvgmc6g5.cxmmr5t8.oygrvhab.hcukyx3x.tgvbjcpo.hpfvmrgz.jb3vyjys.qt6c0cv9.a8nywdso.l9j0dhe7.i1ao9s8h.esuyzwwr.f1sip0of.du4w35lb.n00je7tq.arfg74bv.qs9ysxi8.k77z8yql.pq6dq46d.btwxx1t3.abiwlrkh.lzcic4wl.bp9cbjyn.m9osqain.buofh1pr.g5gj957u.p8fzw8mz.gpro0wi8'
+              )
+              .forEach((el) => el.click());
           }
-        }); // document.querySelector('[aria-label="OK"]').click();
+          clearInterval(timer);
+          resolve();
+        }
 
-      if (totalHeight >= scrollHeight) {
-        clearInterval(timer);
-        resolve();
-      }
-    }, 1000);
-  });
+        document
+          .querySelectorAll('.j83agx80.buofh1pr.jklb3kyz.l9j0dhe7')
+          .forEach((el) => el.click());
+        document
+          .querySelectorAll(
+            '.oajrlxb2.g5ia77u1.qu0x051f.esr5mh6w.e9989ue4.r7d6kgcz.rq0escxv.nhd2j8a9.nc684nl6.p7hjln8o.kvgmc6g5.cxmmr5t8.oygrvhab.hcukyx3x.jb3vyjys.rz4wbd8a.qt6c0cv9.a8nywdso.i1ao9s8h.esuyzwwr.f1sip0of.lzcic4wl.gpro0wi8.oo9gr5id.lrazzd5p'
+          )
+          .forEach((el) => {
+            if (el.nodeName == 'DIV') {
+              el.click();
+            }
+          }); // document.querySelector('[aria-label="OK"]').click();
+
+        if (totalHeight >= scrollHeight) {
+          clearInterval(timer);
+          resolve();
+        }
+      }, 1000);
+    });
+  }, _length);
   return;
 }
 module.exports = async function main(req, res) {
+  req.setTimeout(500000);
   const url = req.body.url;
-  const length = req.body.length;
+  const lengths = req.body.length;
   const username = req.body.username;
   const password = req.body.password;
   if (!url) {
     res.json('url is required');
   }
-  if (!length) {
+  if (!lengths) {
     res.json('length is required');
   }
   const browser = await puppeteer.launch({
@@ -77,14 +81,14 @@ module.exports = async function main(req, res) {
   if (pages.length > 1) {
     await pages[0].close();
   }
-  await page.setRequestInterception(true);
-  page.on('request', (request) => {
-    if (/google|cloudflare/.test(request.url())) {
-      request.abort();
-    } else {
-      request.continue();
-    }
-  });
+  // await page.setRequestInterception(true);
+  // page.on('request', (request) => {
+  //   if (/google|cloudflare/.test(request.url())) {
+  //     request.abort();
+  //   } else {
+  //     request.continue();
+  //   }
+  // });
   await page.goto('https://www.facebook.com', {
     waitUntil: 'load',
   });
@@ -97,28 +101,22 @@ module.exports = async function main(req, res) {
     //https://www.facebook.com/groups/364997627165697
     waitUntil: 'load',
   });
-  await autoScroll(page, length);
-
-  // await page.evaluate(() => {
-  //   document
-  //     .querySelectorAll(
-  //       '.oajrlxb2.g5ia77u1.mtkw9kbi.tlpljxtp.qensuy8j.ppp5ayq2.goun2846.ccm00jje.s44p3ltw.mk2mc5f4.rt8b4zig.n8ej3o3l.agehan2d.sk4xxmp2.rq0escxv.nhd2j8a9.mg4g778l.p7hjln8o.kvgmc6g5.cxmmr5t8.oygrvhab.hcukyx3x.tgvbjcpo.hpfvmrgz.jb3vyjys.qt6c0cv9.a8nywdso.l9j0dhe7.i1ao9s8h.esuyzwwr.f1sip0of.du4w35lb.n00je7tq.arfg74bv.qs9ysxi8.k77z8yql.pq6dq46d.btwxx1t3.abiwlrkh.lzcic4wl.bp9cbjyn.m9osqain.buofh1pr.g5gj957u.p8fzw8mz.gpro0wi8'
-  //     )
-  //     .forEach((el) => el.click());
-  // });
-  await page.waitForTimeout(1000);
-  let datas = await takedata(page, length);
-  await datas.then(function (result) {
+  await page.waitForTimeout(5000);
+  console.log(lengths);
+  await autoScroll(page, (length = lengths));
+  console.log('scroll done');
+  await takedata(page, (length = lengths)).then(async function (result) {
     res.json(JSON.parse(JSON.stringify(result, null, 2)));
-    // fs.writeFile(`item.txt`,JSON.stringify(result, null, 2) , function (err) {
-    //   if (err) throw err;
-    //   console.log('Done');
-    // });
+    fs.writeFile(`item.txt`, JSON.stringify(result, null, 2), function (err) {
+      if (err) throw err;
+      console.log('Done');
+    });
   });
+
   await browser.close();
 };
 async function takedata(page, length) {
-  const dimension = await page.evaluate(async () => {
+  const dimension = await page.evaluate(async (length) => {
     post = document.querySelectorAll('[role="feed"]')[0].childNodes;
     let video = new Array();
     let image_href = new Array();
@@ -675,6 +673,6 @@ async function takedata(page, length) {
     }
 
     return data;
-  });
+  }, length);
   return dimension;
 }
