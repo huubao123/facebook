@@ -91,7 +91,7 @@ module.exports = async function main(req, res) {
   await page.type('#email', username);
   await page.type('#pass', password);
   await page.keyboard.press('Enter');
-  await page.waitForTimeout(5000);
+  await page.waitForTimeout(3000);
   await page.goto(url, {
     //https://www.facebook.com/groups/j2team.community.girls
     //https://www.facebook.com/groups/364997627165697
