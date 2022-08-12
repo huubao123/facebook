@@ -5,7 +5,7 @@ const bodyParser = require('body-parser');
 router.use(bodyParser.urlencoded({ extended: true }));
 var facebook = require('../controllers/api/facebook.js');
 var timeout = require('connect-timeout');
-
+const fs = require('fs');
 // require('../controllers/api/local.js')(passport);
 // var csrf = require('csurf');
 // var csrfProtection = csrf({ cookie: true });
@@ -40,6 +40,14 @@ router.get('/', async function (req, res, next) {
 });
 // router.get('/login', login.login);
 router.post('/post', facebook);
+router.get('/post', async function (req, res, next) {
+  fs.readFile('item.txt', function read(err, data) {
+    if (err) {
+      throw err;
+    }
+    res.json(JSON.parse(data));
+  });
+});
 
 // router.post(
 //   '/login',

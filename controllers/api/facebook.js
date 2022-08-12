@@ -15,7 +15,7 @@ async function autoScroll(page, _length) {
         if (post_length - 3 > _length) {
           console.log(post_length, _length);
 
-          for (var i = 0; i < _length; i++) {
+          for (var i = 0; i < 10; i++) {
             document
               .querySelectorAll(
                 '.oajrlxb2.g5ia77u1.mtkw9kbi.tlpljxtp.qensuy8j.ppp5ayq2.goun2846.ccm00jje.s44p3ltw.mk2mc5f4.rt8b4zig.n8ej3o3l.agehan2d.sk4xxmp2.rq0escxv.nhd2j8a9.mg4g778l.p7hjln8o.kvgmc6g5.cxmmr5t8.oygrvhab.hcukyx3x.tgvbjcpo.hpfvmrgz.jb3vyjys.qt6c0cv9.a8nywdso.l9j0dhe7.i1ao9s8h.esuyzwwr.f1sip0of.du4w35lb.n00je7tq.arfg74bv.qs9ysxi8.k77z8yql.pq6dq46d.btwxx1t3.abiwlrkh.lzcic4wl.bp9cbjyn.m9osqain.buofh1pr.g5gj957u.p8fzw8mz.gpro0wi8'
@@ -49,7 +49,6 @@ async function autoScroll(page, _length) {
   return;
 }
 module.exports = async function main(req, res) {
-  req.setTimeout(500000);
   const url = req.body.url;
   const lengths = req.body.length;
   const username = req.body.username;
@@ -61,21 +60,23 @@ module.exports = async function main(req, res) {
     res.json('length is required');
   }
   const browser = await puppeteer.launch({
-    headless: true,
-    // defaultViewport: null,
-    // args: ['--start-maximized'],
+    headless: false,
+    defaultViewport: null,
+    args: ['--start-maximized'],
     ignoreHTTPSErrors: true,
-    ignoreDefaultArgs: ['--disable-extensions'],
-    args: [
-      '--no-sandbox',
-      '--disable-setuid-sandbox',
-      '--disable-dev-shm-usage',
-      '--single-process',
-    ],
-    // product: 'chrome',
-    // devtools: true,
-    // executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
+    // ignoreDefaultArgs: ['--disable-extensions'],
+    // args: [
+    //   '--no-sandbox',
+    //   '--disable-setuid-sandbox',
+    //   '--disable-dev-shm-usage',
+    //   '--single-process',
+    // ],
+    product: 'chrome',
+    devtools: true,
+    executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
   });
+  res.json('30 s sau vô đây lấy nha  http://localhost:3000/post');
+
   const page = await browser.newPage();
   const pages = await browser.pages();
   if (pages.length > 1) {
@@ -106,15 +107,12 @@ module.exports = async function main(req, res) {
   await autoScroll(page, (length = lengths));
   console.log('scroll done');
   await takedata(page, (length = lengths)).then(async function (result) {
-    res.json(JSON.parse(JSON.stringify(result, null, 2)));
-    console.log('Done');
-    // fs.writeFile(`item.txt`, JSON.stringify(result, null, 2), function (err) {
-    //   if (err) throw err;
-    //   ;
-    // });
+    fs.writeFile(`item.txt`, JSON.stringify(result, null, 2), function (err) {
+      if (err) throw err;
+    });
   });
 
-  await browser.close();
+  // await browser.close();
 };
 async function takedata(page, length) {
   const dimension = await page.evaluate(async (length) => {
