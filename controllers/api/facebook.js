@@ -60,20 +60,20 @@ module.exports = async function main(req, res) {
     res.json('length is required');
   }
   const browser = await puppeteer.launch({
-    headless: false,
-    defaultViewport: null,
-    args: ['--start-maximized'],
+    headless: true,
+    // defaultViewport: null,
+    // args: ['--start-maximized'],
     ignoreHTTPSErrors: true,
-    // ignoreDefaultArgs: ['--disable-extensions'],
-    // args: [
-    //   '--no-sandbox',
-    //   '--disable-setuid-sandbox',
-    //   '--disable-dev-shm-usage',
-    //   '--single-process',
-    // ],
-    product: 'chrome',
-    devtools: true,
-    executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
+    ignoreDefaultArgs: ['--disable-extensions'],
+    args: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-dev-shm-usage',
+      '--single-process',
+    ],
+    // product: 'chrome',
+    // devtools: true,
+    // executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
   });
   res.json('30 s sau vô đây lấy nha  http://localhost:3000/post');
 
