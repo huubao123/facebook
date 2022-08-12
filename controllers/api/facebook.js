@@ -103,7 +103,6 @@ module.exports = async function main(req, res) {
     waitUntil: 'load',
   });
   await page.waitForTimeout(3000);
-  console.log(lengths);
   await autoScroll(page, (length = lengths));
   console.log('scroll done');
   await takedata(page, (length = lengths)).then(async function (result) {
@@ -112,7 +111,7 @@ module.exports = async function main(req, res) {
     });
   });
 
-  // await browser.close();
+  await browser.close();
 };
 async function takedata(page, length) {
   const dimension = await page.evaluate(async (length) => {
