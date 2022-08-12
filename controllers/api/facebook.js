@@ -1,6 +1,6 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
-const { request } = require('http');
+const { request, globalAgent } = require('http');
 async function autoScroll(page, _length) {
   const getdata = await page.evaluate(async (_length) => {
     const data = await new Promise((resolve, reject) => {
@@ -13,19 +13,14 @@ async function autoScroll(page, _length) {
         let post_length =
           document.querySelectorAll('[role="feed"]')[0].childNodes.length;
         if (post_length - 3 > _length) {
-          console.log(post_length, _length);
-
-          for (var i = 0; i < 10; i++) {
-            document
-              .querySelectorAll(
-                '.oajrlxb2.g5ia77u1.mtkw9kbi.tlpljxtp.qensuy8j.ppp5ayq2.goun2846.ccm00jje.s44p3ltw.mk2mc5f4.rt8b4zig.n8ej3o3l.agehan2d.sk4xxmp2.rq0escxv.nhd2j8a9.mg4g778l.p7hjln8o.kvgmc6g5.cxmmr5t8.oygrvhab.hcukyx3x.tgvbjcpo.hpfvmrgz.jb3vyjys.qt6c0cv9.a8nywdso.l9j0dhe7.i1ao9s8h.esuyzwwr.f1sip0of.du4w35lb.n00je7tq.arfg74bv.qs9ysxi8.k77z8yql.pq6dq46d.btwxx1t3.abiwlrkh.lzcic4wl.bp9cbjyn.m9osqain.buofh1pr.g5gj957u.p8fzw8mz.gpro0wi8'
-              )
-              .forEach((el) => el.click());
-          }
           clearInterval(timer);
           resolve();
         }
-
+        document
+          .querySelectorAll(
+            '.oajrlxb2.g5ia77u1.mtkw9kbi.tlpljxtp.qensuy8j.ppp5ayq2.goun2846.ccm00jje.s44p3ltw.mk2mc5f4.rt8b4zig.n8ej3o3l.agehan2d.sk4xxmp2.rq0escxv.nhd2j8a9.mg4g778l.p7hjln8o.kvgmc6g5.cxmmr5t8.oygrvhab.hcukyx3x.tgvbjcpo.hpfvmrgz.jb3vyjys.qt6c0cv9.a8nywdso.l9j0dhe7.i1ao9s8h.esuyzwwr.f1sip0of.du4w35lb.n00je7tq.arfg74bv.qs9ysxi8.k77z8yql.pq6dq46d.btwxx1t3.abiwlrkh.lzcic4wl.bp9cbjyn.m9osqain.buofh1pr.g5gj957u.p8fzw8mz.gpro0wi8'
+          )
+          .forEach((el) => el.click());
         document
           .querySelectorAll('.j83agx80.buofh1pr.jklb3kyz.l9j0dhe7')
           .forEach((el) => el.click());
@@ -60,22 +55,22 @@ module.exports = async function main(req, res) {
     res.json('length is required');
   }
   const browser = await puppeteer.launch({
-    headless: true,
-    // defaultViewport: null,
-    // args: ['--start-maximized'],
+    headless: false,
+    defaultViewport: null,
+    args: ['--start-maximized'],
     ignoreHTTPSErrors: true,
-    ignoreDefaultArgs: ['--disable-extensions'],
-    args: [
-      '--no-sandbox',
-      '--disable-setuid-sandbox',
-      '--disable-dev-shm-usage',
-      '--single-process',
-    ],
-    // product: 'chrome',
-    // devtools: true,
-    // executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
+    // ignoreDefaultArgs: ['--disable-extensions'],
+    // args: [
+    //   '--no-sandbox',
+    //   '--disable-setuid-sandbox',
+    //   '--disable-dev-shm-usage',
+    //   '--single-process',
+    // ],
+    product: 'chrome',
+    devtools: true,
+    executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
   });
-  res.json('30 s sau vô đây lấy nha  http://localhost:3000/post');
+  // res.json('30 s sau vô đây lấy nha  http://localhost:3000/post');
 
   const page = await browser.newPage();
   const pages = await browser.pages();
@@ -102,16 +97,17 @@ module.exports = async function main(req, res) {
     //https://www.facebook.com/groups/364997627165697
     waitUntil: 'load',
   });
-  await page.waitForTimeout(3000);
   await autoScroll(page, (length = lengths));
   console.log('scroll done');
+  await page.waitForTimeout(10000);
   await takedata(page, (length = lengths)).then(async function (result) {
+    res.json('done');
     fs.writeFile(`item.txt`, JSON.stringify(result, null, 2), function (err) {
       if (err) throw err;
     });
   });
 
-  await browser.close();
+  // await browser.close();
 };
 async function takedata(page, length) {
   const dimension = await page.evaluate(async (length) => {
