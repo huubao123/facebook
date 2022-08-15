@@ -1,6 +1,7 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 const { request, globalAgent } = require('http');
+const { Console } = require('console');
 async function autoScroll(page, _length) {
   const getdata = await page.evaluate(async (_length) => {
     const data = await new Promise((resolve, reject) => {
@@ -100,13 +101,12 @@ module.exports = async function main(req, res) {
   await autoScroll(page, (length = lengths));
   console.log('scroll done');
   await takedata(page, (length = lengths)).then(async function (result) {
-    // res.json('done');
     fs.writeFile(`item.txt`, JSON.stringify(result, null, 2), function (err) {
       if (err) throw err;
     });
   });
 
-  // await browser.close();
+  await browser.close();
 };
 async function takedata(page, length) {
   const dimension = await page.evaluate(async (length) => {
@@ -134,9 +134,10 @@ async function takedata(page, length) {
       user_cmtchild_id =
       user_name_cmtchild =
       user_cmtchild_href =
+      imgComment =
         '');
     let data = [];
-    for (let i = 1; i < length + 1; i++) {
+    for (let i = 1; i <= length; i++) {
       try {
         let contens =
           post[i].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
@@ -369,18 +370,15 @@ async function takedata(page, length) {
                 if (elementss.childNodes[0].childNodes.length == 2) {
                   if (
                     elementss.childNodes[0].childNodes[1].childNodes[0]
-                      .childNodes[0].childNodes[0].children[0].childNodes[0]
+                      .childNodes[0].childNodes[0].childNodes[0].childNodes[0]
                       .childNodes[0].childNodes &&
                     elementss.childNodes[0].childNodes[1].childNodes[0]
                       .childNodes[0].childNodes[0].children[0].childNodes[0]
                       .childNodes[0].childNodes.nodeName == 'SPAN'
                   ) {
                     elementss.childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes[0].children[0].childNodes[0].childNodes[0].childNodes.forEach(
-                      (elementsss) => {
-                        if (
-                          elementsss.nodeName == 'SPAN' &&
-                          elementsss.className == ''
-                        ) {
+                      (elementsss, index) => {
+                        if (elementsss.nodeName == 'SPAN' && index == 0) {
                           user_cmt_href =
                             elementsss.childNodes[0].childNodes[0].href;
                           user_name_cmt =
@@ -402,12 +400,21 @@ async function takedata(page, length) {
                       .childNodes[0].childNodes[0].childNodes[0].childNodes[0]
                       .childNodes.length > 1 &&
                     elementss.childNodes[0].childNodes[1].childNodes[0]
-                      .childNodes[0].childNodes[0].children[0].childNodes[0]
+                      .childNodes[0].childNodes[0].childNodes[0].childNodes[0]
                       .childNodes[0].childNodes[0].nodeName !== 'SPAN'
                   ) {
+                    elementss.childNodes[0].childNodes[1].childNodes[1].childNodes.forEach(
+                      (elementsss, index) => {
+                        if (elementsss.nodeName == 'DIV' && index == 1) {
+                          imgComment =
+                            elementsss.childNodes[0].childNodes[0].childNodes[0]
+                              .childNodes[0].childNodes[0].href;
+                        }
+                      }
+                    );
                     elementss.childNodes[0].childNodes[1].childNodes[1].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes.forEach(
-                      (cmt) => {
-                        if (cmt.nodeName == 'SPAN' && cmt.className == '') {
+                      (cmt, index) => {
+                        if (cmt.nodeName == 'SPAN' && index == 0) {
                           user_cmt_href = cmt.childNodes[0].childNodes[0].href;
                           user_name_cmt =
                             cmt.childNodes[0].childNodes[0].innerText;
@@ -427,9 +434,18 @@ async function takedata(page, length) {
                       .childNodes[0].childNodes[0].children[0].childNodes[0]
                       .childNodes[0].childNodes[0].nodeName !== 'SPAN'
                   ) {
+                    elementss.childNodes[0].childNodes[1].childNodes[1].childNodes.forEach(
+                      (elementsss, index) => {
+                        if (elementsss.nodeName == 'DIV' && index == 1) {
+                          imgComment =
+                            elementsss.childNodes[0].childNodes[0].childNodes[0]
+                              .childNodes[0].childNodes[0].href;
+                        }
+                      }
+                    );
                     elementss.childNodes[0].childNodes[1].childNodes[1].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes.forEach(
-                      (child) => {
-                        if (child.nodeName == 'SPAN' && child.className == '') {
+                      (child, index) => {
+                        if (child.nodeName == 'SPAN' && index == 0) {
                           user_cmt_href =
                             child.childNodes[0].childNodes[0].href;
                           user_name_cmt =
@@ -471,10 +487,10 @@ async function takedata(page, length) {
                                 cmt_old.childNodes[
                                   m
                                 ].childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes.forEach(
-                                  (child) => {
+                                  (child, index) => {
                                     if (
                                       child.nodeName == 'SPAN' &&
-                                      child.className == ''
+                                      index == 0
                                     ) {
                                       user_cmtchild_href =
                                         child.childNodes[0].childNodes[0].href;
@@ -525,6 +541,7 @@ async function takedata(page, length) {
                                 //     );
                                 //   }
                                 // }
+
                                 children.push({
                                   user_cmtchild_href: user_cmtchild_href
                                     ? user_cmtchild_href
@@ -583,6 +600,10 @@ async function takedata(page, length) {
                             m++
                           ) {
                             try {
+                              // console.log(
+                              //   elementsss.childNodes[m].childNodes[0]
+                              //     .childNodes
+                              // );
                               children_div =
                                 elementsss.childNodes[m].childNodes[0]
                                   .childNodes[
@@ -590,15 +611,9 @@ async function takedata(page, length) {
                                     .childNodes.length - 1
                                 ].childNodes[1].childNodes[0].childNodes[0]
                                   .childNodes[0].childNodes[0].childNodes;
-                              if (
-                                children_div.length == 3 ||
-                                children_div.length == 2
-                              ) {
-                                children_div.forEach((child) => {
-                                  if (
-                                    child.nodeName == 'SPAN' &&
-                                    child.className == ''
-                                  ) {
+                              if (children_div.length > 1) {
+                                children_div.forEach((child, index) => {
+                                  if (child.nodeName == 'SPAN' && index == 0) {
                                     user_cmtchild_href =
                                       child.childNodes[0].childNodes[0].href;
                                     user_name_cmtchild =
@@ -616,10 +631,10 @@ async function takedata(page, length) {
                                 });
                               } else {
                                 children_div[0].childNodes[0].childNodes.forEach(
-                                  (child) => {
+                                  (child, index) => {
                                     if (
                                       child.nodeName == 'SPAN' &&
-                                      child.className == ''
+                                      index == 0
                                     ) {
                                       user_cmtchild_href =
                                         child.childNodes[0].childNodes[0].href;
@@ -719,50 +734,34 @@ async function takedata(page, length) {
                     );
                   }
                 } else {
-                  divcommment =
-                    elementss.childNodes[0].childNodes[0].childNodes[1]
-                      .childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                      .childNodes;
-                  console.log(divcommment);
-                  if (divcommment.length == 2) {
-                    user_cmt_href =
-                      divcommment[0].childNodes[0].childNodes[0].href;
-                    user_name_cmt =
-                      divcommment[0].childNodes[0].childNodes[0].innerText;
-                    user_cmt_id =
-                      divcommment[0].childNodes[0].childNodes[0].href.split(
-                        '/'
-                      )[6];
-                    cotent_cmt =
-                      divcommment[1].childNodes[0].childNodes[0].innerHTML;
+                  divcommment = elementss.childNodes[0].childNodes[0]
+                    .childNodes[1].childNodes[0].childNodes[0]
+                    ? elementss.childNodes[0].childNodes[0].childNodes[1]
+                        .childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                        .childNodes
+                    : elementss.childNodes[0].childNodes[0].childNodes[1]
+                        .childNodes[1].childNodes[0].childNodes[0].childNodes[0]
+                        .childNodes;
+                  if (divcommment.length > 1) {
+                    divcommment.forEach((element, index) => {
+                      if (element.nodeName == 'SPAN' && index == 0) {
+                        user_cmt_href =
+                          element.childNodes[0].childNodes[0].href;
+                        user_name_cmt =
+                          element.childNodes[0].childNodes[0].innerText;
+                        user_cmt_id =
+                          element.childNodes[0].childNodes[0].href.split(
+                            '/'
+                          )[6];
+                      } else if (element.nodeName == 'DIV') {
+                        cotent_cmt =
+                          element.childNodes[0].childNodes[0].innerHTML;
+                      }
+                    });
                   } else if (divcommment.length == 1) {
-                    user_cmt_href =
-                      divcommment[0].childNodes[0].childNodes[0].childNodes[0]
-                        .childNodes[0].href;
-                    user_name_cmt =
-                      divcommment[0].childNodes[0].childNodes[0].childNodes[0]
-                        .childNodes[0].innerText;
-                    user_cmt_id =
-                      divcommment[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].href.split(
-                        '/'
-                      )[6];
-
-                    if (divcommment[0].childNodes[0].childNodes.length == 3) {
-                      cotent_cmt =
-                        divcommment[0].childNodes[0].childNodes[2].childNodes[0]
-                          .childNodes[0].innerHTML;
-                    } else {
-                      cotent_cmt =
-                        divcommment[0].childNodes[0].childNodes[1].childNodes[0]
-                          .childNodes[0].innerHTML;
-                    }
-
                     divcommment[0].childNodes[0].childNodes.forEach(
-                      (element) => {
-                        if (
-                          element.nodeName == 'SPAN' &&
-                          element.className == ''
-                        ) {
+                      (element, index) => {
+                        if (element.nodeName == 'SPAN' && index == 0) {
                           user_cmt_href =
                             element.childNodes[0].childNodes[0].href;
                           user_name_cmt =
@@ -777,17 +776,6 @@ async function takedata(page, length) {
                         }
                       }
                     );
-                  } else if (divcommment.length == 3) {
-                    user_cmt_href =
-                      divcommment[0].childNodes[0].childNodes[0].href;
-                    user_name_cmt =
-                      divcommment[0].childNodes[0].childNodes[0].innerText;
-                    user_cmt_id =
-                      divcommment[0].childNodes[0].childNodes[0].href.split(
-                        '/'
-                      )[6];
-                    cotent_cmt =
-                      divcommment[2].childNodes[0].childNodes[0].innerHTML;
                   }
                 }
                 commmets.push({
@@ -795,9 +783,15 @@ async function takedata(page, length) {
                   user_name_cmt: user_name_cmt,
                   user_cmt_id: user_cmt_id,
                   user_cmt_href: user_cmt_href,
+                  imgComment: imgComment,
                   children: children,
                 });
-                cotent_cmt = user_cmt_id = user_name_cmt = user_cmt_href = '';
+                cotent_cmt =
+                  user_cmt_id =
+                  user_name_cmt =
+                  user_cmt_href =
+                  imgComment =
+                    '';
                 children = [];
               });
             }
@@ -811,26 +805,32 @@ async function takedata(page, length) {
             user_cmt_id: user_cmt_id ? user_cmt_id : '',
             user_cmt_href: user_cmt_href ? user_cmt_href : '',
             children: children ? children : [],
+            imgComment: imgComment ? imgComment : '',
             statusbar_cmt: '',
           });
-          cotent_cmt = user_cmt_id = user_name_cmt = user_cmt_href = '';
+          cotent_cmt =
+            user_cmt_id =
+            user_name_cmt =
+            user_cmt_href =
+            imgComment =
+              '';
           children = [];
         }
 
         data.push({
-          userhref: userhref,
-          user_name: user_name,
-          content: content,
-          categori: categori,
-          count_comments: count_comments,
-          user_id: user_id,
-          likes: likes,
-          shares: shares,
-          post_id: post_id,
-          posthref: posthref,
-          video: video,
-          image_href: image_href,
-          commmets: commmets,
+          userhref: userhref ? userhref : '',
+          user_name: user_name ? user_name : '',
+          content: content ? content : '',
+          categori: categori ? categori : '',
+          count_comments: count_comments ? count_comments : '',
+          user_id: user_id ? user_id : '',
+          likes: likes ? likes : '',
+          shares: shares ? shares : '',
+          post_id: post_id ? post_id : '',
+          posthref: posthref ? posthref : '',
+          video: video ? video : '',
+          image_href: image_href ? image_href : '',
+          commmets: commmets ? commmets : '',
         });
         userhref =
           user_name =
