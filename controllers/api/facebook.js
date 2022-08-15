@@ -55,22 +55,22 @@ module.exports = async function main(req, res) {
     res.json('length is required');
   }
   const browser = await puppeteer.launch({
-    headless: false,
-    defaultViewport: null,
-    args: ['--start-maximized'],
+    // headless: false,
+    // defaultViewport: null,
+    // args: ['--start-maximized'],
     ignoreHTTPSErrors: true,
-    // ignoreDefaultArgs: ['--disable-extensions'],
-    // args: [
-    //   '--no-sandbox',
-    //   '--disable-setuid-sandbox',
-    //   '--disable-dev-shm-usage',
-    //   '--single-process',
-    // ],
-    product: 'chrome',
-    devtools: true,
-    executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
+    ignoreDefaultArgs: ['--disable-extensions'],
+    args: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-dev-shm-usage',
+      '--single-process',
+    ],
+    // product: 'chrome',
+    // devtools: true,
+    // executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
   });
-  // res.json('30 s sau vô đây lấy nha  http://localhost:3000/post');
+  res.json('đợi tí rồi chuyển thành get rồi lấy data nha');
 
   const page = await browser.newPage();
   const pages = await browser.pages();
@@ -99,9 +99,8 @@ module.exports = async function main(req, res) {
   });
   await autoScroll(page, (length = lengths));
   console.log('scroll done');
-  await page.waitForTimeout(10000);
   await takedata(page, (length = lengths)).then(async function (result) {
-    res.json('done');
+    // res.json('done');
     fs.writeFile(`item.txt`, JSON.stringify(result, null, 2), function (err) {
       if (err) throw err;
     });
@@ -362,19 +361,49 @@ async function takedata(page, length) {
             }
           });
         }
+
         try {
           divcommment.forEach((element) => {
             if (element.nodeName == 'UL') {
               element.childNodes.forEach((elementss) => {
-                console.log(elementss);
                 if (elementss.childNodes[0].childNodes.length == 2) {
+                  if (
+                    elementss.childNodes[0].childNodes[1].childNodes[0]
+                      .childNodes[0].childNodes[0].children[0].childNodes[0]
+                      .childNodes[0].childNodes &&
+                    elementss.childNodes[0].childNodes[1].childNodes[0]
+                      .childNodes[0].childNodes[0].children[0].childNodes[0]
+                      .childNodes[0].childNodes.nodeName == 'SPAN'
+                  ) {
+                    elementss.childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes[0].children[0].childNodes[0].childNodes[0].childNodes.forEach(
+                      (elementsss) => {
+                        if (
+                          elementsss.nodeName == 'SPAN' &&
+                          elementsss.className == ''
+                        ) {
+                          user_cmt_href =
+                            elementsss.childNodes[0].childNodes[0].href;
+                          user_name_cmt =
+                            elementsss.childNodes[0].childNodes[0].innerText;
+                          user_cmt_id =
+                            elementsss.childNodes[0].childNodes[0].href.split(
+                              '/'
+                            )[6];
+                        } else if (elementsss.nodeName == 'DIV') {
+                          cotent_cmt =
+                            elementsss.childNodes[0].childNodes[0].innerHTML;
+                        }
+                      }
+                    );
+                  }
+
                   if (
                     elementss.childNodes[0].childNodes[1].childNodes[1]
                       .childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                      .childNodes.length == 3 ||
-                    elementss.childNodes[0].childNodes[1].childNodes[1]
-                      .childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                      .childNodes.length == 2
+                      .childNodes.length > 1 &&
+                    elementss.childNodes[0].childNodes[1].childNodes[0]
+                      .childNodes[0].childNodes[0].children[0].childNodes[0]
+                      .childNodes[0].childNodes[0].nodeName !== 'SPAN'
                   ) {
                     elementss.childNodes[0].childNodes[1].childNodes[1].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes.forEach(
                       (cmt) => {
@@ -390,7 +419,14 @@ async function takedata(page, length) {
                         }
                       }
                     );
-                  } else {
+                  } else if (
+                    elementss.childNodes[0].childNodes[1].childNodes[1]
+                      .childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                      .childNodes.length == 1 &&
+                    elementss.childNodes[0].childNodes[1].childNodes[0]
+                      .childNodes[0].childNodes[0].children[0].childNodes[0]
+                      .childNodes[0].childNodes[0].nodeName !== 'SPAN'
+                  ) {
                     elementss.childNodes[0].childNodes[1].childNodes[1].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes.forEach(
                       (child) => {
                         if (child.nodeName == 'SPAN' && child.className == '') {
@@ -405,47 +441,160 @@ async function takedata(page, length) {
                         } else if (child.nodeName == 'DIV') {
                           cotent_cmt =
                             child.childNodes[0].childNodes[0].innerHTML;
+                        } else if (child.nodeName == 'A') {
+                          user_cmt_href = child.href;
+                          user_name_cmt = child.innerText;
+                          user_cmt_id = child.href.split('/')[6];
+                          cotent_cmt = 'Icon Facebook';
                         }
                       }
                     );
                   }
-
-                  elementss.childNodes[1].childNodes[0].childNodes.forEach(
-                    (elementsss) => {
-                      if (elementsss.nodeName == 'UL') {
-                        for (let m = 0; m < elementsss.childNodes.length; m++) {
-                          try {
-                            children_div =
-                              elementsss.childNodes[m].childNodes[0].childNodes[
-                                elementsss.childNodes[m].childNodes[0]
-                                  .childNodes.length - 1
-                              ].childNodes[1].childNodes[0].childNodes[0]
-                                .childNodes[0].childNodes[0].childNodes;
-                            if (
-                              children_div.length == 3 ||
-                              children_div.length == 2
+                  if (
+                    elementss.childNodes[0].childNodes[1].childNodes[0]
+                      .childNodes[0].childNodes[0].children[0].childNodes[0]
+                      .childNodes[0].childNodes[0].nodeName == 'SPAN'
+                  ) {
+                    if (
+                      elementss.childNodes[1].childNodes[0].childNodes.length >
+                      0
+                    ) {
+                      elementss.childNodes[1].childNodes[0].childNodes.forEach(
+                        (cmt_old) => {
+                          if (cmt_old.nodeName == 'UL') {
+                            for (
+                              let m = 0;
+                              m < cmt_old.childNodes.length;
+                              m++
                             ) {
-                              children_div.forEach((child) => {
-                                if (
-                                  child.nodeName == 'SPAN' &&
-                                  child.className == ''
-                                ) {
-                                  user_cmtchild_href =
-                                    child.childNodes[0].childNodes[0].href;
+                              try {
+                                cmt_old.childNodes[
+                                  m
+                                ].childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes.forEach(
+                                  (child) => {
+                                    if (
+                                      child.nodeName == 'SPAN' &&
+                                      child.className == ''
+                                    ) {
+                                      user_cmtchild_href =
+                                        child.childNodes[0].childNodes[0].href;
+                                      user_name_cmtchild =
+                                        child.childNodes[0].childNodes[0]
+                                          .innerText;
+                                      user_cmtchild_id =
+                                        child.childNodes[0].childNodes[0].href.split(
+                                          '/'
+                                        )[6];
+                                    } else if (child.nodeName == 'DIV') {
+                                      cotent_cmtchild =
+                                        child.childNodes[0].childNodes[0]
+                                          .innerHTML;
+                                    }
+                                  }
+                                );
+
+                                // if (
+                                //   elementsss.childNodes[m].childNodes[1]
+                                //     .className == ''
+                                // ) {
+                                //   children2 =
+                                //     elementsss.childNodes[m].childNodes[1]
+                                //       .childNodes[0].childNodes;
+                                //   for (let n = 0; n < children2.length; n++) {
+                                //     children2[n].childNodes[0].childNodes[
+                                //       children2[n].childNodes[0].childNodes.length -
+                                //         1
+                                //     ].childNodes[1].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes.forEach(
+                                //       (child) => {
+                                //         if (child.nodeName == 'SPAN') {
+                                //           user_cmtchild_href =
+                                //             child.childNodes[0].childNodes[0].href;
+                                //           user_name_cmtchild =
+                                //             child.childNodes[0].childNodes[0]
+                                //               .innerText;
+                                //           user_cmtchild_id =
+                                //             child.childNodes[0].childNodes[0].href.split(
+                                //               '/'
+                                //             )[6];
+                                //         } else if (child.nodeName == 'DIV') {
+                                //           cotent_cmtchild =
+                                //             child.childNodes[0].childNodes[0]
+                                //               .innerHTML;
+                                //         }
+                                //       }
+                                //     );
+                                //   }
+                                // }
+                                children.push({
+                                  user_cmtchild_href: user_cmtchild_href
+                                    ? user_cmtchild_href
+                                    : '',
+                                  user_name_cmtchild: user_name_cmtchild
+                                    ? user_name_cmtchild
+                                    : '',
+                                  user_cmtchild_id: user_cmtchild_id
+                                    ? user_cmtchild_id
+                                    : '',
+                                  cotent_cmtchild: cotent_cmtchild
+                                    ? cotent_cmtchild
+                                    : '',
+                                });
+                                user_cmtchild_href =
                                   user_name_cmtchild =
-                                    child.childNodes[0].childNodes[0].innerText;
                                   user_cmtchild_id =
-                                    child.childNodes[0].childNodes[0].href.split(
-                                      '/'
-                                    )[6];
-                                } else if (child.nodeName == 'DIV') {
                                   cotent_cmtchild =
-                                    child.childNodes[0].childNodes[0].innerHTML;
-                                }
-                              });
-                            } else {
-                              children_div[0].childNodes[0].childNodes.forEach(
-                                (child) => {
+                                    '';
+                              } catch (e) {
+                                console.log('children error');
+                                console.log(e);
+                                children.push({
+                                  user_cmtchild_href: user_cmtchild_href
+                                    ? user_cmtchild_href
+                                    : '',
+                                  user_name_cmtchild: user_name_cmtchild
+                                    ? user_name_cmtchild
+                                    : '',
+                                  user_cmtchild_id: user_cmtchild_id
+                                    ? user_cmtchild_id
+                                    : '',
+                                  cotent_cmtchild: cotent_cmtchild
+                                    ? cotent_cmtchild
+                                    : '',
+                                  statusbar_cmtchild: '',
+                                });
+                                user_cmtchild_href =
+                                  user_name_cmtchild =
+                                  user_cmtchild_id =
+                                  cotent_cmtchild =
+                                    '';
+                              }
+                            }
+                          }
+                        }
+                      );
+                    }
+                  } else {
+                    elementss.childNodes[1].childNodes[0].childNodes.forEach(
+                      (elementsss) => {
+                        if (elementsss.nodeName == 'UL') {
+                          for (
+                            let m = 0;
+                            m < elementsss.childNodes.length;
+                            m++
+                          ) {
+                            try {
+                              children_div =
+                                elementsss.childNodes[m].childNodes[0]
+                                  .childNodes[
+                                  elementsss.childNodes[m].childNodes[0]
+                                    .childNodes.length - 1
+                                ].childNodes[1].childNodes[0].childNodes[0]
+                                  .childNodes[0].childNodes[0].childNodes;
+                              if (
+                                children_div.length == 3 ||
+                                children_div.length == 2
+                              ) {
+                                children_div.forEach((child) => {
                                   if (
                                     child.nodeName == 'SPAN' &&
                                     child.className == ''
@@ -464,106 +613,150 @@ async function takedata(page, length) {
                                       child.childNodes[0].childNodes[0]
                                         .innerHTML;
                                   }
-                                }
-                              );
+                                });
+                              } else {
+                                children_div[0].childNodes[0].childNodes.forEach(
+                                  (child) => {
+                                    if (
+                                      child.nodeName == 'SPAN' &&
+                                      child.className == ''
+                                    ) {
+                                      user_cmtchild_href =
+                                        child.childNodes[0].childNodes[0].href;
+                                      user_name_cmtchild =
+                                        child.childNodes[0].childNodes[0]
+                                          .innerText;
+                                      user_cmtchild_id =
+                                        child.childNodes[0].childNodes[0].href.split(
+                                          '/'
+                                        )[6];
+                                    } else if (child.nodeName == 'DIV') {
+                                      cotent_cmtchild =
+                                        child.childNodes[0].childNodes[0]
+                                          .innerHTML;
+                                    }
+                                  }
+                                );
+                              }
+                              // if (
+                              //   elementsss.childNodes[m].childNodes[1]
+                              //     .className == ''
+                              // ) {
+                              //   children2 =
+                              //     elementsss.childNodes[m].childNodes[1]
+                              //       .childNodes[0].childNodes;
+                              //   for (let n = 0; n < children2.length; n++) {
+                              //     children2[n].childNodes[0].childNodes[
+                              //       children2[n].childNodes[0].childNodes.length -
+                              //         1
+                              //     ].childNodes[1].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes.forEach(
+                              //       (child) => {
+                              //         if (child.nodeName == 'SPAN') {
+                              //           user_cmtchild_href =
+                              //             child.childNodes[0].childNodes[0].href;
+                              //           user_name_cmtchild =
+                              //             child.childNodes[0].childNodes[0]
+                              //               .innerText;
+                              //           user_cmtchild_id =
+                              //             child.childNodes[0].childNodes[0].href.split(
+                              //               '/'
+                              //             )[6];
+                              //         } else if (child.nodeName == 'DIV') {
+                              //           cotent_cmtchild =
+                              //             child.childNodes[0].childNodes[0]
+                              //               .innerHTML;
+                              //         }
+                              //       }
+                              //     );
+                              //   }
+                              // }
+                              children.push({
+                                user_cmtchild_href: user_cmtchild_href
+                                  ? user_cmtchild_href
+                                  : '',
+                                user_name_cmtchild: user_name_cmtchild
+                                  ? user_name_cmtchild
+                                  : '',
+                                user_cmtchild_id: user_cmtchild_id
+                                  ? user_cmtchild_id
+                                  : '',
+                                cotent_cmtchild: cotent_cmtchild
+                                  ? cotent_cmtchild
+                                  : '',
+                              });
+                              user_cmtchild_href =
+                                user_name_cmtchild =
+                                user_cmtchild_id =
+                                cotent_cmtchild =
+                                  '';
+                            } catch (e) {
+                              console.log('children error');
+                              console.log(e);
+                              children.push({
+                                user_cmtchild_href: user_cmtchild_href
+                                  ? user_cmtchild_href
+                                  : '',
+                                user_name_cmtchild: user_name_cmtchild
+                                  ? user_name_cmtchild
+                                  : '',
+                                user_cmtchild_id: user_cmtchild_id
+                                  ? user_cmtchild_id
+                                  : '',
+                                cotent_cmtchild: cotent_cmtchild
+                                  ? cotent_cmtchild
+                                  : '',
+                                statusbar_cmtchild: '',
+                              });
+                              user_cmtchild_href =
+                                user_name_cmtchild =
+                                user_cmtchild_id =
+                                cotent_cmtchild =
+                                  '';
                             }
-                            // if (
-                            //   elementsss.childNodes[m].childNodes[1]
-                            //     .className == ''
-                            // ) {
-                            //   children2 =
-                            //     elementsss.childNodes[m].childNodes[1]
-                            //       .childNodes[0].childNodes;
-                            //   for (let n = 0; n < children2.length; n++) {
-                            //     children2[n].childNodes[0].childNodes[
-                            //       children2[n].childNodes[0].childNodes.length -
-                            //         1
-                            //     ].childNodes[1].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes.forEach(
-                            //       (child) => {
-                            //         if (child.nodeName == 'SPAN') {
-                            //           user_cmtchild_href =
-                            //             child.childNodes[0].childNodes[0].href;
-                            //           user_name_cmtchild =
-                            //             child.childNodes[0].childNodes[0]
-                            //               .innerText;
-                            //           user_cmtchild_id =
-                            //             child.childNodes[0].childNodes[0].href.split(
-                            //               '/'
-                            //             )[6];
-                            //         } else if (child.nodeName == 'DIV') {
-                            //           cotent_cmtchild =
-                            //             child.childNodes[0].childNodes[0]
-                            //               .innerHTML;
-                            //         }
-                            //       }
-                            //     );
-                            //   }
-                            // }
-                            children.push({
-                              user_cmtchild_href: user_cmtchild_href,
-                              user_name_cmtchild: user_name_cmtchild,
-                              user_cmtchild_id: user_cmtchild_id,
-                              cotent_cmtchild: cotent_cmtchild,
-                            });
-                            user_cmtchild_href =
-                              user_name_cmtchild =
-                              user_cmtchild_id =
-                              cotent_cmtchild =
-                                '';
-                          } catch (e) {
-                            console.log('children error');
-                            console.log(e);
-                            children.push({
-                              user_cmtchild_href: user_cmtchild_href
-                                ? user_cmtchild_href
-                                : '',
-                              user_name_cmtchild: user_name_cmtchild
-                                ? user_name_cmtchild
-                                : '',
-                              user_cmtchild_id: user_cmtchild_id
-                                ? user_cmtchild_id
-                                : '',
-                              cotent_cmtchild: cotent_cmtchild
-                                ? cotent_cmtchild
-                                : '',
-                              statusbar_cmtchild: '',
-                            });
-                            user_cmtchild_href =
-                              user_name_cmtchild =
-                              user_cmtchild_id =
-                              cotent_cmtchild =
-                                '';
                           }
                         }
                       }
-                    }
-                  );
+                    );
+                  }
                 } else {
                   divcommment =
                     elementss.childNodes[0].childNodes[0].childNodes[1]
                       .childNodes[0].childNodes[0].childNodes[0].childNodes[0]
                       .childNodes;
-
+                  console.log(divcommment);
                   if (divcommment.length == 2) {
-                    divcommment.forEach((elements) => {
-                      if (
-                        elements.nodeName == 'SPAN' &&
-                        elements.className == ''
-                      ) {
-                        user_cmt_href =
-                          elements.childNodes[0].childNodes[0].href;
-                        user_name_cmt =
-                          elements.childNodes[0].childNodes[0].innerText;
-                        user_cmt_id =
-                          elements.childNodes[0].childNodes[0].href.split(
-                            '/'
-                          )[6];
-                      } else if (elements.nodeName == 'DIV') {
-                        cotent_cmt =
-                          elements.childNodes[0].childNodes[0].innerHTML;
-                      }
-                    });
-                  } else {
+                    user_cmt_href =
+                      divcommment[0].childNodes[0].childNodes[0].href;
+                    user_name_cmt =
+                      divcommment[0].childNodes[0].childNodes[0].innerText;
+                    user_cmt_id =
+                      divcommment[0].childNodes[0].childNodes[0].href.split(
+                        '/'
+                      )[6];
+                    cotent_cmt =
+                      divcommment[1].childNodes[0].childNodes[0].innerHTML;
+                  } else if (divcommment.length == 1) {
+                    user_cmt_href =
+                      divcommment[0].childNodes[0].childNodes[0].childNodes[0]
+                        .childNodes[0].href;
+                    user_name_cmt =
+                      divcommment[0].childNodes[0].childNodes[0].childNodes[0]
+                        .childNodes[0].innerText;
+                    user_cmt_id =
+                      divcommment[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].href.split(
+                        '/'
+                      )[6];
+
+                    if (divcommment[0].childNodes[0].childNodes.length == 3) {
+                      cotent_cmt =
+                        divcommment[0].childNodes[0].childNodes[2].childNodes[0]
+                          .childNodes[0].innerHTML;
+                    } else {
+                      cotent_cmt =
+                        divcommment[0].childNodes[0].childNodes[1].childNodes[0]
+                          .childNodes[0].innerHTML;
+                    }
+
                     divcommment[0].childNodes[0].childNodes.forEach(
                       (element) => {
                         if (
@@ -584,6 +777,17 @@ async function takedata(page, length) {
                         }
                       }
                     );
+                  } else if (divcommment.length == 3) {
+                    user_cmt_href =
+                      divcommment[0].childNodes[0].childNodes[0].href;
+                    user_name_cmt =
+                      divcommment[0].childNodes[0].childNodes[0].innerText;
+                    user_cmt_id =
+                      divcommment[0].childNodes[0].childNodes[0].href.split(
+                        '/'
+                      )[6];
+                    cotent_cmt =
+                      divcommment[2].childNodes[0].childNodes[0].innerHTML;
                   }
                 }
                 commmets.push({
