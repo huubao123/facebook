@@ -135,6 +135,7 @@ async function takedata(page, length) {
       user_name_cmtchild =
       user_cmtchild_href =
         '');
+    //
     let data = [];
     for (let i = 1; i < length + 1; i++) {
       try {
