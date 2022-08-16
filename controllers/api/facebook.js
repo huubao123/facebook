@@ -121,6 +121,7 @@ async function takedata(page, length) {
       categori =
       likes =
       count_comments =
+      imgComment_cmt =
       shares =
       time =
       videohref =
@@ -135,6 +136,8 @@ async function takedata(page, length) {
       user_name_cmtchild =
       user_cmtchild_href =
       imgComment =
+      count_like_cmt =
+      count_like_cmtchild =
         '');
     //
     let data = [];
@@ -642,30 +645,30 @@ async function takedata(page, length) {
                                       .childNodes[0].childNodes[0].childNodes;
                               }
 
-                              // if (
-                              //   children_div[0].parentNode.parentNode.parentNode
-                              //     .parentNode.parentNode.childNodes.length > 2
-                              // ) {
-                              //   console.log(
-                              //     children_div[0].parentNode.parentNode
-                              //       .parentNode.parentNode.parentNode
-                              //       .childNodes[1].childNodes[0].childNodes
-                              //   );
-                              // }
-                              // if (
-                              //   (children_div.parentNode.parentNode.parentNode
-                              //     )
-                              // ) {
-                              //   console.log(
-                              //     (children_div =
-                              //       elementsss.childNodes[m].childNodes[0]
-                              //         .childNodes[
-                              //         elementsss.childNodes[m].childNodes[0]
-                              //           .childNodes.length - 1
-                              //       ].childNodes[1].childNodes[1].childNodes[0]
-                              //         .childNodes[0].childNodes[0].childNodes)
-                              //   );
-                              // }
+                              if (
+                                children_div[0].parentNode.parentNode.parentNode
+                                  .parentNode.parentNode.childNodes.length > 2
+                              ) {
+                                if (
+                                  children_div[0].parentNode.parentNode
+                                    .parentNode.parentNode.parentNode
+                                    .childNodes[1].childNodes[0].childNodes
+                                    .length > 1
+                                ) {
+                                  imgComment_cmt =
+                                    children_div[0].parentNode.parentNode
+                                      .parentNode.parentNode.parentNode
+                                      .childNodes[1].childNodes[0].childNodes[0]
+                                      .childNodes[0].childNodes[0].childNodes[0]
+                                      .href;
+                                  count_like_cmtchild =
+                                    children_div[0].parentNode.parentNode
+                                      .parentNode.parentNode.parentNode
+                                      .childNodes[1].childNodes[0].childNodes[1]
+                                      .childNodes[0].childNodes[0].childNodes[0]
+                                      .childNodes[0].innerHTML;
+                                }
+                              }
                               if (children_div.length > 1) {
                                 children_div.forEach((child, index) => {
                                   if (child.nodeName == 'SPAN' && index == 0) {
@@ -753,12 +756,21 @@ async function takedata(page, length) {
                                 cotent_cmtchild: cotent_cmtchild
                                   ? cotent_cmtchild
                                   : '',
+                                imgComment: imgComment_cmt
+                                  ? imgComment_cmt
+                                  : '',
+                                count_like: count_like_cmtchild
+                                  ? count_like_cmtchild
+                                  : '',
                               });
                               user_cmtchild_href =
                                 user_name_cmtchild =
                                 user_cmtchild_id =
                                 cotent_cmtchild =
+                                imgComment_cmt =
+                                count_like_cmtchild =
                                   '';
+                              ('');
                             } catch (e) {
                               console.log('children error');
                               console.log(e);
@@ -775,11 +787,20 @@ async function takedata(page, length) {
                                 cotent_cmtchild: cotent_cmtchild
                                   ? cotent_cmtchild
                                   : '',
+                                imgComment: imgComment_cmt
+                                  ? imgComment_cmt
+                                  : '',
+                                count_like: count_like_cmtchild
+                                  ? count_like_cmtchild
+                                  : '',
+
                                 statusbar_cmtchild: '',
                               });
                               user_cmtchild_href =
                                 user_name_cmtchild =
                                 user_cmtchild_id =
+                                imgComment_cmt =
+                                count_like_cmtchild =
                                 cotent_cmtchild =
                                   '';
                             }
@@ -789,14 +810,62 @@ async function takedata(page, length) {
                     );
                   }
                 } else {
-                  divcommment = elementss.childNodes[0].childNodes[0]
-                    .childNodes[1].childNodes[0].childNodes[0]
-                    ? elementss.childNodes[0].childNodes[0].childNodes[1]
+                  if (
+                    elementss.childNodes[0].childNodes[0].childNodes[1]
+                      .childNodes[0].childNodes[0]
+                  ) {
+                    divcommment =
+                      elementss.childNodes[0].childNodes[0].childNodes[1]
                         .childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                        .childNodes
-                    : elementss.childNodes[0].childNodes[0].childNodes[1]
+                        .childNodes;
+                    if (
+                      elementss.childNodes[0].childNodes[0].childNodes[1]
+                        .childNodes.length == 3
+                    ) {
+                      if (
+                        elementss.childNodes[0].childNodes[0].childNodes[1]
+                          .childNodes[1].childNodes[0].childNodes.length == 2
+                      ) {
+                        count_like_cmt = elementss.childNodes[0].childNodes[0]
+                          .childNodes[1].childNodes[1].childNodes[0]
+                          .childNodes[1].innerText
+                          ? elementss.childNodes[0].childNodes[0].childNodes[1]
+                              .childNodes[1].childNodes[0].childNodes[1]
+                              .innerText
+                          : 1;
+                      }
+                      imgComment =
+                        elementss.childNodes[0].childNodes[0].childNodes[1]
+                          .childNodes[1].childNodes[0].childNodes[0]
+                          .childNodes[0].childNodes[0].childNodes[0].href;
+                    }
+                    if (
+                      elementss.childNodes[0].childNodes[0].childNodes[1]
+                        .childNodes[0].childNodes[0].childNodes[0].childNodes
+                        .length == 2
+                    ) {
+                      count_like_cmt = elementss.childNodes[0].childNodes[0]
+                        .childNodes[1].childNodes[0].childNodes[0].childNodes[0]
+                        .childNodes[1].innerText
+                        ? elementss.childNodes[0].childNodes[0].childNodes[1]
+                            .childNodes[0].childNodes[0].childNodes[0]
+                            .childNodes[1].innerText
+                        : 1;
+                    } else {
+                      count_like_cmt = 0;
+                    }
+                  } else {
+                    divcommment =
+                      elementss.childNodes[0].childNodes[0].childNodes[1]
                         .childNodes[1].childNodes[0].childNodes[0].childNodes[0]
                         .childNodes;
+                    count_like_cmt = 0;
+                  }
+
+                  // console.log([1].childNodes[0].childNodes[0].childNodes[0].childNodes
+                  // elementss.childNodes[0].childNodes[0].childNodes
+                  //[1].childNodes[1].childNodes[0].childNodes[0].childNodes[0].childNodes
+                  //);
                   if (divcommment.length > 1) {
                     divcommment.forEach((element, index) => {
                       if (element.nodeName == 'SPAN' && index == 0) {
@@ -834,11 +903,12 @@ async function takedata(page, length) {
                   }
                 }
                 commmets.push({
-                  cotent_cmt: cotent_cmt,
+                  content: cotent_cmt,
                   user_name_cmt: user_name_cmt,
                   user_cmt_id: user_cmt_id,
                   user_cmt_href: user_cmt_href,
                   imgComment: imgComment,
+                  count_like: count_like_cmt,
                   children: children,
                 });
                 cotent_cmt =
@@ -855,12 +925,13 @@ async function takedata(page, length) {
           console.log('error cmt');
           console.log(error);
           commmets.push({
-            cotent_cmt: cotent_cmt ? cotent_cmt : '',
+            content: cotent_cmt ? cotent_cmt : '',
             user_name_cmt: user_name_cmt ? user_name_cmt : '',
             user_cmt_id: user_cmt_id ? user_cmt_id : '',
             user_cmt_href: user_cmt_href ? user_cmt_href : '',
             children: children ? children : [],
             imgComment: imgComment ? imgComment : '',
+            count_like: count_like_cmt ? count_like_cmt : '',
             statusbar_cmt: '',
           });
           cotent_cmt =
@@ -877,14 +948,14 @@ async function takedata(page, length) {
           user_name: user_name ? user_name : '',
           content: content ? content : '',
           categori: categori ? categori : '',
-          count_comments: count_comments ? count_comments : '',
+          count_comment: count_comments ? count_comments : '',
           user_id: user_id ? user_id : '',
-          likes: likes ? likes : '',
-          shares: shares ? shares : '',
+          count_like: likes ? likes : '',
+          count_share: shares ? shares : '',
           post_id: post_id ? post_id : '',
           posthref: posthref ? posthref : '',
           video: video ? video : '',
-          image_href: image_href ? image_href : '',
+          featured_image: image_href ? image_href : '',
           commmets: commmets ? commmets : [],
         });
         userhref =
@@ -909,14 +980,14 @@ async function takedata(page, length) {
           user_name: user_name ? user_name : '',
           content: content ? content : '',
           categori: categori ? categori : '',
-          count_comments: count_comments ? count_comments : '',
+          count_comment: count_comments ? count_comments : '',
           user_id: user_id ? user_id : '',
-          likes: likes ? likes : '',
-          shares: shares ? shares : '',
+          count_like: likes ? likes : '',
+          count_share: shares ? shares : '',
           post_id: post_id ? post_id : '',
           posthref: posthref ? posthref : '',
           video: video ? video : '',
-          image_href: image_href ? image_href : '',
+          featured_image: image_href ? image_href : '',
           commmets: commmets ? commmets : [],
           statusbar: 'error',
         });
