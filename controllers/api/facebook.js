@@ -16,24 +16,15 @@ async function autoScroll(page, _length) {
           clearInterval(timer);
           resolve();
         }
-        document
-          .querySelectorAll(
-            '.oajrlxb2.g5ia77u1.mtkw9kbi.tlpljxtp.qensuy8j.ppp5ayq2.goun2846.ccm00jje.s44p3ltw.mk2mc5f4.rt8b4zig.n8ej3o3l.agehan2d.sk4xxmp2.rq0escxv.nhd2j8a9.mg4g778l.p7hjln8o.kvgmc6g5.cxmmr5t8.oygrvhab.hcukyx3x.tgvbjcpo.hpfvmrgz.jb3vyjys.qt6c0cv9.a8nywdso.l9j0dhe7.i1ao9s8h.esuyzwwr.f1sip0of.du4w35lb.n00je7tq.arfg74bv.qs9ysxi8.k77z8yql.pq6dq46d.btwxx1t3.abiwlrkh.lzcic4wl.bp9cbjyn.m9osqain.buofh1pr.g5gj957u.p8fzw8mz.gpro0wi8'
-          )
-          .forEach((el) => el.click());
-        document
-          .querySelectorAll('.j83agx80.buofh1pr.jklb3kyz.l9j0dhe7')
-          .forEach((el) => el.click());
-        document
-          .querySelectorAll(
-            '.oajrlxb2.g5ia77u1.qu0x051f.esr5mh6w.e9989ue4.r7d6kgcz.rq0escxv.nhd2j8a9.nc684nl6.p7hjln8o.kvgmc6g5.cxmmr5t8.oygrvhab.hcukyx3x.jb3vyjys.rz4wbd8a.qt6c0cv9.a8nywdso.i1ao9s8h.esuyzwwr.f1sip0of.lzcic4wl.gpro0wi8.oo9gr5id.lrazzd5p'
-          )
-          .forEach((el) => {
-            if (el.nodeName == 'DIV') {
-              el.click();
-            }
-          }); // document.querySelector('[aria-label="OK"]').click();
-
+        document.querySelectorAll('[role = "button"]').forEach((el) => {
+          if (
+            el.innerText.indexOf('Xem thêm') !== -1 ||
+            el.innerText.indexOf('phản hồi') !== -1 ||
+            el.innerText.indexOf('câu trả lời') !== -1
+          ) {
+            el.click();
+          }
+        });
         if (totalHeight >= scrollHeight) {
           clearInterval(timer);
           resolve();
@@ -61,7 +52,6 @@ module.exports = async function main(req, res) {
       '--no-sandbox',
       '--disable-setuid-sandbox',
       '--disable-dev-shm-usage',
-      '--single-process',
     ],
     // headless: false,
     // defaultViewport: null,
@@ -100,7 +90,6 @@ module.exports = async function main(req, res) {
   await autoScroll(page, (length = lengths));
   console.log('scroll done');
   await takedata(page, (length = lengths)).then(async function (result) {
-    // res.json('done');
     fs.writeFile(`item.txt`, JSON.stringify(result, null, 2), function (err) {
       if (err) throw err;
     });
@@ -367,10 +356,10 @@ async function takedata(page, length) {
           });
         }
 
-        try {
-          divcommment.forEach((element) => {
-            if (element.nodeName == 'UL') {
-              element.childNodes.forEach((elementss) => {
+        divcommment.forEach((element) => {
+          if (element.nodeName == 'UL') {
+            element.childNodes.forEach((elementss) => {
+              try {
                 if (elementss.childNodes[0].childNodes.length == 2) {
                   if (
                     elementss.childNodes[0].childNodes[1].childNodes[0]
@@ -392,13 +381,43 @@ async function takedata(page, length) {
                               '/'
                             )[6];
                         } else if (elementsss.nodeName == 'DIV') {
-                          cotent_cmt =
-                            elementsss.childNodes[0].childNodes[0].innerHTML;
+                          for (
+                            let l = 0;
+                            l < elementsss.childNodes[0].childNodes.length;
+                            l++
+                          ) {
+                            cotent_cmt +=
+                              elementsss.childNodes[0].childNodes[l].innerHTML;
+                          }
                         }
                       }
                     );
                   }
-
+                  // comment mới nhất hay chưa đọc
+                  if (
+                    elementss.childNodes[0].childNodes[1].childNodes[1]
+                      .childNodes.length > 2
+                  ) {
+                    elementss.childNodes[0].childNodes[1].childNodes[1].childNodes.forEach(
+                      (child, index) => {
+                        console.log(child.className);
+                        console.log(typeof child.className);
+                        if (
+                          child.className ==
+                          'is6700om i09qtzwb pmk7jnqg j9ispegn kr520xx4 dsl5tyj5'
+                        ) {
+                          console.log('true');
+                          divcommment_cmt =
+                            elementss.childNodes[0].childNodes[1].childNodes[1]
+                              .childNodes[1];
+                        } else {
+                          divcommment_cmt =
+                            elementss.childNodes[0].childNodes[1].childNodes[1]
+                              .childNodes[0];
+                        }
+                      }
+                    );
+                  }
                   if (
                     elementss.childNodes[0].childNodes[1].childNodes[1]
                       .childNodes[0].childNodes[0].childNodes[0].childNodes[0]
@@ -410,12 +429,39 @@ async function takedata(page, length) {
                     elementss.childNodes[0].childNodes[1].childNodes[1].childNodes.forEach(
                       (elementsss, index) => {
                         if (elementsss.nodeName == 'DIV' && index == 1) {
+                          if (elementsss.childNodes[0].childNodes.length > 1) {
+                            count_like_cmt =
+                              elementsss.childNodes[0].childNodes[1]
+                                .innerText == ''
+                                ? 1
+                                : elementsss.childNodes[0].childNodes[1]
+                                    .innerText;
+                          }
                           imgComment =
                             elementsss.childNodes[0].childNodes[0].childNodes[0]
                               .childNodes[0].childNodes[0].href;
                         }
                       }
                     );
+                    // đếm like comment
+                    if (
+                      elementss.childNodes[0].childNodes[1].childNodes[1]
+                        .childNodes[0].childNodes[0].childNodes[0].childNodes
+                        .length > 1
+                    ) {
+                      if (
+                        elementss.childNodes[0].childNodes[1].childNodes[1]
+                          .childNodes[0].childNodes[0].childNodes[0]
+                          .childNodes[1].innerText == ''
+                      ) {
+                        count_like_cmt = 1;
+                      } else {
+                        count_like_cmt =
+                          elementss.childNodes[0].childNodes[1].childNodes[1]
+                            .childNodes[0].childNodes[0].childNodes[0]
+                            .childNodes[1].innerText;
+                      }
+                    }
                     elementss.childNodes[0].childNodes[1].childNodes[1].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes.forEach(
                       (cmt, index) => {
                         if (cmt.nodeName == 'SPAN' && index == 0) {
@@ -425,8 +471,14 @@ async function takedata(page, length) {
                           user_cmt_id =
                             cmt.childNodes[0].childNodes[0].href.split('/')[6];
                         } else if (cmt.nodeName == 'DIV') {
-                          cotent_cmt =
-                            cmt.childNodes[0].childNodes[0].innerHTML;
+                          for (
+                            let l = 0;
+                            l < cmt.childNodes[0].childNodes.length;
+                            l++
+                          ) {
+                            cotent_cmt +=
+                              cmt.childNodes[0].childNodes[l].innerHTML;
+                          }
                         }
                       }
                     );
@@ -438,9 +490,30 @@ async function takedata(page, length) {
                       .childNodes[0].childNodes[0].children[0].childNodes[0]
                       .childNodes[0].childNodes[0].nodeName !== 'SPAN'
                   ) {
+                    // đếm like comment
+                    if (
+                      elementss.childNodes[0].childNodes[1].childNodes[1]
+                        .childNodes[0].childNodes[0].childNodes[0].childNodes
+                        .length > 1
+                    ) {
+                      if (
+                        elementss.childNodes[0].childNodes[1].childNodes[1]
+                          .childNodes[0].childNodes[0].childNodes[0]
+                          .childNodes[1].innerText == ''
+                      ) {
+                        count_like_cmt = 1;
+                      } else {
+                        count_like_cmt =
+                          elementss.childNodes[0].childNodes[1].childNodes[1]
+                            .childNodes[0].childNodes[0].childNodes[0]
+                            .childNodes[1].innerText;
+                      }
+                    }
+
                     elementss.childNodes[0].childNodes[1].childNodes[1].childNodes.forEach(
                       (elementsss, index) => {
                         if (elementsss.nodeName == 'DIV' && index == 1) {
+                          //console.log('1', elementsss);
                           imgComment =
                             elementsss.childNodes[0].childNodes[0].childNodes[0]
                               .childNodes[0].childNodes[0].href;
@@ -459,8 +532,14 @@ async function takedata(page, length) {
                               '/'
                             )[6];
                         } else if (child.nodeName == 'DIV') {
-                          cotent_cmt =
-                            child.childNodes[0].childNodes[0].innerHTML;
+                          for (
+                            let l = 0;
+                            l < child.childNodes[0].childNodes.length;
+                            l++
+                          ) {
+                            cotent_cmt +=
+                              child.childNodes[0].childNodes[l].innerHTML;
+                          }
                         } else if (child.nodeName == 'A') {
                           user_cmt_href = child.href;
                           user_name_cmt = child.innerText;
@@ -488,7 +567,6 @@ async function takedata(page, length) {
                               m++
                             ) {
                               try {
-                                // console.log(cmt_old.childNodes[m].childNodes[0].childNodes[1].childNodes)
                                 cmt_old.childNodes[
                                   m
                                 ].childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes.forEach(
@@ -507,9 +585,16 @@ async function takedata(page, length) {
                                           '/'
                                         )[6];
                                     } else if (child.nodeName == 'DIV') {
-                                      cotent_cmtchild =
-                                        child.childNodes[0].childNodes[0]
-                                          .innerHTML;
+                                      for (
+                                        let l = 0;
+                                        l <
+                                        child.childNodes[0].childNodes.length;
+                                        l++
+                                      ) {
+                                        cotent_cmtchild +=
+                                          child.childNodes[0].childNodes[l]
+                                            .innerHTML;
+                                      }
                                     }
                                   }
                                 );
@@ -660,13 +745,29 @@ async function takedata(page, length) {
                                       .parentNode.parentNode.parentNode
                                       .childNodes[1].childNodes[0].childNodes[0]
                                       .childNodes[0].childNodes[0].childNodes[0]
-                                      .href;
+                                      .childNodes[0].href;
                                   count_like_cmtchild =
                                     children_div[0].parentNode.parentNode
                                       .parentNode.parentNode.parentNode
                                       .childNodes[1].childNodes[0].childNodes[1]
-                                      .childNodes[0].childNodes[0].childNodes[0]
-                                      .childNodes[0].innerHTML;
+                                      .innerText == ''
+                                      ? 1
+                                      : children_div[0].parentNode.parentNode
+                                          .parentNode.parentNode.parentNode
+                                          .childNodes[1].childNodes[0]
+                                          .childNodes[1].innerText;
+                                }
+                              } else {
+                                if (
+                                  children_div[0].parentNode.parentNode
+                                    .childNodes.length > 1
+                                ) {
+                                  count_like_cmtchild =
+                                    children_div[0].parentNode.parentNode
+                                      .childNodes[1].innerText == ''
+                                      ? 1
+                                      : children_div[0].parentNode.parentNode
+                                          .childNodes[1].innerText;
                                 }
                               }
                               if (children_div.length > 1) {
@@ -682,9 +783,15 @@ async function takedata(page, length) {
                                         '/'
                                       )[6];
                                   } else if (child.nodeName == 'DIV') {
-                                    cotent_cmtchild =
-                                      child.childNodes[0].childNodes[0]
-                                        .innerHTML;
+                                    for (
+                                      let l = 0;
+                                      l < child.childNodes[0].childNodes.length;
+                                      l++
+                                    ) {
+                                      cotent_cmtchild +=
+                                        child.childNodes[0].childNodes[l]
+                                          .innerHTML;
+                                    }
                                   }
                                 });
                               } else {
@@ -704,45 +811,21 @@ async function takedata(page, length) {
                                           '/'
                                         )[6];
                                     } else if (child.nodeName == 'DIV') {
-                                      cotent_cmtchild =
-                                        child.childNodes[0].childNodes[0]
-                                          .innerHTML;
+                                      for (
+                                        let l = 0;
+                                        l <
+                                        child.childNodes[0].childNodes.length;
+                                        l++
+                                      ) {
+                                        cotent_cmtchild +=
+                                          child.childNodes[0].childNodes[l]
+                                            .innerHTML;
+                                      }
                                     }
                                   }
                                 );
                               }
-                              // if (
-                              //   elementsss.childNodes[m].childNodes[1]
-                              //     .className == ''
-                              // ) {
-                              //   children2 =
-                              //     elementsss.childNodes[m].childNodes[1]
-                              //       .childNodes[0].childNodes;
-                              //   for (let n = 0; n < children2.length; n++) {
-                              //     children2[n].childNodes[0].childNodes[
-                              //       children2[n].childNodes[0].childNodes.length -
-                              //         1
-                              //     ].childNodes[1].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes.forEach(
-                              //       (child) => {
-                              //         if (child.nodeName == 'SPAN') {
-                              //           user_cmtchild_href =
-                              //             child.childNodes[0].childNodes[0].href;
-                              //           user_name_cmtchild =
-                              //             child.childNodes[0].childNodes[0]
-                              //               .innerText;
-                              //           user_cmtchild_id =
-                              //             child.childNodes[0].childNodes[0].href.split(
-                              //               '/'
-                              //             )[6];
-                              //         } else if (child.nodeName == 'DIV') {
-                              //           cotent_cmtchild =
-                              //             child.childNodes[0].childNodes[0]
-                              //               .innerHTML;
-                              //         }
-                              //       }
-                              //     );
-                              //   }
-                              // }
+
                               children.push({
                                 user_cmtchild_href: user_cmtchild_href
                                   ? user_cmtchild_href
@@ -769,8 +852,118 @@ async function takedata(page, length) {
                                 cotent_cmtchild =
                                 imgComment_cmt =
                                 count_like_cmtchild =
+                                imgComment_cmt =
                                   '';
-                              ('');
+
+                              if (
+                                elementsss.childNodes[m].childNodes[1] &&
+                                elementsss.childNodes[m].childNodes[1]
+                                  .className == ''
+                              ) {
+                                children2 =
+                                  elementsss.childNodes[m].childNodes[1]
+                                    .childNodes[0].childNodes;
+                                for (let n = 0; n < children2.length; n++) {
+                                  try {
+                                    children22 =
+                                      children2[n].childNodes[0].childNodes[
+                                        children2[n].childNodes[0].childNodes
+                                          .length - 1
+                                      ].childNodes[1].childNodes;
+                                    if (children22.length > 2) {
+                                      if (
+                                        children22[1].childNodes[0].childNodes
+                                          .length > 1
+                                      ) {
+                                        count_like_cmtchild =
+                                          children22[1].childNodes[0]
+                                            .childNodes[1].innerText == ''
+                                            ? 1
+                                            : children22[1].childNodes[0]
+                                                .childNodes[1].innerText;
+                                      }
+                                      imgComment_cmt = children22[1]
+                                        .childNodes[0].childNodes[1]
+                                        .childNodes[0].childNodes[0]
+                                        .childNodes[0].childNodes[0]
+                                        .childNodes[0].href
+                                        ? children22[1].childNodes[0]
+                                            .childNodes[1].childNodes[0]
+                                            .childNodes[0].childNodes[0]
+                                            .childNodes[0].childNodes[0].href
+                                        : '';
+                                    } else {
+                                      if (
+                                        children22[0].childNodes[0]
+                                          .childNodes[0].childNodes.length > 1
+                                      ) {
+                                        count_like_cmtchild =
+                                          children22[0].childNodes[0]
+                                            .childNodes[0].childNodes[1]
+                                            .innerText == ''
+                                            ? 1
+                                            : children22[0].childNodes[0]
+                                                .childNodes[0].childNodes[1]
+                                                .innerText;
+                                      }
+                                    }
+
+                                    children22[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes.forEach(
+                                      (child, index) => {
+                                        if (
+                                          child.nodeName == 'SPAN' &&
+                                          index == 0
+                                        ) {
+                                          user_cmtchild_href =
+                                            child.childNodes[0].childNodes[0]
+                                              .href;
+                                          user_name_cmtchild =
+                                            child.childNodes[0].childNodes[0]
+                                              .innerText;
+                                          user_cmtchild_id =
+                                            child.childNodes[0].childNodes[0].href.split(
+                                              '/'
+                                            )[6];
+                                        } else if (child.nodeName == 'DIV') {
+                                          cotent_cmtchild =
+                                            child.childNodes[0].childNodes[0]
+                                              .innerHTML;
+                                        }
+                                      }
+                                    );
+                                    children.push({
+                                      user_cmtchild_href: user_cmtchild_href
+                                        ? user_cmtchild_href
+                                        : '',
+                                      user_name_cmtchild: user_name_cmtchild
+                                        ? user_name_cmtchild
+                                        : '',
+                                      user_cmtchild_id: user_cmtchild_id
+                                        ? user_cmtchild_id
+                                        : '',
+                                      cotent_cmtchild: cotent_cmtchild
+                                        ? cotent_cmtchild
+                                        : '',
+                                      imgComment: imgComment_cmt
+                                        ? imgComment_cmt
+                                        : '',
+                                      count_like: count_like_cmtchild
+                                        ? count_like_cmtchild
+                                        : '',
+                                    });
+                                    user_cmtchild_href =
+                                      user_name_cmtchild =
+                                      user_cmtchild_id =
+                                      cotent_cmtchild =
+                                      imgComment_cmt =
+                                      count_like_cmtchild =
+                                      imgComment_cmt =
+                                        '';
+                                  } catch (err) {
+                                    console.log(err);
+                                  }
+                                }
+                              }
                             } catch (e) {
                               console.log('children error');
                               console.log(e);
@@ -793,7 +986,9 @@ async function takedata(page, length) {
                                 count_like: count_like_cmtchild
                                   ? count_like_cmtchild
                                   : '',
-
+                                imgComment: imgComment_cmt
+                                  ? imgComment_cmt
+                                  : '',
                                 statusbar_cmtchild: '',
                               });
                               user_cmtchild_href =
@@ -802,6 +997,7 @@ async function takedata(page, length) {
                                 imgComment_cmt =
                                 count_like_cmtchild =
                                 cotent_cmtchild =
+                                imgComment_cmt =
                                   '';
                             }
                           }
@@ -820,19 +1016,20 @@ async function takedata(page, length) {
                         .childNodes;
                     if (
                       elementss.childNodes[0].childNodes[0].childNodes[1]
-                        .childNodes.length == 3
+                        .childNodes.length > 2
                     ) {
                       if (
                         elementss.childNodes[0].childNodes[0].childNodes[1]
                           .childNodes[1].childNodes[0].childNodes.length == 2
                       ) {
-                        count_like_cmt = elementss.childNodes[0].childNodes[0]
-                          .childNodes[1].childNodes[1].childNodes[0]
-                          .childNodes[1].innerText
-                          ? elementss.childNodes[0].childNodes[0].childNodes[1]
-                              .childNodes[1].childNodes[0].childNodes[1]
-                              .innerText
-                          : 1;
+                        count_like_cmt =
+                          elementss.childNodes[0].childNodes[0].childNodes[1]
+                            .childNodes[1].childNodes[0].childNodes[1]
+                            .innerText == ''
+                            ? 1
+                            : elementss.childNodes[0].childNodes[0]
+                                .childNodes[1].childNodes[1].childNodes[0]
+                                .childNodes[1].innerText;
                       }
                       imgComment =
                         elementss.childNodes[0].childNodes[0].childNodes[1]
@@ -859,13 +1056,12 @@ async function takedata(page, length) {
                       elementss.childNodes[0].childNodes[0].childNodes[1]
                         .childNodes[1].childNodes[0].childNodes[0].childNodes[0]
                         .childNodes;
+                    // console.log(
+                    //   'new',
+                    //   elementss.childNodes[0].childNodes[0].childNodes[1]
+                    // );
                     count_like_cmt = 0;
                   }
-
-                  // console.log([1].childNodes[0].childNodes[0].childNodes[0].childNodes
-                  // elementss.childNodes[0].childNodes[0].childNodes
-                  //[1].childNodes[1].childNodes[0].childNodes[0].childNodes[0].childNodes
-                  //);
                   if (divcommment.length > 1) {
                     divcommment.forEach((element, index) => {
                       if (element.nodeName == 'SPAN' && index == 0) {
@@ -878,8 +1074,14 @@ async function takedata(page, length) {
                             '/'
                           )[6];
                       } else if (element.nodeName == 'DIV') {
-                        cotent_cmt =
-                          element.childNodes[0].childNodes[0].innerHTML;
+                        for (
+                          let l = 0;
+                          l < element.childNodes[0].childNodes.length;
+                          l++
+                        ) {
+                          cotent_cmt +=
+                            element.childNodes[0].childNodes[l].innerHTML;
+                        }
                       }
                     });
                   } else if (divcommment.length == 1) {
@@ -895,8 +1097,14 @@ async function takedata(page, length) {
                               '/'
                             )[6];
                         } else if (element.nodeName == 'DIV') {
-                          cotent_cmt =
-                            element.childNodes[0].childNodes[0].innerHTML;
+                          for (
+                            let l = 0;
+                            l < element.childNodes[0].childNodes.length;
+                            l++
+                          ) {
+                            cotent_cmt +=
+                              element.childNodes[0].childNodes[l].innerHTML;
+                          }
                         }
                       }
                     );
@@ -916,32 +1124,36 @@ async function takedata(page, length) {
                   user_name_cmt =
                   user_cmt_href =
                   imgComment =
+                  count_like_cmt =
+                  count_like_cmtchild =
                     '';
                 children = [];
-              });
-            }
-          });
-        } catch (error) {
-          console.log('error cmt');
-          console.log(error);
-          commmets.push({
-            content: cotent_cmt ? cotent_cmt : '',
-            user_name_cmt: user_name_cmt ? user_name_cmt : '',
-            user_cmt_id: user_cmt_id ? user_cmt_id : '',
-            user_cmt_href: user_cmt_href ? user_cmt_href : '',
-            children: children ? children : [],
-            imgComment: imgComment ? imgComment : '',
-            count_like: count_like_cmt ? count_like_cmt : '',
-            statusbar_cmt: '',
-          });
-          cotent_cmt =
-            user_cmt_id =
-            user_name_cmt =
-            user_cmt_href =
-            imgComment =
-              '';
-          children = [];
-        }
+              } catch (error) {
+                console.log('error cmt');
+                console.log(error);
+                commmets.push({
+                  content: cotent_cmt ? cotent_cmt : '',
+                  user_name_cmt: user_name_cmt ? user_name_cmt : '',
+                  user_cmt_id: user_cmt_id ? user_cmt_id : '',
+                  user_cmt_href: user_cmt_href ? user_cmt_href : '',
+                  children: children ? children : [],
+                  imgComment: imgComment ? imgComment : '',
+                  count_like: count_like_cmt ? count_like_cmt : '',
+                  statusbar_cmt: '',
+                });
+                cotent_cmt =
+                  user_cmt_id =
+                  user_name_cmt =
+                  user_cmt_href =
+                  imgComment =
+                  count_like_cmt =
+                  count_like_cmtchild =
+                    '';
+                children = [];
+              }
+            });
+          }
+        });
 
         data.push({
           userhref: userhref ? userhref : '',
@@ -975,6 +1187,7 @@ async function takedata(page, length) {
         commmets = [];
         image_href = [];
       } catch (error) {
+        console.error(error);
         data.push({
           userhref: userhref ? userhref : '',
           user_name: user_name ? user_name : '',
