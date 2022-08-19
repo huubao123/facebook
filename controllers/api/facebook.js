@@ -111,9 +111,6 @@ module.exports = async function main(req, res) {
   await autoScroll(page, (length = lengths));
   console.log('scroll done');
   await takedata(page, (length = lengths)).then(async function (result) {
-    fs.writeFile(`item.txt`, JSON.stringify(result, null, 2), function (err) {
-      if (err) throw err;
-    });
     for (let i = 0; i < result.length; i++) {
       const app = initializeApp.initializeApp(firebaseConfig);
       const database = getDatabase(app);
