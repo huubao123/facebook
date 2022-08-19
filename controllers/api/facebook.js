@@ -68,20 +68,20 @@ module.exports = async function main(req, res) {
   }
   const browser = await puppeteer.launch({
     ignoreHTTPSErrors: true,
-    // ignoreDefaultArgs: ['--disable-extensions'],
-    // args: [
-    //   '--no-sandbox',
-    //   '--disable-setuid-sandbox',
-    //   '--disable-dev-shm-usage',
-    // ],
-    headless: false,
-    defaultViewport: null,
-    args: ['--start-maximized'],
-    product: 'chrome',
-    devtools: true,
-    executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
+    ignoreDefaultArgs: ['--disable-extensions'],
+    args: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-dev-shm-usage',
+    ],
+    // headless: false,
+    // defaultViewport: null,
+    // args: ['--start-maximized'],
+    // product: 'chrome',
+    // devtools: true,
+    // executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
   });
-  res.json('đợi tí rồi chuyển thành get rồi lấy data nha');
+  res.send('đợi tí rồi chuyển thành get rồi lấy data nha');
 
   const page = await browser.newPage();
   const pages = await browser.pages();
@@ -134,7 +134,7 @@ module.exports = async function main(req, res) {
     }
   });
 
-  // await browser.close();
+  await browser.close();
 };
 async function takedata(page, length) {
   const dimension = await page.evaluate(async (length) => {
