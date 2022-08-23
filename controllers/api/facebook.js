@@ -105,7 +105,6 @@ module.exports = async function main(req, res, next) {
     // executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
   });
   res.status(200).json('đợi tí rồi chuyển thành get rồi lấy data nha');
-  res.end();
   const page = await browser.newPage();
   const pages = await browser.pages();
   if (pages.length > 1) {
