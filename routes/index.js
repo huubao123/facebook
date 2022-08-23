@@ -45,7 +45,6 @@ const firebaseConfig = {
 };
 const app = initializeApp.initializeApp(firebaseConfig);
 const database = getDatabase(app);
-const starCountRef = ref(database, '/postList');
 
 router.get('/', async function (req, res, next) {
   //   console.log(req.headers.cookie);
@@ -63,8 +62,14 @@ router.get('/', async function (req, res, next) {
 // router.get('/login', login.login);
 router.post('/post', facebook);
 router.get('/post', async function (req, res, next) {
+  const url = req.body.url;
+  if (!url) {
+    res.json('url is required');
+  }
+  const starCountRef = ref(database, '/postList/' + url);
+
   onValue(starCountRef, (snapshot) => {
-    res.json(snapshot.val());
+    return res.status(200).json(snapshot.val());
   });
 });
 
