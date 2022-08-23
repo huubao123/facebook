@@ -145,16 +145,14 @@ module.exports = async function main(req, res) {
       const newPostRef = push(postListRef);
       set(newPostRef, {
         user_name: result[i].user_name,
-        user_href: result[i].userhref,
         video: result[i].video,
-        content: result[i].content,
-        categori: result[i].categori,
+        content: result[i].content + result[i].categori,
         count_comment: result[i].count_comment,
         count_like: result[i].count_like,
         count_share: result[i].count_share,
         user_id: result[i].user_id,
         post_id: result[i].post_id,
-        post_href: result[i].posthref,
+        post_link: result[i].post_link,
         featured_image: result[i].featured_image,
         comments: result[i].comments,
       });
@@ -677,18 +675,11 @@ async function takedata(page, length) {
                                 //   }
                                 // }
                                 children.push({
-                                  user_cmtchild_href: user_cmtchild_href
-                                    ? user_cmtchild_href
-                                    : '',
-                                  user_name_cmtchild: user_name_cmtchild
-                                    ? user_name_cmtchild
-                                    : '',
-                                  user_cmtchild_id: user_cmtchild_id
-                                    ? user_cmtchild_id
-                                    : '',
-                                  cotent_cmtchild: cotent_cmtchild
-                                    ? cotent_cmtchild
-                                    : '',
+                                  user_name: user_name_cmtchild,
+                                  user_id: user_cmtchild_id,
+                                  content: cotent_cmtchild,
+                                  imgComment: imgComment_cmt,
+                                  count_like: count_like_cmtchild,
                                 });
                                 user_cmtchild_href =
                                   user_name_cmtchild =
@@ -890,24 +881,11 @@ async function takedata(page, length) {
                               }
 
                               children.push({
-                                user_cmtchild_href: user_cmtchild_href
-                                  ? user_cmtchild_href
-                                  : '',
-                                user_name_cmtchild: user_name_cmtchild
-                                  ? user_name_cmtchild
-                                  : '',
-                                user_cmtchild_id: user_cmtchild_id
-                                  ? user_cmtchild_id
-                                  : '',
-                                cotent_cmtchild: cotent_cmtchild
-                                  ? cotent_cmtchild
-                                  : '',
-                                imgComment: imgComment_cmt
-                                  ? imgComment_cmt
-                                  : '',
-                                count_like: count_like_cmtchild
-                                  ? count_like_cmtchild
-                                  : '',
+                                user_name: user_name_cmtchild,
+                                user_id: user_cmtchild_id,
+                                content: cotent_cmtchild,
+                                imgComment: imgComment_cmt,
+                                count_like: count_like_cmtchild,
                               });
                               user_cmtchild_href =
                                 user_name_cmtchild =
@@ -1110,10 +1088,9 @@ async function takedata(page, length) {
                                     });
 
                                     children.push({
-                                      user_cmtchild_href: user_cmtchild_href,
-                                      user_name_cmtchild: user_name_cmtchild,
-                                      user_cmtchild_id: user_cmtchild_id,
-                                      cotent_cmtchild: cotent_cmtchild,
+                                      user_name: user_name_cmtchild,
+                                      user_id: user_cmtchild_id,
+                                      content: cotent_cmtchild,
                                       imgComment: imgComment_cmt,
                                       count_like: count_like_cmtchild,
                                     });
@@ -1285,8 +1262,8 @@ async function takedata(page, length) {
                 }
                 comments.push({
                   content: cotent_cmt,
-                  user_name_cmt: user_name_cmt,
-                  user_cmt_id: user_cmt_id,
+                  user_name: user_name_cmt,
+                  user_id: user_cmt_id,
                   user_cmt_href: user_cmt_href,
                   imgComment: imgComment,
                   count_like: count_like_cmt,
@@ -1319,7 +1296,7 @@ async function takedata(page, length) {
           count_like: likes ? likes : '',
           count_share: shares ? shares : '',
           post_id: post_id ? post_id : '',
-          posthref: posthref ? posthref : '',
+          post_link: posthref ? posthref : '',
           video: video ? video : '',
           featured_image: image_href ? image_href : '',
           comments: comments ? comments : [],
