@@ -68,12 +68,12 @@ module.exports = async function main(req, res) {
   }
   const browser = await puppeteer.launch({
     ignoreHTTPSErrors: true,
-    // ignoreDefaultArgs: ['--disable-extensions'],
+    ignoreDefaultArgs: ['--disable-extensions'],
     args: [
-      // '--no-sandbox',
-      // '--disable-setuid-sandbox',
-      // '--disable-dev-shm-usage',
-      // '--disable-extensions',
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-dev-shm-usage',
+      '--disable-extensions',
       '--aggressive-cache-discard',
       '--disable-cache',
       '--disable-application-cache',
@@ -96,12 +96,12 @@ module.exports = async function main(req, res) {
       '--disable-domain-reliability',
       '--disable-sync',
     ],
-    headless: false,
-    defaultViewport: null,
-    args: ['--start-maximized'],
-    product: 'chrome',
-    devtools: true,
-    executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
+    // headless: false,
+    // defaultViewport: null,
+    // args: ['--start-maximized'],
+    // product: 'chrome',
+    // devtools: true,
+    // executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
   });
   res.send('đợi tí rồi chuyển thành get rồi lấy data nha');
 
