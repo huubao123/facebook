@@ -2,6 +2,7 @@ const puppeteer = require('puppeteer');
 const fs = require('fs');
 
 const initializeApp = require('firebase/app');
+const { nextTick } = require('process');
 // const fire = require('firebase/app');
 
 const getDatabase = require('firebase/database').getDatabase;
@@ -55,7 +56,7 @@ async function autoScroll(page, _length) {
   }, _length);
   return;
 }
-module.exports = async function main(req, res) {
+module.exports = async function main(req, res, next) {
   const url = req.body.url;
   const lengths = req.body.length;
   const username = req.body.username;
@@ -103,8 +104,8 @@ module.exports = async function main(req, res) {
     // devtools: true,
     // executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
   });
-  res.send('đợi tí rồi chuyển thành get rồi lấy data nha');
-
+  res.status(200).json('đợi tí rồi chuyển thành get rồi lấy data nha');
+  res.end();
   const page = await browser.newPage();
   const pages = await browser.pages();
   if (pages.length > 1) {
@@ -131,7 +132,7 @@ module.exports = async function main(req, res) {
     waitUntil: 'load',
   });
   await autoScroll(page, (length = lengths));
-  console.log('scroll done');
+  console.log('scroll finished');
   await takedata(page, (length = lengths)).then(async function (result) {
     // fs.writeFile('item.txt', JSON.stringify(result, null, 2), (err) => {
     //   if (err) throw err;
@@ -160,6 +161,7 @@ module.exports = async function main(req, res) {
   });
 
   await browser.close();
+  return;
 };
 async function takedata(page, length) {
   const dimension = await page.evaluate(async (length) => {
