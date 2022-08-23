@@ -68,18 +68,40 @@ module.exports = async function main(req, res) {
   }
   const browser = await puppeteer.launch({
     ignoreHTTPSErrors: true,
-    ignoreDefaultArgs: ['--disable-extensions'],
+    // ignoreDefaultArgs: ['--disable-extensions'],
     args: [
-      '--no-sandbox',
-      '--disable-setuid-sandbox',
-      '--disable-dev-shm-usage',
+      // '--no-sandbox',
+      // '--disable-setuid-sandbox',
+      // '--disable-dev-shm-usage',
+      // '--disable-extensions',
+      '--aggressive-cache-discard',
+      '--disable-cache',
+      '--disable-application-cache',
+      '--disable-offline-load-stale-cache',
+      '--disable-gpu-shader-disk-cache',
+      '--media-cache-size=0',
+      '--disk-cache-size=0',
+
+      '--disable-component-extensions-with-background-pages',
+      '--disable-default-apps',
+      '--mute-audio',
+      '--no-default-browser-check',
+      '--autoplay-policy=user-gesture-required',
+      '--disable-background-timer-throttling',
+      '--disable-backgrounding-occluded-windows',
+      '--disable-notifications',
+      '--disable-background-networking',
+      '--disable-breakpad',
+      '--disable-component-update',
+      '--disable-domain-reliability',
+      '--disable-sync',
     ],
-    // headless: false,
-    // defaultViewport: null,
-    // args: ['--start-maximized'],
-    // product: 'chrome',
-    // devtools: true,
-    // executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
+    headless: false,
+    defaultViewport: null,
+    args: ['--start-maximized'],
+    product: 'chrome',
+    devtools: true,
+    executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
   });
   res.send('đợi tí rồi chuyển thành get rồi lấy data nha');
 
@@ -102,7 +124,7 @@ module.exports = async function main(req, res) {
   await page.type('#email', username);
   await page.type('#pass', password);
   await page.keyboard.press('Enter');
-  await page.waitForTimeout(3000);
+  await page.waitForSelector('div', { hidden: true });
   await page.goto(url, {
     //https://www.facebook.com/groups/j2team.community.girls
     //https://www.facebook.com/groups/364997627165697
@@ -111,30 +133,35 @@ module.exports = async function main(req, res) {
   await autoScroll(page, (length = lengths));
   console.log('scroll done');
   await takedata(page, (length = lengths)).then(async function (result) {
-    for (let i = 0; i < result.length; i++) {
-      const app = initializeApp.initializeApp(firebaseConfig);
-      const database = getDatabase(app);
-      const postListRef = ref(database, '/postList');
-      const newPostRef = push(postListRef);
-      set(newPostRef, {
-        user_name: result[i].user_name,
-        user_href: result[i].userhref,
-        video: result[i].video,
-        content: result[i].content,
-        categori: result[i].categori,
-        count_comment: result[i].count_comment,
-        count_like: result[i].count_like,
-        count_share: result[i].count_share,
-        user_id: result[i].user_id,
-        post_id: result[i].post_id,
-        post_href: result[i].posthref,
-        featured_image: result[i].featured_image,
-        comments: result[i].comments,
-      });
-    }
+    fs.writeFile('item.txt', JSON.stringify(result, null, 2), (err) => {
+      if (err) throw err;
+      console.log('The file has been saved!');
+    });
+
+    // for (let i = 0; i < result.length; i++) {
+    //   const app = initializeApp.initializeApp(firebaseConfig);
+    //   const database = getDatabase(app);
+    //   const postListRef = ref(database, '/postList');
+    //   const newPostRef = push(postListRef);
+    //   set(newPostRef, {
+    //     user_name: result[i].user_name,
+    //     user_href: result[i].userhref,
+    //     video: result[i].video,
+    //     content: result[i].content,
+    //     categori: result[i].categori,
+    //     count_comment: result[i].count_comment,
+    //     count_like: result[i].count_like,
+    //     count_share: result[i].count_share,
+    //     user_id: result[i].user_id,
+    //     post_id: result[i].post_id,
+    //     post_href: result[i].posthref,
+    //     featured_image: result[i].featured_image,
+    //     comments: result[i].comments,
+    //   });
+    // }
   });
 
-  await browser.close();
+  // await browser.close();
 };
 async function takedata(page, length) {
   const dimension = await page.evaluate(async (length) => {
@@ -175,6 +202,10 @@ async function takedata(page, length) {
           post[i].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
             .childNodes[0].childNodes[0].childNodes[0].childNodes[0]
             .childNodes[0].childNodes[1];
+        console.log(
+          contens.childNodes[0].childNodes[1].childNodes[0].childNodes[1]
+            .childNodes[0].childNodes
+        );
         contens.childNodes[0].childNodes[1].childNodes[0].childNodes[1].childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes.forEach(
           (ele) => {
             if (ele.className == '') {
@@ -311,6 +342,7 @@ async function takedata(page, length) {
               }
             }
             if (index == 0) {
+              console.log(element.childNodes);
               element.childNodes[0].childNodes.forEach(function (node) {
                 if (node.nodeName == 'SPAN') {
                   content = node.childNodes[0].innerHTML;
@@ -428,31 +460,22 @@ async function takedata(page, length) {
                     );
                   }
                   // comment mới nhất hay chưa đọc
-                  if (
-                    elementss.childNodes[0].childNodes[1].childNodes[1]
-                      .childNodes.length > 2
-                  ) {
-                    elementss.childNodes[0].childNodes[1].childNodes[1].childNodes.forEach(
-                      (child, index) => {
-                        if (
-                          child.className ==
-                          'is6700om i09qtzwb pmk7jnqg j9ispegn kr520xx4 dsl5tyj5'
-                        ) {
-                          console.log('true');
-                          divcommment_cmt =
-                            elementss.childNodes[0].childNodes[1].childNodes[1]
-                              .childNodes[1];
-                        } else {
-                          divcommment_cmt =
-                            elementss.childNodes[0].childNodes[1].childNodes[1]
-                              .childNodes[0];
-                        }
+                  elementss.childNodes[0].childNodes[1].childNodes[1].childNodes.forEach(
+                    (element, index) => {
+                      if (index == 1 && element.className == '') {
+                        diw_newcmt =
+                          elementss.childNodes[0].childNodes[1].childNodes[1]
+                            .childNodes[1];
+                      } else if (index == 1 && element.className !== '') {
+                        diw_newcmt =
+                          elementss.childNodes[0].childNodes[1].childNodes[1]
+                            .childNodes[0];
                       }
-                    );
-                  }
+                    }
+                  );
+
                   if (
-                    elementss.childNodes[0].childNodes[1].childNodes[1]
-                      .childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                    diw_newcmt.childNodes[0].childNodes[0].childNodes[0]
                       .childNodes.length > 1 &&
                     elementss.childNodes[0].childNodes[1].childNodes[0]
                       .childNodes[0].childNodes[0].children[0].childNodes[0]
@@ -477,24 +500,21 @@ async function takedata(page, length) {
                     );
                     // đếm like comment
                     if (
-                      elementss.childNodes[0].childNodes[1].childNodes[1]
-                        .childNodes[0].childNodes[0].childNodes[0].childNodes
-                        .length > 1
+                      diw_newcmt.childNodes[0].childNodes[0].childNodes.length >
+                      1
                     ) {
                       if (
-                        elementss.childNodes[0].childNodes[1].childNodes[1]
-                          .childNodes[0].childNodes[0].childNodes[0]
-                          .childNodes[1].innerText == ''
+                        diw_newcmt.childNodes[0].childNodes[0].childNodes[1]
+                          .innerText == ''
                       ) {
                         count_like_cmt = 1;
                       } else {
                         count_like_cmt =
-                          elementss.childNodes[0].childNodes[1].childNodes[1]
-                            .childNodes[0].childNodes[0].childNodes[0]
-                            .childNodes[1].innerText;
+                          diw_newcmt.childNodes[0].childNodes[0].childNodes[1]
+                            .innerText;
                       }
                     }
-                    elementss.childNodes[0].childNodes[1].childNodes[1].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes.forEach(
+                    diw_newcmt.childNodes[0].childNodes[0].childNodes[0].childNodes.forEach(
                       (cmt, index) => {
                         if (cmt.nodeName == 'SPAN' && index == 0) {
                           user_cmt_href = cmt.childNodes[0].childNodes[0].href;
@@ -515,8 +535,7 @@ async function takedata(page, length) {
                       }
                     );
                   } else if (
-                    elementss.childNodes[0].childNodes[1].childNodes[1]
-                      .childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                    diw_newcmt.childNodes[0].childNodes[0].childNodes[0]
                       .childNodes.length == 1 &&
                     elementss.childNodes[0].childNodes[1].childNodes[0]
                       .childNodes[0].childNodes[0].children[0].childNodes[0]
@@ -524,22 +543,16 @@ async function takedata(page, length) {
                   ) {
                     // đếm like comment
                     if (
-                      elementss.childNodes[0].childNodes[1].childNodes[1]
-                        .childNodes[0].childNodes[0].childNodes[0].childNodes
-                        .length > 1
+                      diw_newcmt.childNodes[0].childNodes[0].childNodes.length >
+                      1
                     ) {
-                      if (
-                        elementss.childNodes[0].childNodes[1].childNodes[1]
-                          .childNodes[0].childNodes[0].childNodes[0]
-                          .childNodes[1].innerText == ''
-                      ) {
-                        count_like_cmt = 1;
-                      } else {
-                        count_like_cmt =
-                          elementss.childNodes[0].childNodes[1].childNodes[1]
-                            .childNodes[0].childNodes[0].childNodes[0]
-                            .childNodes[1].innerText;
-                      }
+                      count_like_cmt =
+                        diw_newcmt.childNodes[0].childNodes[0].childNodes[1]
+                          .innerText == ''
+                          ? 1
+                          : (count_like_cmt =
+                              diw_newcmt.childNodes[0].childNodes[0]
+                                .childNodes[1].innerText);
                     }
 
                     elementss.childNodes[0].childNodes[1].childNodes[1].childNodes.forEach(
@@ -552,7 +565,7 @@ async function takedata(page, length) {
                         }
                       }
                     );
-                    elementss.childNodes[0].childNodes[1].childNodes[1].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes.forEach(
+                    diw_newcmt.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes.forEach(
                       (child, index) => {
                         if (child.nodeName == 'SPAN' && index == 0) {
                           user_cmt_href =
@@ -741,23 +754,27 @@ async function takedata(page, length) {
                                     ].childNodes[1].childNodes[1].childNodes[0]
                                       .childNodes[0].childNodes[0].childNodes;
                               }
-
+                              // cmt cũ có hình ảnh
                               if (
                                 children_div[0].parentNode.parentNode.parentNode
-                                  .parentNode.parentNode.childNodes.length > 2
+                                  .parentNode.parentNode.childNodes.length == 3
                               ) {
+                                imgComment_cmt =
+                                  children_div[0].parentNode.parentNode
+                                    .parentNode.parentNode.parentNode
+                                    .childNodes[1].childNodes[0].childNodes[0]
+                                    .childNodes[0].childNodes.length > 2
+                                    ? children_div[0].parentNode.parentNode
+                                        .parentNode.parentNode.parentNode
+                                        .childNodes[1].childNodes[0]
+                                        .childNodes[0].childNodes[0]
+                                        .childNodes[0].childNodes[0].href
+                                    : 'không phải hình ';
                                 if (
                                   children_div[0].parentNode.parentNode
                                     .parentNode.parentNode.parentNode
-                                    .childNodes[1].childNodes[0].childNodes
-                                    .length > 1
+                                    .childNodes[1].childNodes[0].childNodes[1]
                                 ) {
-                                  imgComment_cmt =
-                                    children_div[0].parentNode.parentNode
-                                      .parentNode.parentNode.parentNode
-                                      .childNodes[1].childNodes[0].childNodes[0]
-                                      .childNodes[0].childNodes[0].childNodes[0]
-                                      .childNodes[0].href;
                                   count_like_cmtchild =
                                     children_div[0].parentNode.parentNode
                                       .parentNode.parentNode.parentNode
@@ -769,6 +786,39 @@ async function takedata(page, length) {
                                           .childNodes[1].childNodes[0]
                                           .childNodes[1].innerText;
                                 }
+                                // cmt_mới có hình ảnh
+                              } else if (
+                                children_div[0].parentNode.parentNode.parentNode
+                                  .parentNode.parentNode.childNodes.length == 4
+                              ) {
+                                imgComment_cmt =
+                                  children_div[0].parentNode.parentNode
+                                    .parentNode.parentNode.parentNode
+                                    .childNodes[2].childNodes[0].childNodes[0]
+                                    .childNodes[0].childNodes.length > 2
+                                    ? children_div[0].parentNode.parentNode
+                                        .parentNode.parentNode.parentNode
+                                        .childNodes[2].childNodes[0]
+                                        .childNodes[0].childNodes[0]
+                                        .childNodes[0].childNodes[0].href
+                                    : 'không phải hình';
+                                if (
+                                  children_div[0].parentNode.parentNode
+                                    .parentNode.parentNode.parentNode
+                                    .childNodes[2].childNodes[0].childNodes[1]
+                                ) {
+                                  count_like_cmtchild =
+                                    children_div[0].parentNode.parentNode
+                                      .parentNode.parentNode.parentNode
+                                      .childNodes[2].childNodes[0].childNodes[1]
+                                      .innerText == ''
+                                      ? 1
+                                      : children_div[0].parentNode.parentNode
+                                          .parentNode.parentNode.parentNode
+                                          .childNodes[2].childNodes[0]
+                                          .childNodes[1].innerText;
+                                }
+                                // đếm like khi không có hình
                               } else {
                                 if (
                                   children_div[0].parentNode.parentNode
@@ -782,6 +832,7 @@ async function takedata(page, length) {
                                           .childNodes[1].innerText;
                                 }
                               }
+                              // lấy thông tin cmt
                               if (children_div.length > 1) {
                                 children_div.forEach((child, index) => {
                                   if (child.nodeName == 'SPAN' && index == 0) {
@@ -882,86 +933,189 @@ async function takedata(page, length) {
                                         children2[n].childNodes[0].childNodes
                                           .length - 1
                                       ].childNodes[1].childNodes;
-                                    if (children22.length > 2) {
+                                    children22.forEach((element, index) => {
+                                      // kiểm tra comments mới có thì index = 1
                                       if (
-                                        children22[1].childNodes[0].childNodes
-                                          .length > 1
+                                        element.className == '' &&
+                                        index == 1
                                       ) {
-                                        count_like_cmtchild =
-                                          children22[1].childNodes[0]
-                                            .childNodes[1].innerText == ''
-                                            ? 1
-                                            : children22[1].childNodes[0]
-                                                .childNodes[1].innerText;
-                                      }
-                                      imgComment_cmt = children22[1]
-                                        .childNodes[0].childNodes[1]
-                                        .childNodes[0].childNodes[0]
-                                        .childNodes[0].childNodes[0]
-                                        .childNodes[0].href
-                                        ? children22[1].childNodes[0]
-                                            .childNodes[1].childNodes[0]
-                                            .childNodes[0].childNodes[0]
-                                            .childNodes[0].childNodes[0].href
-                                        : '';
-                                    } else {
-                                      if (
-                                        children22[0].childNodes[0]
-                                          .childNodes[0].childNodes.length > 1
-                                      ) {
-                                        count_like_cmtchild =
-                                          children22[0].childNodes[0]
-                                            .childNodes[0].childNodes[1]
-                                            .innerText == ''
-                                            ? 1
-                                            : children22[0].childNodes[0]
-                                                .childNodes[0].childNodes[1]
-                                                .innerText;
-                                      }
-                                    }
-
-                                    children22[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes.forEach(
-                                      (child, index) => {
+                                        // lấy thông tin child2 cmt
+                                        element.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes.forEach(
+                                          (child, index) => {
+                                            if (
+                                              child.nodeName == 'SPAN' &&
+                                              index == 0
+                                            ) {
+                                              user_cmtchild_href =
+                                                child.childNodes[0]
+                                                  .childNodes[0].href;
+                                              user_name_cmtchild =
+                                                child.childNodes[0]
+                                                  .childNodes[0].innerText;
+                                              user_cmtchild_id =
+                                                child.childNodes[0].childNodes[0].href.split(
+                                                  '/'
+                                                )[6];
+                                            } else if (
+                                              child.nodeName == 'DIV'
+                                            ) {
+                                              cotent_cmtchild =
+                                                child.childNodes[0]
+                                                  .childNodes[0].innerHTML;
+                                            }
+                                          }
+                                        );
+                                        // đếm like khi có hình
                                         if (
-                                          child.nodeName == 'SPAN' &&
-                                          index == 0
+                                          element.nodeName == 'DIV' &&
+                                          index == 2
                                         ) {
-                                          user_cmtchild_href =
-                                            child.childNodes[0].childNodes[0]
-                                              .href;
-                                          user_name_cmtchild =
-                                            child.childNodes[0].childNodes[0]
-                                              .innerText;
-                                          user_cmtchild_id =
-                                            child.childNodes[0].childNodes[0].href.split(
-                                              '/'
-                                            )[6];
-                                        } else if (child.nodeName == 'DIV') {
-                                          cotent_cmtchild =
-                                            child.childNodes[0].childNodes[0]
-                                              .innerHTML;
+                                          if (
+                                            children22[2].childNodes[0]
+                                              .childNodes.length > 1
+                                          ) {
+                                            count_like_cmtchild =
+                                              children22[1].childNodes[0]
+                                                .childNodes[1].innerText == ''
+                                                ? 1
+                                                : children22[1].childNodes[0]
+                                                    .childNodes[1].innerText;
+                                          }
+                                          imgComment_cmt = children22[1]
+                                            .childNodes[0].childNodes[1]
+                                            .childNodes[0].childNodes[0]
+                                            .childNodes[0].childNodes[0]
+                                            .childNodes[0].href
+                                            ? children22[1].childNodes[0]
+                                                .childNodes[1].childNodes[0]
+                                                .childNodes[0].childNodes[0]
+                                                .childNodes[0].childNodes[0]
+                                                .href
+                                            : '';
+                                        } else {
+                                          console.log('aaaaa', children22);
+                                          // đếm like khi không có hình
+                                          // if (
+                                          //   children22[0].childNodes[0]
+                                          //     .childNodes[0].childNodes.length >
+                                          //   1
+                                          // ) {
+                                          //   count_like_cmtchild =
+                                          //     children22[0].childNodes[0]
+                                          //       .childNodes[0].childNodes[1]
+                                          //       .innerText == ''
+                                          //       ? 1
+                                          //       : children22[0].childNodes[0]
+                                          //           .childNodes[0].childNodes[1]
+                                          //           .innerText;
+                                          // }
+                                        }
+                                        // kiểm tra comments child 2 mới không thì làm dưới
+                                      } else if (
+                                        index == 1 &&
+                                        element.className !== ''
+                                      ) {
+                                        // đếm like khi có hình
+                                        if (children22.length > 2) {
+                                          if (
+                                            children22[1].childNodes[0]
+                                              .childNodes.length > 1
+                                          ) {
+                                            count_like_cmtchild =
+                                              children22[1].childNodes[0]
+                                                .childNodes[1].innerText == ''
+                                                ? 1
+                                                : children22[1].childNodes[0]
+                                                    .childNodes[1].innerText;
+                                          }
+                                          imgComment_cmt = children22[1]
+                                            .childNodes[0].childNodes[0]
+                                            .childNodes[0].childNodes[0]
+                                            .childNodes[0].href
+                                            ? children22[1].childNodes[0]
+                                                .childNodes[0].childNodes[0]
+                                                .childNodes[0].childNodes[0]
+                                                .href
+                                            : '';
+                                          // lấy thông tin khi có hình
+                                          children22[0].childNodes[0].childNodes[0].childNodes[0].childNodes.forEach(
+                                            (child, index) => {
+                                              if (
+                                                child.nodeName == 'SPAN' &&
+                                                index == 0
+                                              ) {
+                                                user_cmtchild_href =
+                                                  child.childNodes[0]
+                                                    .childNodes[0].href;
+                                                user_name_cmtchild =
+                                                  child.childNodes[0]
+                                                    .childNodes[0].innerText;
+                                                user_cmtchild_id =
+                                                  child.childNodes[0].childNodes[0].href.split(
+                                                    '/'
+                                                  )[6];
+                                              } else if (
+                                                child.nodeName == 'DIV'
+                                              ) {
+                                                cotent_cmtchild =
+                                                  child.childNodes[0]
+                                                    .childNodes[0].innerHTML;
+                                              }
+                                            }
+                                          );
+                                        } else {
+                                          // đếm like khi không có hình
+                                          if (
+                                            children22[0].childNodes[0]
+                                              .childNodes[0].childNodes.length >
+                                            1
+                                          ) {
+                                            count_like_cmtchild =
+                                              children22[0].childNodes[0]
+                                                .childNodes[0].childNodes[1]
+                                                .innerText == ''
+                                                ? 1
+                                                : children22[0].childNodes[0]
+                                                    .childNodes[0].childNodes[1]
+                                                    .innerText;
+                                          }
+                                          // lấy thông tin cmt child 2
+                                          children22[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes.forEach(
+                                            (child, index) => {
+                                              if (
+                                                child.nodeName == 'SPAN' &&
+                                                index == 0
+                                              ) {
+                                                user_cmtchild_href =
+                                                  child.childNodes[0]
+                                                    .childNodes[0].href;
+                                                user_name_cmtchild =
+                                                  child.childNodes[0]
+                                                    .childNodes[0].innerText;
+                                                user_cmtchild_id =
+                                                  child.childNodes[0].childNodes[0].href.split(
+                                                    '/'
+                                                  )[6];
+                                              } else if (
+                                                child.nodeName == 'DIV'
+                                              ) {
+                                                cotent_cmtchild =
+                                                  child.childNodes[0]
+                                                    .childNodes[0].innerHTML;
+                                              }
+                                            }
+                                          );
                                         }
                                       }
-                                    );
+                                    });
+
                                     children.push({
-                                      user_cmtchild_href: user_cmtchild_href
-                                        ? user_cmtchild_href
-                                        : '',
-                                      user_name_cmtchild: user_name_cmtchild
-                                        ? user_name_cmtchild
-                                        : '',
-                                      user_cmtchild_id: user_cmtchild_id
-                                        ? user_cmtchild_id
-                                        : '',
-                                      cotent_cmtchild: cotent_cmtchild
-                                        ? cotent_cmtchild
-                                        : '',
-                                      imgComment: imgComment_cmt
-                                        ? imgComment_cmt
-                                        : '',
-                                      count_like: count_like_cmtchild
-                                        ? count_like_cmtchild
-                                        : '',
+                                      user_cmtchild_href: user_cmtchild_href,
+                                      user_name_cmtchild: user_name_cmtchild,
+                                      user_cmtchild_id: user_cmtchild_id,
+                                      cotent_cmtchild: cotent_cmtchild,
+                                      imgComment: imgComment_cmt,
+                                      count_like: count_like_cmtchild,
                                     });
                                     user_cmtchild_href =
                                       user_name_cmtchild =
@@ -972,6 +1126,7 @@ async function takedata(page, length) {
                                       imgComment_cmt =
                                         '';
                                   } catch (err) {
+                                    console.log('children2 error');
                                     console.log(err);
                                   }
                                 }
@@ -986,6 +1141,10 @@ async function takedata(page, length) {
                     );
                   }
                 } else {
+                  console.log(
+                    'cmt _1 ',
+                    elementss.childNodes[0].childNodes[0].childNodes[1]
+                  );
                   if (
                     elementss.childNodes[0].childNodes[0].childNodes[1]
                       .childNodes[0].childNodes[0]
@@ -1032,16 +1191,50 @@ async function takedata(page, length) {
                       count_like_cmt = 0;
                     }
                   } else {
+                    // cmt mới
                     divcommment =
                       elementss.childNodes[0].childNodes[0].childNodes[1]
                         .childNodes[1].childNodes[0].childNodes[0].childNodes[0]
                         .childNodes;
-                    // console.log(
-                    //   'new',
-                    //   elementss.childNodes[0].childNodes[0].childNodes[1]
-                    // );
-                    count_like_cmt = 0;
+                    if (
+                      elementss.childNodes[0].childNodes[0].childNodes[1]
+                        .childNodes[2].nodeName == 'DIV'
+                    ) {
+                      imgComment =
+                        elementss.childNodes[0].childNodes[0].childNodes[1]
+                          .childNodes[2].childNodes[0].childNodes[0]
+                          .childNodes[0].childNodes[0].childNodes[0].href;
+                      if (
+                        elementss.childNodes[0].childNodes[0].childNodes[1]
+                          .childNodes[2].childNodes[0].childNodes[1]
+                      ) {
+                        count_like_cmt =
+                          elementss.childNodes[0].childNodes[0].childNodes[1]
+                            .childNodes[2].childNodes[0].childNodes[1]
+                            .innerText == ''
+                            ? 1
+                            : elementss.childNodes[0].childNodes[0]
+                                .childNodes[1].childNodes[2].childNodes[0]
+                                .childNodes[1].innerText;
+                      }
+                    } else {
+                      if (
+                        elementss.childNodes[0].childNodes[0].childNodes[1]
+                          .childNodes[1].childNodes[0].childNodes[0]
+                          .childNodes[1]
+                      ) {
+                        count_like_cmt =
+                          elementss.childNodes[0].childNodes[0].childNodes[1]
+                            .childNodes[1].childNodes[0].childNodes[0]
+                            .childNodes[1].innerText == ''
+                            ? 1
+                            : elementss.childNodes[0].childNodes[0]
+                                .childNodes[1].childNodes[1].childNodes[0]
+                                .childNodes[0].childNodes[1].innerText;
+                      }
+                    }
                   }
+
                   if (divcommment.length > 1) {
                     divcommment.forEach((element, index) => {
                       if (element.nodeName == 'SPAN' && index == 0) {
