@@ -135,10 +135,15 @@ module.exports = async function main(req, res, next) {
     //     request.continue();
     //   }
     // });
-    await page.goto('https://www.facebook.com', {
-      waitUntil: 'load',
-    });
-    console.log('5');
+    try {
+      await page.goto('https://www.facebook.com', {
+        waitUntil: 'load',
+      });
+      console.log('5');
+    } catch (error) {
+      console.log(error);
+    }
+
     await page.type('#email', username);
     await page.type('#pass', password);
     await page.keyboard.press('Enter');
