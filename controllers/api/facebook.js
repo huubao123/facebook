@@ -195,9 +195,9 @@ module.exports = async function main(req, res, next) {
       //   });
       // }
     });
-    await browser.close();
+    //await browser.close();
   } catch (err) {
-    console.log(err);
+    console.log('lỗi server', err);
   }
 };
 async function takedata(page, length) {
@@ -1358,7 +1358,7 @@ async function takedata(page, length) {
         comments = [];
         image_href = [];
       } catch (error) {
-        console.error(error);
+        console.log(error);
       }
     }
 
