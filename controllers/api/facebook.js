@@ -65,121 +65,128 @@ async function autoScroll(page, _length) {
   return;
 }
 module.exports = async function main(req, res, next) {
-  const url = req.body.url;
-  const lengths = req.body.length;
-  const username = req.body.username;
-  const password = req.body.password;
-  if (!url) {
-    res.json('url is required');
-  }
-  if (!lengths) {
-    res.json('length is required');
-  }
-  const browser = await puppeteer.launch({
-    ignoreHTTPSErrors: true,
-    ignoreDefaultArgs: ['--disable-extensions'],
-    args: [
-      '--no-sandbox',
-      '--disable-setuid-sandbox',
-      '--disable-dev-shm-usage',
-      // '--disable-extensions',
-      // '--aggressive-cache-discard',
-      // '--disable-cache',
-      // '--disable-application-cache',
-      // '--disable-offline-load-stale-cache',
-      // '--disable-gpu-shader-disk-cache',
-      // '--media-cache-size=0',
-      // '--disk-cache-size=0',
-
-      // '--disable-component-extensions-with-background-pages',
-      // '--disable-default-apps',
-      // '--mute-audio',
-      // '--no-default-browser-check',
-      // '--autoplay-policy=user-gesture-required',
-      // '--disable-background-timer-throttling',
-      // '--disable-backgrounding-occluded-windows',
-      // '--disable-notifications',
-      // '--disable-background-networking',
-      // '--disable-breakpad',
-      // '--disable-component-update',
-      // '--disable-domain-reliability',
-      // '--disable-sync',
-    ],
-    // headless: false,
-    // defaultViewport: null,
-    // args: ['--start-maximized'],
-    // product: 'chrome',
-    // // devtools: true,
-    // executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
-  });
-  console.log('1');
-  res.status(200).json('đợi tí rồi chuyển thành get rồi lấy data nha');
-  console.log('2');
-  const page = await browser.newPage();
-  const pages = await browser.pages();
-  console.log('3');
-  if (pages.length > 1) {
-    await pages[0].close();
-  }
-  console.log('4');
-  // await page.setRequestInterception(true);
-  // page.on('request', (request) => {
-  //   if (/google|cloudflare/.test(request.url())) {
-  //     request.abort();
-  //   } else {
-  //     request.continue();
-  //   }
-  // });
-  await page.goto('https://www.facebook.com', {
-    waitUntil: 'load',
-  });
-  console.log('5');
-  await page.type('#email', username);
-  await page.type('#pass', password);
-  await page.keyboard.press('Enter');
-
-  console.log('6');
-  await page.waitForSelector('div', { hidden: true });
-  console.log('7');
-  await page.goto(url, {
-    //https://www.facebook.com/groups/j2team.community.girls
-    //https://www.facebook.com/groups/364997627165697
-    waitUntil: 'load',
-  });
-  await autoScroll(page, (length = lengths));
-  await new Promise((r) => setTimeout(r, 5000));
-
-  console.log('scroll finished');
-  await takedata(page, (length = lengths)).then(async function (result) {
-    // fs.writeFile('item.txt', JSON.stringify(result, null, 2), (err) => {
-    //   if (err) throw err;
-    //   console.log('The file has been saved!');
-    // });
-
-    for (let i = 0; i < result.length; i++) {
-      const app = initializeApp.initializeApp(firebaseConfig);
-      const database = getDatabase(app);
-      const postListRef = ref(
-        database,
-        '/postList/' + url.replace(/[#:.,$]/g, '')
-      );
-      const newPostRef = push(postListRef);
-      set(newPostRef, {
-        user_name: result[i].user_name,
-        video: result[i].video,
-        content: result[i].content + result[i].categori,
-        count_comment: result[i].count_comment,
-        count_like: result[i].count_like,
-        count_share: result[i].count_share,
-        user_id: result[i].user_id,
-        post_id: result[i].post_id,
-        post_link: result[i].post_link,
-        featured_image: result[i].featured_image,
-        comments: result[i].comments,
-      });
+  try {
+    const url = req.body.url;
+    const lengths = req.body.length;
+    const username = req.body.username;
+    const password = req.body.password;
+    console.log(username, password);
+    console.log(url);
+    console.log(lengths);
+    if (!url) {
+      res.json('url is required');
     }
-  });
-  await browser.close();
+    if (!lengths) {
+      res.json('length is required');
+    }
+    const browser = await puppeteer.launch({
+      ignoreHTTPSErrors: true,
+      ignoreDefaultArgs: ['--disable-extensions'],
+      args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        // '--disable-extensions',
+        // '--aggressive-cache-discard',
+        // '--disable-cache',
+        // '--disable-application-cache',
+        // '--disable-offline-load-stale-cache',
+        // '--disable-gpu-shader-disk-cache',
+        // '--media-cache-size=0',
+        // '--disk-cache-size=0',
+
+        // '--disable-component-extensions-with-background-pages',
+        // '--disable-default-apps',
+        // '--mute-audio',
+        // '--no-default-browser-check',
+        // '--autoplay-policy=user-gesture-required',
+        // '--disable-background-timer-throttling',
+        // '--disable-backgrounding-occluded-windows',
+        // '--disable-notifications',
+        // '--disable-background-networking',
+        // '--disable-breakpad',
+        // '--disable-component-update',
+        // '--disable-domain-reliability',
+        // '--disable-sync',
+      ],
+      // headless: false,
+      // defaultViewport: null,
+      // args: ['--start-maximized'],
+      // product: 'chrome',
+      // // devtools: true,
+      // executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
+    });
+    console.log('1');
+    res.status(200).json('đợi tí rồi chuyển thành get rồi lấy data nha');
+    console.log('2');
+    const page = await browser.newPage();
+    const pages = await browser.pages();
+    console.log('3');
+    if (pages.length > 1) {
+      await pages[0].close();
+    }
+    console.log('4');
+    // await page.setRequestInterception(true);
+    // page.on('request', (request) => {
+    //   if (/google|cloudflare/.test(request.url())) {
+    //     request.abort();
+    //   } else {
+    //     request.continue();
+    //   }
+    // });
+    await page.goto('https://www.facebook.com', {
+      waitUntil: 'load',
+    });
+    console.log('5');
+    await page.type('#email', username);
+    await page.type('#pass', password);
+    await page.keyboard.press('Enter');
+
+    console.log('6');
+    await page.waitForSelector('div', { hidden: true });
+    console.log('7');
+    await page.goto(url, {
+      //https://www.facebook.com/groups/j2team.community.girls
+      //https://www.facebook.com/groups/364997627165697
+      waitUntil: 'load',
+    });
+    await autoScroll(page, (length = lengths));
+    await new Promise((r) => setTimeout(r, 5000));
+
+    console.log('scroll finished');
+    await takedata(page, (length = lengths)).then(async function (result) {
+      // fs.writeFile('item.txt', JSON.stringify(result, null, 2), (err) => {
+      //   if (err) throw err;
+      //   console.log('The file has been saved!');
+      // });
+
+      for (let i = 0; i < result.length; i++) {
+        const app = initializeApp.initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+        const postListRef = ref(
+          database,
+          '/postList/' + url.replace(/[#:.,$]/g, '')
+        );
+        const newPostRef = push(postListRef);
+        set(newPostRef, {
+          user_name: result[i].user_name,
+          video: result[i].video,
+          content: result[i].content + result[i].categori,
+          count_comment: result[i].count_comment,
+          count_like: result[i].count_like,
+          count_share: result[i].count_share,
+          user_id: result[i].user_id,
+          post_id: result[i].post_id,
+          post_link: result[i].post_link,
+          featured_image: result[i].featured_image,
+          comments: result[i].comments,
+        });
+      }
+    });
+    await browser.close();
+  } catch (err) {
+    console.log(err);
+  }
 };
 async function takedata(page, length) {
   const dimension = await page.evaluate(async (length) => {
