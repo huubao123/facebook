@@ -2,8 +2,6 @@ const puppeteer = require('puppeteer');
 const fs = require('fs');
 
 const initializeApp = require('firebase/app');
-const { nextTick } = require('process');
-// const fire = require('firebase/app');
 
 const getDatabase = require('firebase/database').getDatabase;
 const set = require('firebase/database').set;
@@ -32,21 +30,31 @@ async function autoScroll(page, _length) {
         let scrollHeight = document.body.scrollHeight;
         window.scrollBy(0, distance);
         totalHeight += distance;
-        let post_length =
-          document.querySelectorAll('[role="feed"]')[0].childNodes.length;
-        if (post_length - 3 > _length) {
+        if (
+          window.performance.memory.jsHeapSizeLimit -
+            window.performance.memory.jsHeapSizeLimit / 10 <
+          window.performance.memory.totalJSHeapSize
+        ) {
           clearInterval(timer);
           resolve();
         }
-        document.querySelectorAll('[role = "button"]').forEach((el) => {
-          if (
-            el.innerText.indexOf('Xem thêm') !== -1 ||
-            el.innerText.indexOf('phản hồi') !== -1 ||
-            el.innerText.indexOf('câu trả lời') !== -1
-          ) {
-            el.click();
-          }
-        });
+
+        let post_length =
+          document.querySelectorAll('[role="feed"]')[0].childNodes.length;
+        if (post_length - 3 > _length) {
+          document.querySelectorAll('[role = "button"]').forEach((el) => {
+            if (
+              el.innerText.indexOf('Xem thêm') !== -1 ||
+              el.innerText.indexOf('phản hồi') !== -1 ||
+              el.innerText.indexOf('câu trả lời') !== -1
+            ) {
+              el.click();
+            }
+          });
+          clearInterval(timer);
+          resolve();
+        }
+
         if (totalHeight >= scrollHeight) {
           clearInterval(timer);
           resolve();
@@ -101,7 +109,7 @@ module.exports = async function main(req, res, next) {
     // defaultViewport: null,
     // args: ['--start-maximized'],
     // product: 'chrome',
-    // devtools: true,
+    // // devtools: true,
     // executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
   });
   res.status(200).json('đợi tí rồi chuyển thành get rồi lấy data nha');
@@ -131,6 +139,8 @@ module.exports = async function main(req, res, next) {
     waitUntil: 'load',
   });
   await autoScroll(page, (length = lengths));
+  await new Promise((r) => setTimeout(r, 5000));
+
   console.log('scroll finished');
   await takedata(page, (length = lengths)).then(async function (result) {
     // fs.writeFile('item.txt', JSON.stringify(result, null, 2), (err) => {
@@ -1286,6 +1296,7 @@ async function takedata(page, length) {
         });
 
         data.push({
+          // id: data.length ? data.length + 1 : 1,
           userhref: userhref ? userhref : '',
           user_name: user_name ? user_name : '',
           content: content ? content : '',
