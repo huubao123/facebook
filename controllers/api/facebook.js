@@ -70,9 +70,7 @@ module.exports = async function main(req, res, next) {
     const lengths = req.body.length;
     const username = req.body.username;
     const password = req.body.password;
-    console.log(username, password);
-    console.log(url);
-    console.log(lengths);
+
     if (!url) {
       res.json('url is required');
     }
@@ -116,6 +114,9 @@ module.exports = async function main(req, res, next) {
       // // devtools: true,
       // executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
     });
+    console.log(username, password);
+    console.log(url);
+    console.log(lengths);
     console.log('1');
     res.status(200).json('đợi tí rồi chuyển thành get rồi lấy data nha');
     console.log('2');
