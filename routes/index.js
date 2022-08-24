@@ -12,8 +12,8 @@ const { urlencoded } = require('express');
 
 const getDatabase = require('firebase/database').getDatabase;
 const ref = require('firebase/database').ref;
-const onValue = require('firebase/database').onValue;
-
+const child = require('firebase/database').child;
+const get = require('firebase/database').get;
 // require('../controllers/api/local.js')(passport);
 // var csrf = require('csurf');
 // var csrfProtection = csrf({ cookie: true });
@@ -71,10 +71,18 @@ router.get('/post', async function (req, res, next) {
     database,
     '/postList/' + url.replace(/[#:.,$]/g, '')
   );
-
-  onValue(starCountRef, (snapshot) => {
-    return res.status(200).json(snapshot.val());
-  });
+  const dbRef = ref(getDatabase());
+  get(child(dbRef, '/postList/' + url.replace(/[#:.,$]/g, '')))
+    .then((snapshot) => {
+      if (snapshot.exists()) {
+        res.json(snapshot.val());
+      } else {
+        console.log('No data available');
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+    });
 });
 
 // router.post(
