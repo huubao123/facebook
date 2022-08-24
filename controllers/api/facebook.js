@@ -117,9 +117,11 @@ module.exports = async function main(req, res, next) {
   console.log('2');
   const page = await browser.newPage();
   const pages = await browser.pages();
+  console.log('3');
   if (pages.length > 1) {
     await pages[0].close();
   }
+  console.log('4');
   // await page.setRequestInterception(true);
   // page.on('request', (request) => {
   //   if (/google|cloudflare/.test(request.url())) {
@@ -131,10 +133,14 @@ module.exports = async function main(req, res, next) {
   await page.goto('https://www.facebook.com', {
     waitUntil: 'load',
   });
+  console.log('5');
   await page.type('#email', username);
   await page.type('#pass', password);
   await page.keyboard.press('Enter');
+
+  console.log('6');
   await page.waitForSelector('div', { hidden: true });
+  console.log('7');
   await page.goto(url, {
     //https://www.facebook.com/groups/j2team.community.girls
     //https://www.facebook.com/groups/364997627165697
