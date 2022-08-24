@@ -83,7 +83,7 @@ module.exports = async function main(req, res, next) {
       args: [
         '--no-sandbox',
         '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage',
+        // '--disable-dev-shm-usage',
         // '--disable-extensions',
         // '--aggressive-cache-discard',
         // '--disable-cache',
