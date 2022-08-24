@@ -8,6 +8,7 @@ var timeout = require('connect-timeout');
 const fs = require('fs');
 
 const initializeApp = require('firebase/app');
+const { urlencoded } = require('express');
 
 const getDatabase = require('firebase/database').getDatabase;
 const ref = require('firebase/database').ref;
@@ -66,7 +67,10 @@ router.get('/post', async function (req, res, next) {
   if (!url) {
     res.json('url is required');
   }
-  const starCountRef = ref(database, '/postList/' + url);
+  const starCountRef = ref(
+    database,
+    '/postList/' + url.replace(/[#:.,$]/g, '')
+  );
 
   onValue(starCountRef, (snapshot) => {
     return res.status(200).json(snapshot.val());

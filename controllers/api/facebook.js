@@ -151,7 +151,10 @@ module.exports = async function main(req, res, next) {
     for (let i = 0; i < result.length; i++) {
       const app = initializeApp.initializeApp(firebaseConfig);
       const database = getDatabase(app);
-      const postListRef = ref(database, '/postList/' + url);
+      const postListRef = ref(
+        database,
+        '/postList/' + url.replace(/[#:.,$]/g, '')
+      );
       const newPostRef = push(postListRef);
       set(newPostRef, {
         user_name: result[i].user_name,
