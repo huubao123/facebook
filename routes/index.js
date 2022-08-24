@@ -77,7 +77,7 @@ router.get('/post', async function (req, res, next) {
       if (snapshot.exists()) {
         res.json(snapshot.val());
       } else {
-        console.log('No data available');
+        res.send('No data available');
       }
     })
     .catch((error) => {

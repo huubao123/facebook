@@ -157,11 +157,12 @@ module.exports = async function main(req, res, next) {
     });
     console.log('8');
     try {
+      console.log('9');
       await autoScroll(page, (length = lengths));
+      console.log('10');
     } catch (error) {
       console.log(error);
     }
-    console.log('9');
     await new Promise((r) => setTimeout(r, 5000));
 
     console.log('scroll finished');
