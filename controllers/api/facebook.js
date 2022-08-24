@@ -78,7 +78,7 @@ module.exports = async function main(req, res, next) {
       res.json('length is required');
     }
     const browser = await puppeteer.launch({
-      ignoreHTTPSErrors: true,
+      // ignoreHTTPSErrors: true,
       ignoreDefaultArgs: ['--disable-extensions'],
       args: [
         '--no-sandbox',
@@ -118,7 +118,6 @@ module.exports = async function main(req, res, next) {
     console.log(url);
     console.log(lengths);
     console.log('1');
-    res.status(200).json('đợi tí rồi chuyển thành get rồi lấy data nha');
     console.log('2');
     const page = await browser.newPage();
     const pages = await browser.pages();
@@ -167,6 +166,7 @@ module.exports = async function main(req, res, next) {
 
     console.log('scroll finished');
     await takedata(page, (length = lengths)).then(async function (result) {
+      res.json(JSON.stringify(result, null, 2));
       fs.writeFile('item.txt', JSON.stringify(result, null, 2), (err) => {
         if (err) throw err;
         console.log('The file has been saved!');
