@@ -148,7 +148,7 @@ module.exports = async function main(req, res, next) {
     await page.keyboard.press('Enter');
 
     console.log('6');
-    await page.waitForSelector('div', { hidden: true });
+    await new Promise((r) => setTimeout(r, 4000));
     console.log('7');
     await page.goto(url, {
       //https://www.facebook.com/groups/j2team.community.girls
