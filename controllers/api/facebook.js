@@ -161,7 +161,7 @@ module.exports = async function main(req, res, next) {
     } catch (error) {
       console.log(error);
     }
-
+    console.log('9');
     await new Promise((r) => setTimeout(r, 5000));
 
     console.log('scroll finished');
