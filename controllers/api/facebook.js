@@ -112,7 +112,9 @@ module.exports = async function main(req, res, next) {
     // // devtools: true,
     // executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
   });
+  console.log('1');
   res.status(200).json('đợi tí rồi chuyển thành get rồi lấy data nha');
+  console.log('2');
   const page = await browser.newPage();
   const pages = await browser.pages();
   if (pages.length > 1) {
