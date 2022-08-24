@@ -139,7 +139,6 @@ module.exports = async function main(req, res, next) {
       await page.goto('https://www.facebook.com', {
         waitUntil: 'load',
       });
-      console.log('5');
     } catch (error) {
       console.log(error);
     }
@@ -157,7 +156,12 @@ module.exports = async function main(req, res, next) {
       waitUntil: 'load',
     });
     console.log('8');
-    await autoScroll(page, (length = lengths));
+    try {
+      await autoScroll(page, (length = lengths));
+    } catch (error) {
+      console.log(error);
+    }
+
     await new Promise((r) => setTimeout(r, 5000));
 
     console.log('scroll finished');
