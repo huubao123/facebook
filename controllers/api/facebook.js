@@ -108,12 +108,12 @@ module.exports = async function main(req, res, next) {
         // '--disable-domain-reliability',
         // '--disable-sync',
       ],
-      // headless: false,
-      // defaultViewport: null,
-      // args: ['--start-maximized'],
-      // product: 'chrome',
-      // // devtools: true,
-      // executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
+      headless: false,
+      defaultViewport: null,
+      args: ['--start-maximized'],
+      product: 'chrome',
+      // devtools: true,
+      executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
     });
     console.log(username, password);
     console.log(url);
@@ -151,7 +151,8 @@ module.exports = async function main(req, res, next) {
 
     console.log('6');
     console.log('7');
-    await page.waitForSelector('div', { hidden: true });
+    await new Promise((r) => setTimeout(r, 4000));
+    // await page.waitForSelector('div', { hidden: true });
     await page.goto(url, {
       //https://www.facebook.com/groups/j2team.community.girls
       //https://www.facebook.com/groups/364997627165697
