@@ -111,7 +111,7 @@ module.exports = async function main(req, res, next) {
       // headless: false,
       // defaultViewport: null,
       // args: ['--start-maximized'],
-      // product: 'chrome',
+      //product: 'chrome',
       // devtools: true,
       // executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
     });
@@ -158,7 +158,12 @@ module.exports = async function main(req, res, next) {
     console.log('8');
     try {
       console.log('9');
+      const used = process.memoryUsage();
+      for (let key in used) {
+        console.log(`Memory: ${key} ${Math.round(used[key])} `);
+      }
       await autoScroll(page, (length = lengths));
+
       console.log('10');
     } catch (error) {
       console.log(error);
