@@ -31,14 +31,14 @@ async function autoScroll(page, _length) {
         let scrollHeight = document.body.scrollHeight;
         window.scrollBy(0, distance);
         totalHeight += distance;
-        if (
-          window.performance.memory.jsHeapSizeLimit -
-            window.performance.memory.jsHeapSizeLimit / 10 <
-          window.performance.memory.totalJSHeapSize
-        ) {
-          clearInterval(timer);
-          resolve();
-        }
+        // if (
+        //   window.performance.memory.jsHeapSizeLimit -
+        //     window.performance.memory.jsHeapSizeLimit / 10 <
+        //   window.performance.memory.totalJSHeapSize
+        // ) {
+        //   clearInterval(timer);
+        //   resolve();
+        // }
 
         let post_length =
           document.querySelectorAll('[role="feed"]')[0].childNodes.length;
@@ -112,12 +112,9 @@ module.exports = async function main(req, res, next) {
       // defaultViewport: null,
       // args: ['--start-maximized'],
       // product: 'chrome',
-      // // devtools: true,
+      // devtools: true,
       // executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
     });
-    console.log(username, password);
-    console.log(url);
-    console.log(lengths);
     console.log('1');
     console.log('2');
     const page = await browser.newPage();
