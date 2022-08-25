@@ -171,36 +171,35 @@ module.exports = async function main(req, res, next) {
     console.log('scroll finished');
     onFinished(page, async function () {
       await takedata(page, (length = lengths)).then(async function (result) {
-        fs.writeFile('item.txt', JSON.stringify(result, null, 2), (err) => {
-          if (err) throw err;
-          console.log('The file has been saved!');
-        });
+        // fs.writeFile('item.txt', JSON.stringify(result, null, 2), (err) => {
+        //   if (err) throw err;
+        //   console.log('The file has been saved!');
+        // });
+        for (let i = 0; i < result.length; i++) {
+          const app = initializeApp.initializeApp(firebaseConfig);
+          const database = getDatabase(app);
+          const postListRef = ref(
+            database,
+            '/postList/' + url.replace(/[#:.,$]/g, '')
+          );
+          const newPostRef = push(postListRef);
+          set(newPostRef, {
+            user_name: result[i].user_name,
+            video: result[i].video,
+            content: result[i].content + result[i].categori,
+            count_comment: result[i].count_comment,
+            count_like: result[i].count_like,
+            count_share: result[i].count_share,
+            user_id: result[i].user_id,
+            post_id: result[i].post_id,
+            post_link: result[i].post_link,
+            featured_image: result[i].featured_image,
+            comments: result[i].comments,
+          });
+        }
       });
-
-      // for (let i = 0; i < result.length; i++) {
-      //   const app = initializeApp.initializeApp(firebaseConfig);
-      //   const database = getDatabase(app);
-      //   const postListRef = ref(
-      //     database,
-      //     '/postList/' + url.replace(/[#:.,$]/g, '')
-      //   );
-      //   const newPostRef = push(postListRef);
-      //   set(newPostRef, {
-      //     user_name: result[i].user_name,
-      //     video: result[i].video,
-      //     content: result[i].content + result[i].categori,
-      //     count_comment: result[i].count_comment,
-      //     count_like: result[i].count_like,
-      //     count_share: result[i].count_share,
-      //     user_id: result[i].user_id,
-      //     post_id: result[i].post_id,
-      //     post_link: result[i].post_link,
-      //     featured_image: result[i].featured_image,
-      //     comments: result[i].comments,
-      //   });
-      // }
     });
-    //await browser.close();
+    await browser.close();
   } catch (err) {
     console.log('lỗi server', err);
   }
