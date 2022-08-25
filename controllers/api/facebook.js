@@ -108,12 +108,12 @@ module.exports = async function main(req, res, next) {
         // '--disable-domain-reliability',
         // '--disable-sync',
       ],
-      headless: false,
-      defaultViewport: null,
-      args: ['--start-maximized'],
-      product: 'chrome',
-      // devtools: true,
-      executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
+      // headless: false,
+      // defaultViewport: null,
+      // args: ['--start-maximized'],
+      // product: 'chrome',
+      // // devtools: true,
+      // executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
     });
     console.log(username, password);
     console.log(url);
