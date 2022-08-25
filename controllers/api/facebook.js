@@ -77,94 +77,96 @@ module.exports = async function main(req, res, next) {
     if (!lengths) {
       res.json('length is required');
     }
-    const browser = await puppeteer.launch({
-      // ignoreHTTPSErrors: true,
-      ignoreDefaultArgs: ['--disable-extensions'],
-      args: [
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        // '--disable-dev-shm-usage',
-        // '--disable-extensions',
-        // '--aggressive-cache-discard',
-        // '--disable-cache',
-        // '--disable-application-cache',
-        // '--disable-offline-load-stale-cache',
-        // '--disable-gpu-shader-disk-cache',
-        // '--media-cache-size=0',
-        // '--disk-cache-size=0',
+    if (url && lengths && username && password) {
+      const browser = await puppeteer.launch({
+        // ignoreHTTPSErrors: true,
+        ignoreDefaultArgs: ['--disable-extensions'],
+        args: [
+          '--no-sandbox',
+          '--disable-setuid-sandbox',
+          // '--disable-dev-shm-usage',
+          // '--disable-extensions',
+          // '--aggressive-cache-discard',
+          // '--disable-cache',
+          // '--disable-application-cache',
+          // '--disable-offline-load-stale-cache',
+          // '--disable-gpu-shader-disk-cache',
+          // '--media-cache-size=0',
+          // '--disk-cache-size=0',
 
-        // '--disable-component-extensions-with-background-pages',
-        // '--disable-default-apps',
-        // '--mute-audio',
-        // '--no-default-browser-check',
-        // '--autoplay-policy=user-gesture-required',
-        // '--disable-background-timer-throttling',
-        // '--disable-backgrounding-occluded-windows',
-        // '--disable-notifications',
-        // '--disable-background-networking',
-        // '--disable-breakpad',
-        // '--disable-component-update',
-        // '--disable-domain-reliability',
-        // '--disable-sync',
-      ],
-      // headless: false,
-      // defaultViewport: null,
-      // args: ['--start-maximized'],
-      // product: 'chrome',
-      // // devtools: true,
-      // executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
-    });
-    console.log(username, password);
-    console.log(url);
-    console.log(lengths);
-    console.log('1');
-    console.log('2');
-    const page = await browser.newPage();
-    const pages = await browser.pages();
-    console.log('3');
-    if (pages.length > 1) {
-      await pages[0].close();
-    }
-    console.log('4');
-    // await page.setRequestInterception(true);
-    // page.on('request', (request) => {
-    //   if (/google|cloudflare/.test(request.url())) {
-    //     request.abort();
-    //   } else {
-    //     request.continue();
-    //   }
-    // });
-    try {
-      await page.goto('https://www.facebook.com', {
+          // '--disable-component-extensions-with-background-pages',
+          // '--disable-default-apps',
+          // '--mute-audio',
+          // '--no-default-browser-check',
+          // '--autoplay-policy=user-gesture-required',
+          // '--disable-background-timer-throttling',
+          // '--disable-backgrounding-occluded-windows',
+          // '--disable-notifications',
+          // '--disable-background-networking',
+          // '--disable-breakpad',
+          // '--disable-component-update',
+          // '--disable-domain-reliability',
+          // '--disable-sync',
+        ],
+        // headless: false,
+        // defaultViewport: null,
+        // args: ['--start-maximized'],
+        // product: 'chrome',
+        // // devtools: true,
+        // executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
+      });
+      console.log(username, password);
+      console.log(url);
+      console.log(lengths);
+      console.log('1');
+      console.log('2');
+      const page = await browser.newPage();
+      const pages = await browser.pages();
+      console.log('3');
+      if (pages.length > 1) {
+        await pages[0].close();
+      }
+      console.log('4');
+      // await page.setRequestInterception(true);
+      // page.on('request', (request) => {
+      //   if (/google|cloudflare/.test(request.url())) {
+      //     request.abort();
+      //   } else {
+      //     request.continue();
+      //   }
+      // });
+      try {
+        await page.goto('https://www.facebook.com', {
+          waitUntil: 'load',
+        });
+      } catch (error) {
+        console.log(error);
+      }
+
+      await page.type('#email', username);
+      await page.type('#pass', password);
+      await page.keyboard.press('Enter');
+
+      console.log('6');
+      console.log('7');
+      await page.waitForSelector('div', { hidden: true });
+      await page.goto(url, {
+        //https://www.facebook.com/groups/j2team.community.girls
+        //https://www.facebook.com/groups/364997627165697
         waitUntil: 'load',
       });
-    } catch (error) {
-      console.log(error);
+      console.log('8');
+      try {
+        console.log('9');
+        await autoScroll(page, (length = lengths));
+        console.log('10');
+      } catch (error) {
+        console.log(error);
+      }
+      await new Promise((r) => setTimeout(r, 5000));
+
+      console.log('scroll finished');
     }
-
-    await page.type('#email', username);
-    await page.type('#pass', password);
-    await page.keyboard.press('Enter');
-
-    console.log('6');
-    console.log('7');
-    await page.waitForSelector('div', { hidden: true });
-    await page.goto(url, {
-      //https://www.facebook.com/groups/j2team.community.girls
-      //https://www.facebook.com/groups/364997627165697
-      waitUntil: 'load',
-    });
-    console.log('8');
-    try {
-      console.log('9');
-      await autoScroll(page, (length = lengths));
-      console.log('10');
-    } catch (error) {
-      console.log(error);
-    }
-    await new Promise((r) => setTimeout(r, 5000));
-
-    console.log('scroll finished');
     await takedata(page, (length = lengths)).then(async function (result) {
       res.json(JSON.stringify(result, null, 2));
       fs.writeFile('item.txt', JSON.stringify(result, null, 2), (err) => {
