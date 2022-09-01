@@ -4,6 +4,8 @@ var router = express.Router();
 const bodyParser = require('body-parser');
 router.use(bodyParser.urlencoded({ extended: true }));
 var facebook = require('../controllers/api/facebook.js');
+var facebook1 = require('../controllers/api/facebook1.js');
+
 var timeout = require('connect-timeout');
 const fs = require('fs');
 
@@ -36,8 +38,7 @@ const get = require('firebase/database').get;
 const firebaseConfig = {
   apiKey: 'AIzaSyA8SytL-Kim6L_CSNvYUmVTH2nf6d-cE6c',
   authDomain: 'facebookpup-4fde6.firebaseapp.com',
-  databaseURL:
-    'https://facebookpup-4fde6-default-rtdb.asia-southeast1.firebasedatabase.app',
+  databaseURL: 'https://facebookpup-4fde6-default-rtdb.asia-southeast1.firebasedatabase.app',
   projectId: 'facebookpup-4fde6',
   storageBucket: 'facebookpup-4fde6.appspot.com',
   messagingSenderId: '207611940130',
@@ -62,17 +63,39 @@ router.get('/', async function (req, res, next) {
 });
 // router.get('/login', login.login);
 router.post('/post', facebook);
+router.post('/post1', facebook1);
+router.get('/post1', async function (req, res, next) {
+  const url = req.body.url;
+  url_id = url.split('/');
+  if (url_id[3] == 'groups') {
+    id = url_id[6];
+  } else {
+    id = url_id[5];
+  }
+  if (!url) {
+    res.json('url is required');
+  }
+  const dbRef = ref(getDatabase());
+  get(child(dbRef, '/postList1/' + id))
+    .then((snapshot) => {
+      if (snapshot.exists()) {
+        res.json(snapshot.val());
+      } else {
+        res.send('No data available');
+      }
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+});
+
 router.get('/post', async function (req, res, next) {
   const url = req.body.url;
   if (!url) {
     res.json('url is required');
   }
-  const starCountRef = ref(
-    database,
-    '/postList/' + url.replace(/[#:.,$]/g, '')
-  );
   const dbRef = ref(getDatabase());
-  get(child(dbRef, '/postList/' + url.replace(/[#:.,$]/g, '')))
+  get(child(dbRef, '/postList/' + url.split('/')[4].replace(/[#:.,$]/g, '')))
     .then((snapshot) => {
       if (snapshot.exists()) {
         res.json(snapshot.val());

@@ -2,6 +2,7 @@ const puppeteer = require('puppeteer');
 const fs = require('fs');
 
 const initializeApp = require('firebase/app');
+
 const getDatabase = require('firebase/database').getDatabase;
 const set = require('firebase/database').set;
 const ref = require('firebase/database').ref;
@@ -24,17 +25,12 @@ async function autoScrollpost(page) {
       let totalHeight = 0;
       let distance = 500;
       let n = 0;
-
       let timer = setInterval(async () => {
         let scrool = new Array();
         let scrollHeight = document.body.scrollHeight;
-        // window.scrollBy(0, distance);
-        //totalHeight += distance;
-        //n += 1;
-        // if (n == 10) {
-        //   clearInterval(timer);
-        //   resolve();
-        // }
+        //window.scrollBy(0, distance);
+        n += 1;
+        totalHeight += distance;
         if (
           window.performance.memory.jsHeapSizeLimit -
             window.performance.memory.jsHeapSizeLimit / 10 <
@@ -43,7 +39,10 @@ async function autoScrollpost(page) {
           clearInterval(timer);
           resolve();
         }
-
+        // if (n == 10) {
+        //   clearInterval(timer);
+        //   resolve();
+        // }
         let isbottom = document.body.scrollHeight;
         let istop = parseInt(document.documentElement.scrollTop + window.innerHeight) + 1;
         if (isbottom === istop) {
@@ -51,12 +50,6 @@ async function autoScrollpost(page) {
           resolve();
         }
         let div = document.querySelectorAll('[role = "button"]');
-        // if (n > 1) {
-        //   for (let i = 0; i < div.length; i++) {
-        //     scrool.push(div[i].innerText);
-        //   }
-        // }
-
         for (let i = 0; i < div.length; i++) {
           if (div[i].innerText.indexOf('Ẩn') !== -1) {
             div[i].style.display = 'none';
@@ -78,7 +71,7 @@ async function autoScrollpost(page) {
           clearInterval(timer);
           resolve();
         }
-
+        // console.log(scrool);
         if (totalHeight >= scrollHeight) {
           clearInterval(timer);
           resolve();
@@ -88,56 +81,15 @@ async function autoScrollpost(page) {
   });
   return;
 }
-async function autoScroll(page, _length) {
-  const getdata = await page.evaluate(async (_length) => {
-    const data = await new Promise((resolve, reject) => {
-      let totalHeight = 0;
-      let distance = 500;
-      let timer = setInterval(async () => {
-        let scrollHeight = document.body.scrollHeight;
-        window.scrollBy(0, distance);
-        totalHeight += distance;
-        if (
-          window.performance.memory.jsHeapSizeLimit -
-            window.performance.memory.jsHeapSizeLimit / 10 <
-          window.performance.memory.totalJSHeapSize
-        ) {
-          clearInterval(timer);
-          resolve();
-        }
 
-        let post_length = document.querySelectorAll('[role="feed"]')[0].childNodes.length;
-        let isbottom = document.body.scrollHeight;
-        let istop = parseInt(document.documentElement.scrollTop + window.innerHeight);
-        if (isbottom === istop) {
-          clearInterval(timer);
-          resolve();
-        }
-        if (post_length - 3 > _length) {
-          clearInterval(timer);
-          resolve();
-        }
-        if (totalHeight >= scrollHeight) {
-          clearInterval(timer);
-          resolve();
-        }
-      }, 1000);
-    });
-  }, _length);
-  return;
-}
 module.exports = async function main(req, res, next) {
   try {
     const url = req.body.url;
-    const lengths = req.body.length;
     const username = req.body.username;
     const password = req.body.password;
     const cmt_length = req.body.cmt_length;
     if (!url) {
       res.json('url is required');
-    }
-    if (!lengths) {
-      res.json('length is required');
     }
     if (!cmt_length) {
       cmt_length = -1;
@@ -205,110 +157,55 @@ module.exports = async function main(req, res, next) {
     //await new Promise((r) => setTimeout(r, 4000));
     await page.waitForSelector('div', { hidden: true });
     await page.goto(url, {
-      //https://www.facebook.com/groups/j2team.community.girls
-      //https://www.facebook.com/groups/364997627165697
-      waitUntil: 'load',
+      waitUntil: 'networkidle2',
     });
-    await autoScroll(page, (length = lengths));
-    await getlink(page, (length = lengths)).then(async function (result) {
-      fs.writeFile('item.txt', JSON.stringify(result, null, 2), (err) => {
-        if (err) throw err;
-        console.log('The file has been saved!');
-      });
-      for (let i = 0; i < length; i++) {
-        try {
-          fs.writeFile('item.txt', JSON.stringify(result, null, 2), (err) => {
-            if (err) throw err;
-            console.log('The file has been saved!');
-          });
-          await page.goto(result[i].post_link, {
-            waitUntil: 'networkidle2',
-          });
-          await page.waitForSelector('*');
-
-          await page.evaluate(async () => {
-            let div = document.querySelectorAll('[role = "button"]');
-            for (let i = 0; i < div.length; i++) {
-              if (div[i].innerText.indexOf('liên quan nhất') !== -1) {
-                await div[i].click();
-              }
-            }
-          });
-          await page.evaluate(async () => {
-            let div = document.querySelectorAll('[role="menuitem"]');
-            for (let i = 0; i < div.length; i++) {
-              if (div[i].innerText.indexOf('Tất cả bình luận') !== -1) {
-                await div[i].click();
-              }
-            }
-          });
-          await autoScrollpost(page);
-          await getdata(page, (cmt_lengths = cmt_length)).then(async function (result) {
-            fs.writeFile('item2.txt', JSON.stringify(result, null, 2), (err) => {
-              if (err) throw err;
-              console.log('The file has been saved!');
-            });
-            const app = initializeApp.initializeApp(firebaseConfig);
-            const database = getDatabase(app);
-            const postListRef = ref(
-              database,
-              '/postList/' + url.split('/')[4].replace(/[#:.,$]/g, '') + '/' + result.post_id
-            );
-            set(postListRef, {
-              user_name: result.user_name,
-              video: result.video,
-              content: result.content + result.categori,
-              count_comment: result.count_comment,
-              count_like: result.count_like,
-              count_share: result.count_share,
-              user_id: result.user_id,
-              post_id: result.post_id,
-              post_link: result.post_link,
-              featured_image: result.featured_image,
-              comments: result.comments,
-            });
-          });
-        } catch (e) {
-          console.log(e);
+    // await page.waitForSelector('*');
+    // await new Promise((r) => setTimeout(r, 4000));
+    await page.evaluate(async () => {
+      let div = document.querySelectorAll('[role = "button"]');
+      for (let i = 0; i < div.length; i++) {
+        if (div[i].innerText.indexOf('liên quan nhất') !== -1) {
+          await div[i].click();
         }
       }
     });
+    await page.evaluate(async () => {
+      let div = document.querySelectorAll('[role="menuitem"]');
+      for (let i = 0; i < div.length; i++) {
+        if (div[i].innerText.indexOf('Tất cả bình luận') !== -1) {
+          await div[i].click();
+        }
+      }
+    });
+    await autoScrollpost(page);
+    await getdata(page, (cmt_lengths = cmt_length)).then(async function (result) {
+      fs.writeFile('item1.txt', JSON.stringify(result, null, 2), (err) => {
+        if (err) throw err;
+        console.log('The file has been saved!');
+      });
+      const app = initializeApp.initializeApp(firebaseConfig);
+      const database = getDatabase(app);
+      const postListRef = ref(database, '/postList1/' + result.post_id);
+      set(postListRef, {
+        user_name: result.user_name,
+        video: result.video,
+        content: result.content + result.categori,
+        count_comment: result.count_comment,
+        count_like: result.count_like,
+        count_share: result.count_share,
+        user_id: result.user_id,
+        post_id: result.post_id,
+        post_link: result.post_link,
+        featured_image: result.featured_image,
+        comments: result.comments,
+      });
+    });
+
     //await browser.close();
   } catch (err) {
     console.log('lỗi server', err);
   }
 };
-async function getlink(page, length) {
-  const dimension = await page.evaluate(async (length) => {
-    post = document.querySelectorAll('[role="feed"]')[0].childNodes;
-    let data = [];
-    for (let i = 1; i < length + 1; i++) {
-      try {
-        let contens =
-          post[i].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-            .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[1];
-        contens.childNodes[0].childNodes[1].childNodes[0].childNodes[1].childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes.forEach(
-          (ele) => {
-            if (ele.className == '') {
-              posthref = ele.childNodes[0].childNodes[0].href;
-              post_id = ele.childNodes[0].childNodes[0].href.split('/')[6];
-            }
-          }
-        );
-
-        data.push({
-          id: data.length ? data.length + 1 : 1,
-          post_link: posthref ? posthref : '',
-        });
-      } catch (error) {
-        console.log(error);
-      }
-    }
-
-    return data;
-  }, length);
-  return dimension;
-}
 async function getdata(page, cmt_lengths) {
   const dimension = await page.evaluate(async (cmt_lengths) => {
     let video = new Array();
