@@ -3,14 +3,13 @@ var router = express.Router();
 // var passport = require('passport');
 const bodyParser = require('body-parser');
 router.use(bodyParser.urlencoded({ extended: true }));
-var facebook = require('../controllers/api/facebook.js');
+var facebook = require('../controllers/api/facebook');
 var facebook1 = require('../controllers/api/facebook1.js');
 
 var timeout = require('connect-timeout');
 const fs = require('fs');
 
 const initializeApp = require('firebase/app');
-const { urlencoded } = require('express');
 
 const getDatabase = require('firebase/database').getDatabase;
 const ref = require('firebase/database').ref;
@@ -63,6 +62,31 @@ router.get('/', async function (req, res, next) {
 });
 // router.get('/login', login.login);
 router.post('/post', facebook);
+router.post('/post2', async (req, res, next) => {
+  var arr = ['success', 'error'];
+  res.json({ data: arr[Math.floor(Math.random() * arr.length)], status: 'adsdasds' });
+});
+
+router.get('/post_link', async function (req, res, next) {
+  fs.readFile('item2.txt', function (err, data) {
+    aaa = JSON.parse(data);
+    bbb = [];
+    for (var i = 0; i < aaa.length; i++) {
+      bbb.push(aaa[i].linkPost);
+    }
+    fs.writeFile('item.txt', JSON.stringify(bbb, null, 2), (err) => {
+      if (err) throw err;
+      console.log('The file has been saved!');
+    });
+    // aaa.forEach((element) => {
+    //   fs.writeFile('item.txt', JSON.stringify(element.linkPost, null, 2), (err) => {
+    //     if (err) throw err;
+    //     console.log('The file has been saved!');
+    //   });
+    // });
+  });
+});
+
 router.post('/post1', facebook1);
 router.get('/post1', async function (req, res, next) {
   const url = req.body.url;

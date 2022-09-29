@@ -1,5 +1,6 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
+const crypto = require('crypto');
 
 const initializeApp = require('firebase/app');
 
@@ -60,12 +61,12 @@ async function autoScrollpost(page) {
             div[i].innerText.indexOf('bình luận trước') !== -1
           ) {
             await div[i].click();
-            await scrool.push('đã hết');
+            scrool.push('đã hết');
           } else {
-            await scrool.push(div[i].innerText);
+            scrool.push(div[i].innerText);
           }
         }
-        checkcom = (await scrool.indexOf('đã hết')) > -1;
+        checkcom = scrool.indexOf('đã hết') > -1;
         if (!checkcom) {
           console.log(n);
           clearInterval(timer);
@@ -85,9 +86,27 @@ async function autoScrollpost(page) {
 module.exports = async function main(req, res, next) {
   try {
     const url = req.body.url;
-    const username = req.body.username;
-    const password = req.body.password;
-    const cmt_length = req.body.cmt_length;
+    let url_group = '';
+    for (let i = 0; i < 5; i++) {
+      url_group += url.split('/')[i];
+    }
+    const name = url.split('/')[3] == 'groups' ? url.split('/')[4] : url.split('/')[3];
+    const cmt_length = req.body.length_comment;
+    let name_group = '';
+    const craw_id = crypto.randomBytes(16).toString('hex');
+    const app = initializeApp.initializeApp(firebaseConfig);
+    const database = getDatabase(app);
+    const postListRefs = ref(
+      database,
+      '/craw_list_length/' + name.replace(/[#:.,$]/g, '') + '/' + craw_id
+    );
+    await set(postListRefs, {
+      craw_id: craw_id,
+      length: 1,
+      url: url,
+      cmt_length: cmt_length,
+      create_at: Date.now(),
+    });
     if (!url) {
       res.json('url is required');
     }
@@ -144,64 +163,139 @@ module.exports = async function main(req, res, next) {
     //     request.continue();
     //   }
     // });
-
-    res.send('đợi chút rồi chuyển get lấy data nha');
-    await page.goto('https://www.facebook.com', {
-      waitUntil: 'load',
-    });
-
-    await page.type('#email', username);
-    await page.type('#pass', password);
-    await page.keyboard.press('Enter');
-
-    //await new Promise((r) => setTimeout(r, 4000));
-    await page.waitForSelector('div', { hidden: true });
-    await page.goto(url, {
-      waitUntil: 'networkidle2',
-    });
-    // await page.waitForSelector('*');
-    // await new Promise((r) => setTimeout(r, 4000));
-    await page.evaluate(async () => {
-      let div = document.querySelectorAll('[role = "button"]');
-      for (let i = 0; i < div.length; i++) {
-        if (div[i].innerText.indexOf('liên quan nhất') !== -1) {
-          await div[i].click();
-        }
-      }
-    });
-    await page.evaluate(async () => {
-      let div = document.querySelectorAll('[role="menuitem"]');
-      for (let i = 0; i < div.length; i++) {
-        if (div[i].innerText.indexOf('Tất cả bình luận') !== -1) {
-          await div[i].click();
-        }
-      }
-    });
-    await autoScrollpost(page);
-    await getdata(page, (cmt_lengths = cmt_length)).then(async function (result) {
-      fs.writeFile('item1.txt', JSON.stringify(result, null, 2), (err) => {
-        if (err) throw err;
-        console.log('The file has been saved!');
+    try {
+      await page.goto('https://www.facebook.com', {
+        waitUntil: 'load',
       });
+
+      await page.type('#email', 'huubao034@gmail.com');
+      await page.type('#pass', 'huubao123');
+      await page.keyboard.press('Enter');
+
+      //await new Promise((r) => setTimeout(r, 4000));
+      await page.waitForSelector('div', { hidden: true });
+      if (url.indexOf('posts') !== -1) {
+        for (let i = 0; i < 5; i++) {
+          name_group += url.split('/')[i] + '/';
+        }
+      }
+      console.log(name_group);
+      await page.goto(name_group, {
+        waitUntil: 'networkidle2',
+      });
+      await page.waitForFunction('document.querySelector("h1")');
+      res.json({ data: 'success', statusbar: craw_id });
+    } catch (e) {
+      res.json({ data: 'error', statusbar: JSON.stringify(e) });
+    }
+
+    let result = await page.evaluate(() => {
+      return document.querySelector('h1').textContent;
+    });
+    const apps = initializeApp.initializeApp(firebaseConfig);
+    const databases = getDatabase(apps);
+    const postListRefss = ref(databases, 'Group/' + name.replace(/[#:.,$]/g, ''));
+    await set(postListRefss, {
+      name: result,
+      url: url_group,
+      create_at: Date.now(),
+    });
+    try {
+      await page.goto(url, {
+        waitUntil: 'networkidle2',
+      });
+      // await page.waitForSelector('*');
+      // await new Promise((r) => setTimeout(r, 4000));
+      await page.evaluate(async () => {
+        let div = document.querySelectorAll('[role = "button"]');
+        for (let i = 0; i < div.length; i++) {
+          if (
+            div[i].innerText.indexOf('liên quan nhất') !== -1 ||
+            div[i].innerText.indexOf('Gần đây nhất') !== -1
+          ) {
+            await div[i].click();
+          }
+        }
+      });
+      await page.evaluate(async () => {
+        let div = document.querySelectorAll('[role="menuitem"]');
+        for (let i = 0; i < div.length; i++) {
+          if (div[i].innerText.indexOf('Tất cả bình luận') !== -1) {
+            await div[i].click();
+          }
+        }
+      });
+      await autoScrollpost(page);
+      await getdata(page, (cmt_lengths = cmt_length)).then(async function (result) {
+        fs.writeFile('item1.txt', JSON.stringify(result, null, 2), (err) => {
+          if (err) throw err;
+          console.log('The file has been saved!');
+        });
+        const app = initializeApp.initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+        const postListRef = ref(
+          database,
+          '/postList/' + name.replace(/[#:.,$]/g, '') + '/' + url.split('/')[6]
+        );
+
+        set(postListRef, {
+          user: result.user,
+          videos: result.videos,
+          contentList: result.contentList,
+          countComment: result.countComment,
+          countLike: result.countLike,
+          countShare: result.countShare,
+          user_id: result.user_id,
+          idPost: result.idPost,
+          linkPost: result.linkPost,
+          linkImgs: result.linkImgs,
+          commentList: result.commentList,
+          token: result.token,
+          count_comments_config: result.count_comments_config,
+          create_at: Date.now(),
+        });
+        const postListRefs = ref(
+          database,
+          '/craw_list/' + name.replace(/[#:.,$]/g, '') + '/' + craw_id
+        );
+        const newPostRef = push(postListRefs);
+
+        await set(newPostRef, {
+          id: 1,
+          post_link: url,
+          statusbar: 'active',
+          countComment: result.countComment,
+          countLike: result.countLike,
+          countShare: result.countShare,
+          count_comments_config: result.count_comments_config,
+          comments_config: cmt_length,
+          create_at: Date.now(),
+        });
+      });
+    } catch (e) {
       const app = initializeApp.initializeApp(firebaseConfig);
       const database = getDatabase(app);
-      const postListRef = ref(database, '/postList1/' + result.post_id);
+      const postListRef = ref(
+        database,
+        '/postList/' + name.replace(/[#:.,$]/g, '') + '/' + url.split('/')[6]
+      );
       set(postListRef, {
-        user_name: result.user_name,
-        video: result.video,
-        content: result.content + result.categori,
-        count_comment: result.count_comment,
-        count_like: result.count_like,
-        count_share: result.count_share,
-        user_id: result.user_id,
-        post_id: result.post_id,
-        post_link: result.post_link,
-        featured_image: result.featured_image,
-        comments: result.comments,
+        post_link: url,
+        error: 'error' + e,
       });
-    });
+      const postListRefs = ref(
+        database,
+        '/craw_list/' + name.replace(/[#:.,$]/g, '') + '/' + craw_id
+      );
+      const newPostRef = push(postListRefs);
+      set(newPostRef, {
+        id: 1,
+        post_link: url,
+        statusbar: 'error' + e,
+      });
+    }
 
-    //await browser.close();
+    await browser.close();
   } catch (err) {
     console.log('lỗi server', err);
   }
@@ -215,6 +309,7 @@ async function getdata(page, cmt_lengths) {
     let userhref =
       (user_name =
       content =
+      posthref =
       categori =
       likes =
       count_comments =
@@ -236,20 +331,26 @@ async function getdata(page, cmt_lengths) {
       cotent_cmtchild_text =
       imgComment =
         '');
-    let count_like_cmt = (count_like_cmtchild = 0);
+    let count_comments_config = 0;
+    let token = require('DTSGInitialData').token;
+    let count_like_cmt = (count_like_cmtchild = count_like_cmtchild2 = 0);
     //
     post = document.querySelector('[role="article"]').childNodes[0];
-    let contens =
-      post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[1].childNodes[0];
+    let contens = post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[1]
+      .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+      ? post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[1].childNodes[0]
+      : post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[7].childNodes[0];
+
     try {
-      contens.childNodes[1].childNodes[0].childNodes[1].childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes.forEach(
-        (ele) => {
-          if (ele.className == '') {
-            posthref = ele.childNodes[0].childNodes[0].href;
-            post_id = ele.childNodes[0].childNodes[0].href.split('/')[6];
-          }
-        }
-      );
+      // contens.childNodes[1].childNodes[0].childNodes[1].childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes.forEach(
+      //   (ele) => {
+      //     if (ele.className == '') {
+      //       posthref = ele.childNodes[0].childNodes[0].href;
+      //       post_id = ele.childNodes[0].childNodes[0].href.split('/')[6];
+      //     }
+      //   }
+      // );
+
       if (
         contens.childNodes[1].childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes[0]
           .childNodes[0].childNodes[0].childNodes.length > 1
@@ -267,11 +368,11 @@ async function getdata(page, cmt_lengths) {
           userhref = element.children[0].href
             ? element.childNodes[0].href
             : element.childNodes[0].href;
-          user_name = element.children[0].innerText
-            ? element.children[0].innerText
-            : element.children[0].innerText;
-          user_id = element.children[0].href
-            ? element.children[0].href.split('/')[6]
+          user_name = element.childNodes[0].innerText
+            ? element.childNodes[0].innerText
+            : element.childNodes[0].innerText;
+          user_id = element.childNodes[0].href
+            ? element.childNodes[0].href.split('/')[6]
             : element.childNodes[0].href.split('/')[6];
         }
       });
@@ -315,7 +416,7 @@ async function getdata(page, cmt_lengths) {
             if (checkitemlength.length == 7) {
               if (checkitemlength[5].childNodes.length == 11) {
                 video.push(
-                  checkitemlength[5].childNodes[1].childNodes[0].childNodes[0].childNodes[0].childNodes[0].href.split(
+                  checkitemlength[5].childNodes[7].childNodes[0].childNodes[0].childNodes[0].childNodes[0].href.split(
                     '/'
                   )[5]
                 );
@@ -329,7 +430,7 @@ async function getdata(page, cmt_lengths) {
             } else if (checkitemlength.length == 6) {
               if (checkitemlength[4].childNodes.length == 11) {
                 video.push(
-                  checkitemlength[4].childNodes[1].childNodes[0].childNodes[0].childNodes[0].childNodes[0].href.split(
+                  checkitemlength[4].childNodes[7].childNodes[0].childNodes[0].childNodes[0].childNodes[0].href.split(
                     '/'
                   )[5]
                 );
@@ -340,80 +441,105 @@ async function getdata(page, cmt_lengths) {
                   )[5]
                 );
               }
+            } else if (checkitemlength.length == 8) {
+              if (checkitemlength[6].childNodes.length == 11) {
+                video.push(
+                  checkitemlength[4].childNodes[7].childNodes[0].childNodes[0].childNodes[0].childNodes[0].href.split(
+                    '/'
+                  )[5]
+                );
+              } else if (checkitemlength[6].childNodes.length == 10) {
+                video.push(
+                  checkitemlength[4].childNodes[6].childNodes[0].childNodes[0].childNodes[0].childNodes[0].href.split(
+                    '/'
+                  )[5]
+                );
+              }
             }
           } else if (
             element.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes.length == 1
           ) {
-            if (
-              element.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                .childNodes.length > 1
-            ) {
+            try {
               if (
-                !element.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].href
+                element.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                  .childNodes.length > 1
               ) {
-                for (
-                  let j = 0;
-                  j <
-                  element.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                    .childNodes.length;
-                  j++
+                if (
+                  !element.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                    .href
                 ) {
-                  element.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[
-                    j
-                  ].childNodes[0].href.indexOf('videos') > 0
-                    ? video.push(
-                        element.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[
-                          j
-                        ].childNodes[0].href
-                          .split('/')[6]
-                          .split('?')[0]
-                      )
-                    : image_href.push(
-                        element.childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                          .childNodes[0].childNodes[j].childNodes[0].childNodes[0].childNodes[0]
-                          .childNodes[0].childNodes[0].currentSrc
-                      );
-                }
-              }
-            } else {
-              element.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes.forEach(
-                function (element) {
-                  if (element.childNodes[0].childNodes[0].nodeName == 'IMG') {
-                    image_href.push(element.childNodes[0].childNodes[0].currentSrc);
-                  } else {
-                    console.log('Warning: Invalid', element.childNodes);
-                    if (element.childNodes.length == 3) {
-                      for (let k = 0; k < element.childNodes.length; k++) {
-                        image_href.push(
+                  for (
+                    let j = 0;
+                    j <
+                    element.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                      .childNodes.length;
+                    j++
+                  ) {
+                    element.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[
+                      j
+                    ].childNodes[0].href.indexOf('videos') > 0
+                      ? video.push(
+                          element.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[
+                            j
+                          ].childNodes[0].href
+                            .split('/')[6]
+                            .split('?')[0]
+                        )
+                      : image_href.push(
                           element.childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                            .childNodes[0].href
+                            .childNodes[0].childNodes[j].childNodes[0].childNodes[0].childNodes[0]
+                            .childNodes[0].childNodes[0].currentSrc
                         );
-                      }
-                    } else {
-                      element.childNodes.forEach(function (element) {
-                        if (element.childNodes.length == 2) {
-                          console.log('image 3', element.childNodes);
-                          image_href.push(
-                            element.childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                              .childNodes[0].childNodes[0].childNodes[0].childNodes[0].currentSrc
-                          );
-                        } else {
-                          image_href.push(
-                            element.childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                              .childNodes[0].childNodes[0].childNodes[0].childNodes[0].currentSrc
-                          );
-                        }
-                      });
-                    }
                   }
                 }
-              );
-            }
+              } else {
+                element.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes.forEach(
+                  function (element) {
+                    if (element.childNodes[0].childNodes[0].nodeName == 'IMG') {
+                      image_href.push(element.childNodes[0].childNodes[0].currentSrc);
+                    } else {
+                      console.log('Warning: Invalid', element.childNodes);
+                      if (element.childNodes.length == 3) {
+                        for (let k = 0; k < element.childNodes.length; k++) {
+                          image_href.push(
+                            element.childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                              .childNodes[0].href
+                          );
+                        }
+                      } else {
+                        element.childNodes.forEach(function (element) {
+                          if (element.childNodes.length == 2) {
+                            console.log('image 3', element.childNodes);
+                            image_href.push(
+                              element.childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                                .childNodes[0].childNodes[0].childNodes[0].childNodes[0].currentSrc
+                            );
+                          } else {
+                            image_href.push(
+                              element.childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                                .childNodes[0].childNodes[0].childNodes[0].childNodes[0].currentSrc
+                            );
+                          }
+                        });
+                      }
+                    }
+                  }
+                );
+              }
+            } catch (e) {}
+          } else {
+            content = element.childNodes[0].childNodes[0].childNodes[0].innerHTML;
+            // for (var i = 0; i < 2; i++) {
+            //   content += lengths[i].innerHTML;
+            // }
           }
         }
       });
-      let divlikecomshare =
-        post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[1].childNodes[0];
+      let divlikecomshare = post.childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+        .childNodes[1].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+        ? post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[1].childNodes[0]
+        : post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[7].childNodes[0];
+
       let likecomshare = '';
       let divcommment = '';
 
@@ -450,6 +576,16 @@ async function getdata(page, cmt_lengths) {
 
       divcommment.forEach((element) => {
         if (element.nodeName == 'UL') {
+          div = element.childNodes[0].querySelectorAll('a[role="link"]');
+          for (let k = 0; k < div.length; k++) {
+            if (div[k].href?.indexOf('posts') !== -1) {
+              console.log(div[k].href);
+              for (let j = 0; j < 7; j++) {
+                posthref += div[k].href.split('/')[j] + '/';
+              }
+              break;
+            }
+          }
           element.childNodes.forEach((elementss) => {
             try {
               if (elementss.childNodes[0].childNodes.length == 2) {
@@ -468,7 +604,7 @@ async function getdata(page, cmt_lengths) {
                         user_cmt_id = elementsss.childNodes[0].childNodes[0].href.split('/')[6];
                       } else if (elementsss.nodeName == 'DIV') {
                         for (let l = 0; l < elementsss.childNodes[0].childNodes.length; l++) {
-                          cotent_cmt += elementsss.childNodes[0].childNodes[l].innerHTML
+                          cotent_cmt += elementsss.childNodes[0].childNodes[l].innerText
                             .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
                             .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
                             .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
@@ -512,9 +648,9 @@ async function getdata(page, cmt_lengths) {
                       if (elementsss.nodeName == 'DIV' && index == 1) {
                         if (elementsss.childNodes[0].childNodes.length > 1) {
                           count_like_cmt =
-                            elementsss.childNodes[0].childNodes[1].innerText == ''
+                            elementsss.childNodes[0].childNodes[1].textContent == ''
                               ? 1
-                              : elementsss.childNodes[0].childNodes[1].innerText;
+                              : elementsss.childNodes[0].childNodes[1].textContent;
                         }
                         imgComment = elementsss.childNodes[0].childNodes[0].childNodes[0]
                           .childNodes[0].childNodes[0].childNodes[0]
@@ -528,9 +664,9 @@ async function getdata(page, cmt_lengths) {
                   console.log('diw_newcmt', diw_newcmt);
                   if (diw_newcmt.childNodes[0].childNodes[0].childNodes[1]) {
                     count_like_cmt =
-                      diw_newcmt.childNodes[0].childNodes[0].childNodes[1].innerText == ''
+                      diw_newcmt.childNodes[0].childNodes[0].childNodes[1].textContent == ''
                         ? 1
-                        : diw_newcmt.childNodes[0].childNodes[0].childNodes[1].innerText;
+                        : diw_newcmt.childNodes[0].childNodes[0].childNodes[1].textContent;
                   }
                   diw_newcmt.childNodes[0].childNodes[0].childNodes[0].childNodes.forEach(
                     (cmt, index) => {
@@ -540,7 +676,7 @@ async function getdata(page, cmt_lengths) {
                         user_cmt_id = cmt.childNodes[0].childNodes[0].href.split('/')[6];
                       } else if (cmt.nodeName == 'DIV') {
                         for (let l = 0; l < cmt.childNodes[0].childNodes.length; l++) {
-                          cotent_cmt += cmt.childNodes[0].childNodes[l].innerHTML
+                          cotent_cmt += cmt.childNodes[0].childNodes[l].innerText
                             .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
                             .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
                             .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
@@ -566,10 +702,11 @@ async function getdata(page, cmt_lengths) {
                   console.log('qwe', diw_newcmt.childNodes);
                   // đếm like comment
                   if (diw_newcmt.childNodes[0].childNodes[0].childNodes.length > 1) {
+                    console.log(diw_newcmt.childNodes[0].childNodes[0].childNodes[1].textContent);
                     count_like_cmt =
-                      diw_newcmt.childNodes[0].childNodes[0].childNodes[1].innerText == ''
+                      diw_newcmt.childNodes[0].childNodes[0].childNodes[1].textContent == ''
                         ? 1
-                        : diw_newcmt.childNodes[0].childNodes[0].childNodes[1].innerText;
+                        : diw_newcmt.childNodes[0].childNodes[0].childNodes[1].textContent;
                   }
 
                   elementss.childNodes[0].childNodes[1].childNodes[1].childNodes.forEach(
@@ -590,7 +727,7 @@ async function getdata(page, cmt_lengths) {
                         user_cmt_id = child.childNodes[0].childNodes[0].href.split('/')[6];
                       } else if (child.nodeName == 'DIV') {
                         for (let l = 0; l < child.childNodes[0].childNodes.length; l++) {
-                          cotent_cmt += child.childNodes[0].childNodes[l].innerHTML
+                          cotent_cmt += child.childNodes[0].childNodes[l].innerText
                             .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
                             .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
                             .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
@@ -634,7 +771,7 @@ async function getdata(page, cmt_lengths) {
                                     child.childNodes[0].childNodes[0].href.split('/')[6];
                                 } else if (child.nodeName == 'DIV') {
                                   for (let l = 0; l < child.childNodes[0].childNodes.length; l++) {
-                                    cotent_cmtchild += child.childNodes[0].childNodes[l].innerHTML
+                                    cotent_cmtchild += child.childNodes[0].childNodes[l].innerText
                                       .replace(
                                         /([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/,
                                         ''
@@ -706,12 +843,13 @@ async function getdata(page, cmt_lengths) {
                             //   }
                             // }
                             children.push({
-                              user_name: user_name_cmtchild,
-                              user_id: user_cmtchild_id,
-                              content: cotent_cmtchild,
-                              imgComment: imgComment_cmt,
-                              count_like: count_like_cmtchild,
+                              usernameComment: user_name_cmtchild,
+                              userIDComment: user_cmtchild_id,
+                              contentComment: cotent_cmtchild,
+                              imageComment: imgComment_cmt == '' ? null : imgComment_cmt,
+                              countLike: count_like_cmtchild,
                             });
+                            count_comments_config += 1;
                             user_cmtchild_href =
                               user_name_cmtchild =
                               user_cmtchild_id =
@@ -779,12 +917,12 @@ async function getdata(page, cmt_lengths) {
                             ) {
                               count_like_cmtchild =
                                 children_div[0].parentNode.parentNode.parentNode.parentNode
-                                  .parentNode.childNodes[1].childNodes[0].childNodes[1].innerText ==
-                                ''
+                                  .parentNode.childNodes[1].childNodes[0].childNodes[1]
+                                  .textContent == ''
                                   ? 1
                                   : children_div[0].parentNode.parentNode.parentNode.parentNode
                                       .parentNode.childNodes[1].childNodes[0].childNodes[1]
-                                      .innerText;
+                                      .textContent;
                             }
                             // cmtchild1 mới có hình ảnh
                           } else if (
@@ -806,20 +944,20 @@ async function getdata(page, cmt_lengths) {
                             ) {
                               count_like_cmtchild =
                                 children_div[0].parentNode.parentNode.parentNode.parentNode
-                                  .parentNode.childNodes[2].childNodes[0].childNodes[1].innerText ==
-                                ''
+                                  .parentNode.childNodes[2].childNodes[0].childNodes[1]
+                                  .textContent == ''
                                   ? 1
                                   : children_div[0].parentNode.parentNode.parentNode.parentNode
                                       .parentNode.childNodes[2].childNodes[0].childNodes[1]
-                                      .innerText;
+                                      .textContent;
                             }
                             // đếm like khi cmtchild1 cũ không có hình
                           }
                           if (children_div[0].parentNode.parentNode.childNodes[1]) {
                             count_like_cmtchild =
-                              children_div[0].parentNode.parentNode.childNodes[1].innerText == ''
+                              children_div[0].parentNode.parentNode.childNodes[1].textContent == ''
                                 ? 1
-                                : children_div[0].parentNode.parentNode.childNodes[1].innerText;
+                                : children_div[0].parentNode.parentNode.childNodes[1].textContent;
                           } else if (
                             children_div[0].parentNode.parentNode.parentNode.parentNode.parentNode
                               .childNodes[1].childNodes[0].childNodes[0].childNodes[1]
@@ -827,13 +965,12 @@ async function getdata(page, cmt_lengths) {
                             //đếm like khi cmtchild1 mới không có hình
                             count_like_cmtchild =
                               children_div[0].parentNode.parentNode.parentNode.parentNode.parentNode
-                                .childNodes[1].childNodes[0].childNodes[0].childNodes[1] == ''
+                                .childNodes[1].childNodes[0].childNodes[0].childNodes[1]
+                                .textContent == ''
                                 ? 1
                                 : children_div[0].parentNode.parentNode.parentNode.parentNode
                                     .parentNode.childNodes[1].childNodes[0].childNodes[0]
-                                    .childNodes[1].innerText;
-                          } else {
-                            count_like_cmtchild = 0;
+                                    .childNodes[1].textContent;
                           }
 
                           // lấy thông tin cmt
@@ -846,7 +983,7 @@ async function getdata(page, cmt_lengths) {
                                   child.childNodes[0].childNodes[0].href.split('/')[6];
                               } else if (child.nodeName == 'DIV') {
                                 for (let l = 0; l < child.childNodes[0].childNodes.length; l++) {
-                                  cotent_cmtchild += child.childNodes[0].childNodes[l].innerHTML
+                                  cotent_cmtchild += child.childNodes[0].childNodes[l].innerText
                                     .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
                                     .replace(
                                       /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/,
@@ -886,7 +1023,7 @@ async function getdata(page, cmt_lengths) {
                                   child.childNodes[0].childNodes[0].href.split('/')[6];
                               } else if (child.nodeName == 'DIV') {
                                 for (let l = 0; l < child.childNodes[0].childNodes.length; l++) {
-                                  cotent_cmtchild += child.childNodes[0].childNodes[l].innerHTML
+                                  cotent_cmtchild += child.childNodes[0].childNodes[l].innerText
                                     .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
                                     .replace(
                                       /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/,
@@ -920,12 +1057,13 @@ async function getdata(page, cmt_lengths) {
                           }
 
                           children.push({
-                            user_name: user_name_cmtchild,
-                            user_id: user_cmtchild_id,
-                            content: cotent_cmtchild,
-                            imgComment: imgComment_cmt,
-                            count_like: count_like_cmtchild,
+                            usernameComment: user_name_cmtchild,
+                            userIDComment: user_cmtchild_id,
+                            contentComment: cotent_cmtchild,
+                            imageComment: imgComment_cmt == '' ? null : imgComment_cmt,
+                            countLike: count_like_cmtchild,
                           });
+                          count_comments_config += 1;
                           user_cmtchild_href =
                             user_name_cmtchild =
                             user_cmtchild_id =
@@ -968,7 +1106,7 @@ async function getdata(page, cmt_lengths) {
                                           ) {
                                             cotent_cmtchild += child.childNodes[0].childNodes[
                                               l
-                                            ].innerHTML
+                                            ].innerText
                                               .replace(
                                                 /([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/,
                                                 ''
@@ -1007,12 +1145,14 @@ async function getdata(page, cmt_lengths) {
                                       }
                                     );
                                     // đếm like khi có hình
+                                    console.log('cmt child2 new ', element);
                                     if (element.nodeName == 'DIV' && index == 2) {
                                       if (children22[2].childNodes[0].childNodes.length > 1) {
-                                        count_like_cmtchild =
-                                          children22[2].childNodes[0].childNodes[1].innerText == ''
+                                        count_like_cmtchild2 =
+                                          children22[2].childNodes[0].childNodes[1].textContent ==
+                                          ''
                                             ? 1
-                                            : children22[1].childNodes[0].childNodes[1].innerText;
+                                            : children22[1].childNodes[0].childNodes[1].textContent;
                                       }
 
                                       imgComment_cmt =
@@ -1025,12 +1165,12 @@ async function getdata(page, cmt_lengths) {
                                     } else {
                                       // đếm like khi không có hình
                                       if (children22[1].childNodes[0].childNodes[0].childNodes[1]) {
-                                        count_like_cmtchild =
+                                        count_like_cmtchild2 =
                                           children22[1].childNodes[0].childNodes[0].childNodes[1]
-                                            .innerText == ''
+                                            .textContent == ''
                                             ? 1
                                             : children22[1].childNodes[0].childNodes[0]
-                                                .childNodes[1].innerText;
+                                                .childNodes[1].textContent;
                                       }
                                     }
                                     // kiểm tra comments child 2 cũ thì làm dưới
@@ -1038,10 +1178,11 @@ async function getdata(page, cmt_lengths) {
                                     // đếm like khi có hình
                                     if (children22.length > 2) {
                                       if (children22[1].childNodes[0].childNodes.length > 1) {
-                                        count_like_cmtchild =
-                                          children22[1].childNodes[0].childNodes[1].innerText == ''
+                                        count_like_cmtchild2 =
+                                          children22[1].childNodes[0].childNodes[1].textContent ==
+                                          ''
                                             ? 1
-                                            : children22[1].childNodes[0].childNodes[1].innerText;
+                                            : children22[1].childNodes[0].childNodes[1].textContent;
                                       }
                                       imgComment_cmt = children22[1].childNodes[0].childNodes[0]
                                         .childNodes[0].childNodes[0].childNodes[0]
@@ -1066,7 +1207,7 @@ async function getdata(page, cmt_lengths) {
                                             ) {
                                               cotent_cmtchild += child.childNodes[0].childNodes[
                                                 l
-                                              ].innerHTML
+                                              ].innerText
                                                 .replace(
                                                   /([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/,
                                                   ''
@@ -1105,16 +1246,18 @@ async function getdata(page, cmt_lengths) {
                                       );
                                     } else {
                                       // đếm like khi không có hình
+
                                       if (
                                         children22[0].childNodes[0].childNodes[0].childNodes
                                           .length > 1
                                       ) {
-                                        count_like_cmtchild =
+                                        console.log('children22', children22);
+                                        count_like_cmtchild2 =
                                           children22[0].childNodes[0].childNodes[0].childNodes[1]
-                                            .innerText == ''
+                                            .textContent == ''
                                             ? 1
                                             : children22[0].childNodes[0].childNodes[0]
-                                                .childNodes[1].innerText;
+                                                .childNodes[1].textContent;
                                       }
                                       // lấy thông tin cmt child 2
                                       children22[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes.forEach(
@@ -1134,7 +1277,7 @@ async function getdata(page, cmt_lengths) {
                                             ) {
                                               cotent_cmtchild += child.childNodes[0].childNodes[
                                                 l
-                                              ].innerHTML
+                                              ].innerText
                                                 .replace(
                                                   /([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/,
                                                   ''
@@ -1176,19 +1319,20 @@ async function getdata(page, cmt_lengths) {
                                 });
 
                                 children.push({
-                                  user_name: user_name_cmtchild,
-                                  user_id: user_cmtchild_id,
-                                  content: cotent_cmtchild,
-                                  imgComment: imgComment_cmt,
-                                  count_like: count_like_cmtchild,
+                                  usernameComment: user_name_cmtchild,
+                                  userIDComment: user_cmtchild_id,
+                                  contentComment: cotent_cmtchild,
+                                  imageComment: imgComment_cmt == '' ? null : imgComment_cmt,
+                                  countLike: count_like_cmtchild2,
                                 });
+                                count_comments_config += 1;
                                 user_cmtchild_href =
                                   user_name_cmtchild =
                                   user_cmtchild_id =
                                   cotent_cmtchild =
                                   imgComment_cmt =
                                     '';
-                                count_like_cmtchild = 0;
+                                count_like_cmtchild2 = 0;
                               } catch (err) {
                                 console.log('children2 error');
                                 console.log(err);
@@ -1222,10 +1366,10 @@ async function getdata(page, cmt_lengths) {
                     ) {
                       count_like_cmt =
                         elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[1]
-                          .childNodes[0].childNodes[1].innerText == ''
+                          .childNodes[0].childNodes[1].textContent == ''
                           ? 1
                           : elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[1]
-                              .childNodes[0].childNodes[1].innerText;
+                              .childNodes[0].childNodes[1].textContent;
                     }
                     imgComment = elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[1]
                       .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
@@ -1240,10 +1384,10 @@ async function getdata(page, cmt_lengths) {
                   ) {
                     count_like_cmt =
                       elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[0]
-                        .childNodes[0].childNodes[0].childNodes[1].innerText == ''
+                        .childNodes[0].childNodes[0].childNodes[1].textContent == ''
                         ? 1
                         : elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[0]
-                            .childNodes[0].childNodes[0].childNodes[1].innerText;
+                            .childNodes[0].childNodes[0].childNodes[1].textContent;
                   }
                 } else {
                   // cmt mới
@@ -1264,10 +1408,10 @@ async function getdata(page, cmt_lengths) {
                     ) {
                       count_like_cmt =
                         elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[2]
-                          .childNodes[0].childNodes[1].innerText == ''
+                          .childNodes[0].childNodes[1].textContent == ''
                           ? 1
                           : elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[2]
-                              .childNodes[0].childNodes[1].innerText;
+                              .childNodes[0].childNodes[1].textContent;
                     }
                   } else {
                     if (
@@ -1276,10 +1420,10 @@ async function getdata(page, cmt_lengths) {
                     ) {
                       count_like_cmt =
                         elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[1]
-                          .childNodes[0].childNodes[0].childNodes[1].innerText == ''
+                          .childNodes[0].childNodes[0].childNodes[1].textContent == ''
                           ? 1
                           : elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[1]
-                              .childNodes[0].childNodes[0].childNodes[1].innerText;
+                              .childNodes[0].childNodes[0].childNodes[1].textContent;
                     }
                   }
                 }
@@ -1292,7 +1436,7 @@ async function getdata(page, cmt_lengths) {
                       user_cmt_id = element.childNodes[0].childNodes[0].href.split('/')[6];
                     } else if (element.nodeName == 'DIV') {
                       for (let l = 0; l < element.childNodes[0].childNodes.length; l++) {
-                        cotent_cmt += element.childNodes[0].childNodes[l].innerHTML
+                        cotent_cmt += element.childNodes[0].childNodes[l].innerText
                           .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
                           .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
                           .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
@@ -1317,7 +1461,7 @@ async function getdata(page, cmt_lengths) {
                       user_cmt_id = element.childNodes[0].childNodes[0].href.split('/')[6];
                     } else if (element.nodeName == 'DIV') {
                       for (let l = 0; l < element.childNodes[0].childNodes.length; l++) {
-                        cotent_cmt += element.childNodes[0].childNodes[l].innerHTML
+                        cotent_cmt += element.childNodes[0].childNodes[l].innerText
                           .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
                           .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
                           .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
@@ -1337,16 +1481,17 @@ async function getdata(page, cmt_lengths) {
                 }
               }
               comments.push({
-                content: cotent_cmt,
-                user_name: user_name_cmt,
-                user_id: user_cmt_id,
-                user_cmt_href: user_cmt_href,
-                imgComment: imgComment,
-                count_like: count_like_cmt,
+                contentComment: cotent_cmt,
+                usernameComment: user_name_cmt,
+                userIDComment: user_cmt_id,
+                //user_cmt_href: user_cmt_href,
+                imageComment: imgComment == '' ? null : imgComment,
+                countLike: count_like_cmt,
                 children: children,
               });
+              count_comments_config += 1;
               cotent_cmt = user_cmt_id = user_name_cmt = user_cmt_href = imgComment = '';
-              count_like_cmt = count_like_cmtchild = 0;
+              count_like_cmt = 0;
               children = [];
             } catch (error) {
               console.log('error cmt');
@@ -1355,36 +1500,44 @@ async function getdata(page, cmt_lengths) {
           });
         }
       });
-
+      post_id = posthref.split('/')[6];
       data = {
         // id: data.length ? data.length + 1 : 1,
-        userhref: userhref ? userhref : '',
-        user_name: user_name ? user_name : '',
-        content: content ? content : '',
-        categori: categori ? categori : '',
-        count_comment: count_comments ? count_comments : '',
-        user_id: user_id ? user_id : '',
-        count_like: likes ? likes : '',
-        count_share: shares ? shares : '',
-        post_id: post_id ? post_id : '',
-        post_link: posthref ? posthref : '',
-        video: video ? video : '',
-        featured_image: image_href ? image_href : '',
-        comments: comments ? comments : [],
+        // userhref: userhref == '' ? 'undefined - undefined' : userhref,
+        videos: video ? video : [],
+        commentList: comments ? comments : [],
+
+        linkImgs: [],
+        user: user_name == '' ? 'undefined - undefined' : user_name,
+        date: '',
+        contentList: content ? content : '',
+        linkImgs: image_href ? image_href : '',
+        countLike: likes ? likes : '',
+        linkPost: posthref ? posthref : '',
+        idPost: post_id ? post_id : '',
+        imageList: [],
+        //categori: categori ? categori : '',
+        countComment: count_comments ? count_comments : '',
+        //user_id: user_id ? user_id : '',
+        count_comments_config: count_comments_config,
+        countShare: shares ? shares : '',
+
+        token: token ? token : '',
       };
-      userhref =
-        user_name =
-        posthref =
-        user_id =
-        content =
-        categori =
-        image_href =
-        likes =
-        count_comments =
-        shares =
-        post_id =
-        time =
-          '';
+      (count_comments_config = 0),
+        (userhref =
+          user_name =
+          posthref =
+          user_id =
+          content =
+          categori =
+          image_href =
+          likes =
+          count_comments =
+          shares =
+          post_id =
+          time =
+            '');
       video = [];
       comments = [];
       image_href = [];
