@@ -91,7 +91,7 @@ module.exports = async function main(req, res, next) {
       url_group += url.split('/')[i];
     }
     const name = url.split('/')[3] == 'groups' ? url.split('/')[4] : url.split('/')[3];
-    const cmt_length = req.body.length_comment;
+    const cmt_length = req.body.length_comment ? req.body.length_comment : 0;
     let name_group = '';
     const craw_id = crypto.randomBytes(16).toString('hex');
     const app = initializeApp.initializeApp(firebaseConfig);
@@ -174,17 +174,17 @@ module.exports = async function main(req, res, next) {
 
       //await new Promise((r) => setTimeout(r, 4000));
       await page.waitForSelector('div', { hidden: true });
+
+      res.json({ data: 'success', statusbar: craw_id });
       if (url.indexOf('posts') !== -1) {
         for (let i = 0; i < 5; i++) {
           name_group += url.split('/')[i] + '/';
         }
       }
-      console.log(name_group);
       await page.goto(name_group, {
         waitUntil: 'networkidle2',
       });
       await page.waitForFunction('document.querySelector("h1")');
-      res.json({ data: 'success', statusbar: craw_id });
     } catch (e) {
       res.json({ data: 'error', statusbar: JSON.stringify(e) });
     }
@@ -226,58 +226,63 @@ module.exports = async function main(req, res, next) {
         }
       });
       await autoScrollpost(page);
-      await getdata(page, (cmt_lengths = cmt_length)).then(async function (result) {
-        fs.writeFile('item1.txt', JSON.stringify(result, null, 2), (err) => {
-          if (err) throw err;
-          console.log('The file has been saved!');
-        });
-        const app = initializeApp.initializeApp(firebaseConfig);
-        const database = getDatabase(app);
-        const postListRef = ref(
-          database,
-          '/postList/' + name.replace(/[#:.,$]/g, '') + '/' + url.split('/')[6]
-        );
+      try {
+        await getdata(page, cmt_length).then(async function (result) {
+          fs.writeFile('item1.txt', JSON.stringify(result, null, 2), (err) => {
+            if (err) throw err;
+            console.log('The file has been saved!');
+          });
+          const app = initializeApp.initializeApp(firebaseConfig);
+          const database = getDatabase(app);
+          const postListRef = ref(
+            database,
+            '/Listpost/' + name.replace(/[#:.,$]/g, '') + '/' + url.split('/')[6]
+          );
 
-        set(postListRef, {
-          user: result.user,
-          videos: result.videos,
-          contentList: result.contentList,
-          countComment: result.countComment,
-          countLike: result.countLike,
-          countShare: result.countShare,
-          user_id: result.user_id,
-          idPost: result.idPost,
-          linkPost: result.linkPost,
-          linkImgs: result.linkImgs,
-          commentList: result.commentList,
-          token: result.token,
-          count_comments_config: result.count_comments_config,
-          create_at: Date.now(),
-        });
-        const postListRefs = ref(
-          database,
-          '/craw_list/' + name.replace(/[#:.,$]/g, '') + '/' + craw_id
-        );
-        const newPostRef = push(postListRefs);
+          set(postListRef, {
+            user: result.user,
+            videos: result.videos,
+            contentList: result.contentList,
+            countComment: result.countComment,
+            countLike: result.countLike,
+            countShare: result.countShare,
+            user_id: result.user_id,
+            idPost: result.idPost,
+            linkPost: result.linkPost,
+            linkImgs: result.linkImgs,
+            commentList: result.commentList,
+            token: result.token,
+            count_comments_config: result.count_comments_config,
+            create_at: Date.now(),
+          });
+          const postListRefs = ref(
+            database,
+            '/craw_list/' + name.replace(/[#:.,$]/g, '') + '/' + craw_id
+          );
+          const newPostRef = push(postListRefs);
 
-        await set(newPostRef, {
-          id: 1,
-          post_link: url,
-          statusbar: 'active',
-          countComment: result.countComment,
-          countLike: result.countLike,
-          countShare: result.countShare,
-          count_comments_config: result.count_comments_config,
-          comments_config: cmt_length,
-          create_at: Date.now(),
+          await set(newPostRef, {
+            id: 1,
+            post_link: url,
+            statusbar: 'active',
+            countComment: result.countComment,
+            countLike: result.countLike,
+            countShare: result.countShare,
+            count_comments_config: result.count_comments_config,
+            comments_config: cmt_length,
+            create_at: Date.now(),
+          });
         });
-      });
+      } catch (e) {
+        console.log('lỗi nè', e);
+      }
     } catch (e) {
+      console.log(e);
       const app = initializeApp.initializeApp(firebaseConfig);
       const database = getDatabase(app);
       const postListRef = ref(
         database,
-        '/postList/' + name.replace(/[#:.,$]/g, '') + '/' + url.split('/')[6]
+        '/Listpost/' + name.replace(/[#:.,$]/g, '') + '/' + url.split('/')[6]
       );
       set(postListRef, {
         post_link: url,
@@ -335,7 +340,7 @@ async function getdata(page, cmt_lengths) {
     let token = require('DTSGInitialData').token;
     let count_like_cmt = (count_like_cmtchild = count_like_cmtchild2 = 0);
     //
-    post = document.querySelector('[role="article"]').childNodes[0];
+    post = document.querySelector('[aria-posinset="1"]').childNodes[0];
     let contens = post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[1]
       .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
       ? post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[1].childNodes[0]
@@ -1507,7 +1512,6 @@ async function getdata(page, cmt_lengths) {
         videos: video ? video : [],
         commentList: comments ? comments : [],
 
-        linkImgs: [],
         user: user_name == '' ? 'undefined - undefined' : user_name,
         date: '',
         contentList: content ? content : '',
@@ -1518,7 +1522,7 @@ async function getdata(page, cmt_lengths) {
         imageList: [],
         //categori: categori ? categori : '',
         countComment: count_comments ? count_comments : '',
-        //user_id: user_id ? user_id : '',
+        user_id: user_id ? user_id : '',
         count_comments_config: count_comments_config,
         countShare: shares ? shares : '',
 
