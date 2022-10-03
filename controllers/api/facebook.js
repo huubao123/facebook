@@ -264,7 +264,7 @@ module.exports = async function main(req, res, next) {
       args: ['--start-maximized'],
       product: 'chrome',
       devtools: true,
-      executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
+      //executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
     });
     const page = await browser.newPage();
     const pages = await browser.pages();
@@ -594,11 +594,17 @@ async function getdata(page, cmt_lengths) {
     let token = require('DTSGInitialData').token;
     let count_like_cmt = (count_like_cmtchild = count_like_cmtchild2 = 0);
     //
-    post = document.querySelector('[aria-posinset="1"]').childNodes[0];
-    let contens = post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[1]
+     document.querySelectorAll('div').forEach((e)=>{
+     if(e.hasAttribute('aria-describedby')){
+         post = e[0]
+     }
+ })  
+ 
+    post = document.querySelectorAll('[role="main"]')[2];
+    let contens = post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[1]
       .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-      ? post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[1].childNodes[0]
-      : post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[7].childNodes[0];
+      ? post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[1].childNodes[0]
+      : post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[7].childNodes[0];
 
     try {
       // contens.childNodes[1].childNodes[0].childNodes[1].childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes.forEach(
@@ -794,10 +800,10 @@ async function getdata(page, cmt_lengths) {
           }
         }
       });
-      let divlikecomshare = post.childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-        .childNodes[1].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-        ? post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[1].childNodes[0]
-        : post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[7].childNodes[0];
+      let divlikecomshare = post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[1]
+      .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+      ? post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[1].childNodes[0]
+      : post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[7].childNodes[0];
 
       let likecomshare = '';
       let divcommment = '';

@@ -148,7 +148,7 @@ module.exports = async function main(req, res, next) {
       args: ['--start-maximized'],
       product: 'chrome',
       devtools: true,
-      executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
+      executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
     });
     const page = await browser.newPage();
     const pages = await browser.pages();
@@ -167,7 +167,7 @@ module.exports = async function main(req, res, next) {
       await page.goto('https://www.facebook.com', {
         waitUntil: 'load',
       });
-
+      res.json({ data: 'success', statusbar: craw_id });
       await page.type('#email', 'huubao034@gmail.com');
       await page.type('#pass', 'huubao123');
       await page.keyboard.press('Enter');
@@ -175,7 +175,7 @@ module.exports = async function main(req, res, next) {
       //await new Promise((r) => setTimeout(r, 4000));
       await page.waitForSelector('div', { hidden: true });
 
-      res.json({ data: 'success', statusbar: craw_id });
+     
       if (url.indexOf('posts') !== -1) {
         for (let i = 0; i < 5; i++) {
           name_group += url.split('/')[i] + '/';
@@ -226,7 +226,6 @@ module.exports = async function main(req, res, next) {
         }
       });
       await autoScrollpost(page);
-      try {
         await getdata(page, cmt_length).then(async function (result) {
           fs.writeFile('item1.txt', JSON.stringify(result, null, 2), (err) => {
             if (err) throw err;
@@ -273,9 +272,6 @@ module.exports = async function main(req, res, next) {
             create_at: Date.now(),
           });
         });
-      } catch (e) {
-        console.log('lỗi nè', e);
-      }
     } catch (e) {
       console.log(e);
       const app = initializeApp.initializeApp(firebaseConfig);
@@ -300,7 +296,7 @@ module.exports = async function main(req, res, next) {
       });
     }
 
-    await browser.close();
+   // await browser.close();
   } catch (err) {
     console.log('lỗi server', err);
   }
@@ -340,11 +336,17 @@ async function getdata(page, cmt_lengths) {
     let token = require('DTSGInitialData').token;
     let count_like_cmt = (count_like_cmtchild = count_like_cmtchild2 = 0);
     //
-    post = document.querySelector('[aria-posinset="1"]').childNodes[0];
-    let contens = post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[1]
+     document.querySelectorAll('div').forEach((e)=>{
+     if(e.hasAttribute('aria-describedby')){
+         post = e[0]
+     }
+ })  
+ 
+    post = document.querySelectorAll('[role="main"]')[2];
+    let contens = post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[1]
       .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-      ? post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[1].childNodes[0]
-      : post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[7].childNodes[0];
+      ? post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[1].childNodes[0]
+      : post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[7].childNodes[0];
 
     try {
       // contens.childNodes[1].childNodes[0].childNodes[1].childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes.forEach(
@@ -540,10 +542,10 @@ async function getdata(page, cmt_lengths) {
           }
         }
       });
-      let divlikecomshare = post.childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-        .childNodes[1].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-        ? post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[1].childNodes[0]
-        : post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[7].childNodes[0];
+      let divlikecomshare = post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[1]
+      .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+      ? post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[1].childNodes[0]
+      : post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[7].childNodes[0];
 
       let likecomshare = '';
       let divcommment = '';
