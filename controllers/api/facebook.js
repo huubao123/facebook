@@ -284,7 +284,7 @@ module.exports = async function main(req, res, next) {
       await page.goto('https://www.facebook.com', {
         waitUntil: 'load',
       });
-
+      res.json({ data: 'success', statusbar: craw_id });
       await page.type('#email', 'huubao034@gmail.com');
       await page.type('#pass', 'huubao123');
       await page.keyboard.press('Enter');
@@ -295,7 +295,6 @@ module.exports = async function main(req, res, next) {
         waitUntil: 'load',
       });
       await page.waitForFunction('document.querySelector("h1")');
-      res.json({ data: 'success', statusbar: craw_id });
     } catch (e) {
       res.json({ data: 'error', statusbar: JSON.stringify(e) });
     }
@@ -363,7 +362,7 @@ module.exports = async function main(req, res, next) {
             const database = getDatabase(app);
             const postListRef = ref(
               database,
-              '/postList/' + name.replace(/[#:.,$]/g, '') + '/' + result[i].post_link.split('/')[6]
+              '/Listpost/' + name.replace(/[#:.,$]/g, '') + '/' + result[i].post_link.split('/')[6]
             );
             await set(postListRef, {
               user: results.user,
@@ -405,7 +404,7 @@ module.exports = async function main(req, res, next) {
           const database = getDatabase(app);
           const postListRef = ref(
             database,
-            '/postList/' + name.replace(/[#:.,$]/g, '') + '/' + result[i].post_link.split('/')[6]
+            '/Listpost/' + name.replace(/[#:.,$]/g, '') + '/' + result[i].post_link.split('/')[6]
           );
           set(postListRef, {
             post_link: result[i].post_link,
@@ -595,7 +594,7 @@ async function getdata(page, cmt_lengths) {
     let token = require('DTSGInitialData').token;
     let count_like_cmt = (count_like_cmtchild = count_like_cmtchild2 = 0);
     //
-    post = document.querySelector('[role="article"]').childNodes[0];
+    post = document.querySelector('[aria-posinset="1"]').childNodes[0];
     let contens = post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[1]
       .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
       ? post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[1].childNodes[0]
@@ -1767,7 +1766,6 @@ async function getdata(page, cmt_lengths) {
         videos: video ? video : [],
         commentList: comments ? comments : [],
 
-        linkImgs: [],
         user: user_name == '' ? 'undefined - undefined' : user_name,
         date: '',
         contentList: content ? content : '',
@@ -1778,7 +1776,7 @@ async function getdata(page, cmt_lengths) {
         imageList: [],
         //categori: categori ? categori : '',
         countComment: count_comments ? count_comments : '',
-        //user_id: user_id ? user_id : '',
+        user_id: user_id ? user_id : '',
         count_comments_config: count_comments_config,
         countShare: shares ? shares : '',
 
