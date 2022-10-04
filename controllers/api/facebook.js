@@ -264,7 +264,7 @@ module.exports = async function main(req, res, next) {
       args: ['--start-maximized'],
       product: 'chrome',
       devtools: true,
-      //executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
+      executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
     });
     const page = await browser.newPage();
     const pages = await browser.pages();
@@ -444,22 +444,6 @@ module.exports = async function main(req, res, next) {
       // await new Promise((r) => setTimeout(r, 10000));
       // fs.readFile('item2.txt', async (err, data) => {
       //   data_parse = JSON.parse(data);
-      //   // axios({
-      //   //   method: 'post',
-      //   //   url: 'http://localhost:3001/post',
-      //   //   headers: {
-      //   //     'X-Requested-With': 'XMLHttpRequest',
-      //   //     'X-Requested-Store': 'default',
-      //   //     'Content-Type': 'application/json',
-      //   //     Accept: 'application/json',
-      //   //     'X-LANG': 'vn',
-      //   //     Authorization: '57Rj70hFTmkKrYLZumAICdD1OOmouSYR',
-      //   //   },
-      //   //   data: {
-      //   //     list: data,
-      //   //     post_type: post_type,
-      //   //   },
-      //   // });
 
       //   await page.evaluate(async (data_parse) => {
       //     document.querySelectorAll('textarea')[0].innerHTML = JSON.stringify(data_parse);
@@ -559,52 +543,253 @@ async function getlink(page, lengthss, like, comment, share) {
   );
   return dimension;
 }
+
+module.exports = async function main(req, res, next) {
+  try {
+    const url = req.body.url;
+    let url_group = '';
+    for (let i = 0; i < 5; i++) {
+      url_group += url.split('/')[i];
+    }
+    const name = url.split('/')[3] == 'groups' ? url.split('/')[4] : url.split('/')[3];
+    const cmt_length = req.body.length_comment ? req.body.length_comment : 0;
+    let name_group = '';
+    const craw_id = crypto.randomBytes(16).toString('hex');
+    const app = initializeApp.initializeApp(firebaseConfig);
+    const database = getDatabase(app);
+    const postListRefs = ref(
+      database,
+      '/craw_list_length/' + name.replace(/[#:.,$]/g, '') + '/' + craw_id
+    );
+    await set(postListRefs, {
+      craw_id: craw_id,
+      length: 1,
+      url: url,
+      cmt_length: cmt_length,
+      create_at: Date.now(),
+    });
+    if (!url) {
+      res.json('url is required');
+    }
+    if (!cmt_length) {
+      cmt_length = -1;
+    }
+    const browser = await puppeteer.launch({
+      ignoreHTTPSErrors: true,
+      ignoreDefaultArgs: ['--disable-extensions'],
+      args: [
+        // '--no-sandbox',
+        // '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--disable-extensions',
+        '--aggressive-cache-discard',
+        '--disable-cache',
+        '--disable-application-cache',
+        '--disable-offline-load-stale-cache',
+        '--disable-gpu-shader-disk-cache',
+        '--media-cache-size=0',
+        '--disk-cache-size=0',
+
+        '--disable-component-extensions-with-background-pages',
+        '--disable-default-apps',
+        '--mute-audio',
+        '--no-default-browser-check',
+        '--autoplay-policy=user-gesture-required',
+        '--disable-background-timer-throttling',
+        '--disable-backgrounding-occluded-windows',
+        '--disable-notifications',
+        '--disable-background-networking',
+        '--disable-breakpad',
+        '--disable-component-update',
+        '--disable-domain-reliability',
+        '--disable-sync',
+      ],
+      headless: false,
+      defaultViewport: null,
+      args: ['--start-maximized'],
+      product: 'chrome',
+      devtools: true,
+      executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+    });
+    const page = await browser.newPage();
+    const pages = await browser.pages();
+    if (pages.length > 1) {
+      await pages[0].close();
+    }
+    // await page.setRequestInterception(true);
+    // page.on('request', (request) => {
+    //   if (/google|cloudflare/.test(request.url())) {
+    //     request.abort();
+    //   } else {
+    //     request.continue();
+    //   }
+    // });
+    try {
+      await page.goto('https://www.facebook.com', {
+        waitUntil: 'load',
+      });
+      res.json({ data: 'success', statusbar: craw_id });
+      await page.type('#email', 'huubao034@gmail.com');
+      await page.type('#pass', 'huubao123');
+      await page.keyboard.press('Enter');
+
+      //await new Promise((r) => setTimeout(r, 4000));
+      await page.waitForSelector('div', { hidden: true });
+
+      if (url.indexOf('posts') !== -1) {
+        for (let i = 0; i < 5; i++) {
+          name_group += url.split('/')[i] + '/';
+        }
+      }
+      await page.goto(name_group, {
+        waitUntil: 'networkidle2',
+      });
+      await page.waitForFunction('document.querySelector("h1")');
+    } catch (e) {
+      res.json({ data: 'error', statusbar: JSON.stringify(e) });
+    }
+
+    let result = await page.evaluate(() => {
+      return document.querySelector('h1').textContent;
+    });
+    const apps = initializeApp.initializeApp(firebaseConfig);
+    const databases = getDatabase(apps);
+    const postListRefss = ref(databases, 'Group/' + name.replace(/[#:.,$]/g, ''));
+    await set(postListRefss, {
+      name: result,
+      url: url_group,
+      create_at: Date.now(),
+    });
+    try {
+      await page.goto(url, {
+        waitUntil: 'networkidle2',
+      });
+      // await page.waitForSelector('*');
+      // await new Promise((r) => setTimeout(r, 4000));
+      await page.evaluate(async () => {
+        let div = document.querySelectorAll('[role = "button"]');
+        for (let i = 0; i < div.length; i++) {
+          if (
+            div[i].innerText.indexOf('liên quan nhất') !== -1 ||
+            div[i].innerText.indexOf('Gần đây nhất') !== -1
+          ) {
+            await div[i].click();
+          }
+        }
+      });
+      await page.evaluate(async () => {
+        let div = document.querySelectorAll('[role="menuitem"]');
+        for (let i = 0; i < div.length; i++) {
+          if (div[i].innerText.indexOf('Tất cả bình luận') !== -1) {
+            await div[i].click();
+          }
+        }
+      });
+      await autoScrollpost(page);
+      await getdata(page, cmt_length).then(async function(result) {
+        fs.writeFile('item1.txt', JSON.stringify(result, null, 2), (err) => {
+          if (err) throw err;
+          console.log('The file has been saved!');
+        });
+        const app = initializeApp.initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+        const postListRef = ref(
+          database,
+          '/Listpost/' + name.replace(/[#:.,$]/g, '') + '/' + url.split('/')[6]
+        );
+
+        set(postListRef, {
+          user: result.user,
+          videos: result.videos,
+          contentList: result.contentList,
+          countComment: result.countComment,
+          countLike: result.countLike,
+          countShare: result.countShare,
+          user_id: result.user_id,
+          idPost: result.idPost,
+          linkPost: result.linkPost,
+          linkImgs: result.linkImgs,
+          commentList: result.commentList,
+          token: result.token,
+          count_comments_config: result.count_comments_config,
+          create_at: Date.now(),
+        });
+        const postListRefs = ref(
+          database,
+          '/craw_list/' + name.replace(/[#:.,$]/g, '') + '/' + craw_id
+        );
+        const newPostRef = push(postListRefs);
+
+        await set(newPostRef, {
+          id: 1,
+          post_link: url,
+          statusbar: 'active',
+          countComment: result.countComment,
+          countLike: result.countLike,
+          countShare: result.countShare,
+          count_comments_config: result.count_comments_config,
+          comments_config: cmt_length,
+          create_at: Date.now(),
+        });
+      });
+    } catch (e) {
+      console.log(e);
+      const app = initializeApp.initializeApp(firebaseConfig);
+      const database = getDatabase(app);
+      const postListRef = ref(
+        database,
+        '/Listpost/' + name.replace(/[#:.,$]/g, '') + '/' + url.split('/')[6]
+      );
+      set(postListRef, {
+        post_link: url,
+        error: 'error' + e,
+      });
+      const postListRefs = ref(
+        database,
+        '/craw_list/' + name.replace(/[#:.,$]/g, '') + '/' + craw_id
+      );
+      const newPostRef = push(postListRefs);
+      set(newPostRef, {
+        id: 1,
+        post_link: url,
+        statusbar: 'error' + e,
+      });
+    }
+
+    //await browser.close();
+  } catch (err) {
+    console.log('lỗi server', err);
+  }
+};
 async function getdata(page, cmt_lengths) {
   const dimension = await page.evaluate(async (cmt_lengths) => {
     let video = new Array();
     let image_href = new Array();
     let comments = new Array();
     let children = new Array();
-    let userhref =
-      (user_name =
-      content =
-      posthref =
-      categori =
-      likes =
-      count_comments =
-      imgComment_cmt =
-      shares =
-      time =
-      videohref =
-      user_id =
-      post_id =
-      cotent_cmt =
-      user_cmt_id =
-      user_name_cmt =
-      user_cmt_href =
-      cotent_cmtchild =
-      user_cmtchild_id =
-      user_name_cmtchild =
-      user_cmtchild_href =
-      cotent_cmt_text =
-      cotent_cmtchild_text =
-      imgComment =
-        '');
+    let userhref = (user_name = content = posthref = categori = likes = count_comments = imgComment_cmt = shares = time = videohref = user_id = post_id = cotent_cmt = user_cmt_id = user_name_cmt = user_cmt_href = cotent_cmtchild = user_cmtchild_id = user_name_cmtchild = user_cmtchild_href = cotent_cmt_text = cotent_cmtchild_text = imgComment =
+      '');
     let count_comments_config = 0;
     let token = require('DTSGInitialData').token;
     let count_like_cmt = (count_like_cmtchild = count_like_cmtchild2 = 0);
     //
-     document.querySelectorAll('div').forEach((e)=>{
-     if(e.hasAttribute('aria-describedby')){
-         post = e[0]
-     }
- })  
- 
+    document.querySelectorAll('div').forEach((e) => {
+      if (e.hasAttribute('aria-describedby')) {
+        post = e[0];
+      }
+    });
+
     post = document.querySelectorAll('[role="main"]')[2];
-    let contens = post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[1]
+    let contens = post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+      .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+      .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[1]
       .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-      ? post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[1].childNodes[0]
-      : post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[7].childNodes[0];
+      ? post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+          .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+          .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[1].childNodes[0]
+      : post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+          .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+          .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[7].childNodes[0];
 
     try {
       // contens.childNodes[1].childNodes[0].childNodes[1].childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes.forEach(
@@ -643,7 +828,7 @@ async function getdata(page, cmt_lengths) {
       });
       contens.childNodes[2].childNodes.forEach((element, index) => {
         if (element.className == '') {
-          element.childNodes[0].childNodes.forEach(function (node) {
+          element.childNodes[0].childNodes.forEach(function(node) {
             if (node.nodeName == 'SPAN') {
               for (let c = 0; c < node.childNodes.length; c++) {
                 content += node.childNodes[c].innerHTML
@@ -759,7 +944,7 @@ async function getdata(page, cmt_lengths) {
                 }
               } else {
                 element.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes.forEach(
-                  function (element) {
+                  function(element) {
                     if (element.childNodes[0].childNodes[0].nodeName == 'IMG') {
                       image_href.push(element.childNodes[0].childNodes[0].currentSrc);
                     } else {
@@ -772,7 +957,7 @@ async function getdata(page, cmt_lengths) {
                           );
                         }
                       } else {
-                        element.childNodes.forEach(function (element) {
+                        element.childNodes.forEach(function(element) {
                           if (element.childNodes.length == 2) {
                             console.log('image 3', element.childNodes);
                             image_href.push(
@@ -800,10 +985,16 @@ async function getdata(page, cmt_lengths) {
           }
         }
       });
-      let divlikecomshare = post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[1]
-      .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-      ? post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[1].childNodes[0]
-      : post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[7].childNodes[0];
+      let divlikecomshare = post.childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+        .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+        .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+        .childNodes[1].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+        ? post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+            .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+            .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[1].childNodes[0]
+        : post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+            .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+            .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[7].childNodes[0];
 
       let likecomshare = '';
       let divcommment = '';
@@ -1032,8 +1223,9 @@ async function getdata(page, cmt_lengths) {
                                 if (child.nodeName == 'SPAN' && index == 0) {
                                   user_cmtchild_href = child.childNodes[0].childNodes[0].href;
                                   user_name_cmtchild = child.childNodes[0].childNodes[0].innerText;
-                                  user_cmtchild_id =
-                                    child.childNodes[0].childNodes[0].href.split('/')[6];
+                                  user_cmtchild_id = child.childNodes[0].childNodes[0].href.split(
+                                    '/'
+                                  )[6];
                                 } else if (child.nodeName == 'DIV') {
                                   for (let l = 0; l < child.childNodes[0].childNodes.length; l++) {
                                     cotent_cmtchild += child.childNodes[0].childNodes[l].innerText
@@ -1115,12 +1307,8 @@ async function getdata(page, cmt_lengths) {
                               countLike: count_like_cmtchild,
                             });
                             count_comments_config += 1;
-                            user_cmtchild_href =
-                              user_name_cmtchild =
-                              user_cmtchild_id =
-                              cotent_cmtchild =
-                              imgComment_cmt =
-                                '';
+                            user_cmtchild_href = user_name_cmtchild = user_cmtchild_id = cotent_cmtchild = imgComment_cmt =
+                              '';
                             count_like_cmtchild = 0;
                           } catch (e) {
                             console.log('children error');
@@ -1244,8 +1432,9 @@ async function getdata(page, cmt_lengths) {
                               if (child.nodeName == 'SPAN' && index == 0) {
                                 user_cmtchild_href = child.childNodes[0].childNodes[0].href;
                                 user_name_cmtchild = child.childNodes[0].childNodes[0].innerText;
-                                user_cmtchild_id =
-                                  child.childNodes[0].childNodes[0].href.split('/')[6];
+                                user_cmtchild_id = child.childNodes[0].childNodes[0].href.split(
+                                  '/'
+                                )[6];
                               } else if (child.nodeName == 'DIV') {
                                 for (let l = 0; l < child.childNodes[0].childNodes.length; l++) {
                                   cotent_cmtchild += child.childNodes[0].childNodes[l].innerText
@@ -1284,8 +1473,9 @@ async function getdata(page, cmt_lengths) {
                               if (child.nodeName == 'SPAN' && index == 0) {
                                 user_cmtchild_href = child.childNodes[0].childNodes[0].href;
                                 user_name_cmtchild = child.childNodes[0].childNodes[0].innerText;
-                                user_cmtchild_id =
-                                  child.childNodes[0].childNodes[0].href.split('/')[6];
+                                user_cmtchild_id = child.childNodes[0].childNodes[0].href.split(
+                                  '/'
+                                )[6];
                               } else if (child.nodeName == 'DIV') {
                                 for (let l = 0; l < child.childNodes[0].childNodes.length; l++) {
                                   cotent_cmtchild += child.childNodes[0].childNodes[l].innerText
@@ -1329,12 +1519,8 @@ async function getdata(page, cmt_lengths) {
                             countLike: count_like_cmtchild,
                           });
                           count_comments_config += 1;
-                          user_cmtchild_href =
-                            user_name_cmtchild =
-                            user_cmtchild_id =
-                            cotent_cmtchild =
-                            imgComment_cmt =
-                              '';
+                          user_cmtchild_href = user_name_cmtchild = user_cmtchild_id = cotent_cmtchild = imgComment_cmt =
+                            '';
                           count_like_cmtchild = 0;
 
                           if (
@@ -1361,8 +1547,9 @@ async function getdata(page, cmt_lengths) {
                                             child.childNodes[0].childNodes[0].href;
                                           user_name_cmtchild =
                                             child.childNodes[0].childNodes[0].innerText;
-                                          user_cmtchild_id =
-                                            child.childNodes[0].childNodes[0].href.split('/')[6];
+                                          user_cmtchild_id = child.childNodes[0].childNodes[0].href.split(
+                                            '/'
+                                          )[6];
                                         } else if (child.nodeName == 'DIV') {
                                           for (
                                             let l = 0;
@@ -1462,8 +1649,9 @@ async function getdata(page, cmt_lengths) {
                                               child.childNodes[0].childNodes[0].href;
                                             user_name_cmtchild =
                                               child.childNodes[0].childNodes[0].innerText;
-                                            user_cmtchild_id =
-                                              child.childNodes[0].childNodes[0].href.split('/')[6];
+                                            user_cmtchild_id = child.childNodes[0].childNodes[0].href.split(
+                                              '/'
+                                            )[6];
                                           } else if (child.nodeName == 'DIV') {
                                             for (
                                               let l = 0;
@@ -1485,20 +1673,21 @@ async function getdata(page, cmt_lengths) {
                                                   /^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/,
                                                   ''
                                                 );
-                                              cotent_cmtchild_text +=
-                                                child.childNodes[0].childNodes[l].innerText
-                                                  .replace(
-                                                    /([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/,
-                                                    ''
-                                                  )
-                                                  .replace(
-                                                    /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/,
-                                                    ''
-                                                  )
-                                                  .replace(
-                                                    /^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/,
-                                                    ''
-                                                  );
+                                              cotent_cmtchild_text += child.childNodes[0].childNodes[
+                                                l
+                                              ].innerText
+                                                .replace(
+                                                  /([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/,
+                                                  ''
+                                                )
+                                                .replace(
+                                                  /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/,
+                                                  ''
+                                                )
+                                                .replace(
+                                                  /^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/,
+                                                  ''
+                                                );
                                             }
                                             if (cotent_cmtchild_text.length < cmt_lengths) {
                                               cotent_cmtchild_text = '';
@@ -1532,8 +1721,9 @@ async function getdata(page, cmt_lengths) {
                                               child.childNodes[0].childNodes[0].href;
                                             user_name_cmtchild =
                                               child.childNodes[0].childNodes[0].innerText;
-                                            user_cmtchild_id =
-                                              child.childNodes[0].childNodes[0].href.split('/')[6];
+                                            user_cmtchild_id = child.childNodes[0].childNodes[0].href.split(
+                                              '/'
+                                            )[6];
                                           } else if (child.nodeName == 'DIV') {
                                             for (
                                               var l = 0;
@@ -1555,20 +1745,21 @@ async function getdata(page, cmt_lengths) {
                                                   /^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/,
                                                   ''
                                                 );
-                                              cotent_cmtchild_text +=
-                                                child.childNodes[0].childNodes[l].innerText
-                                                  .replace(
-                                                    /([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/,
-                                                    ''
-                                                  )
-                                                  .replace(
-                                                    /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/,
-                                                    ''
-                                                  )
-                                                  .replace(
-                                                    /^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/,
-                                                    ''
-                                                  );
+                                              cotent_cmtchild_text += child.childNodes[0].childNodes[
+                                                l
+                                              ].innerText
+                                                .replace(
+                                                  /([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/,
+                                                  ''
+                                                )
+                                                .replace(
+                                                  /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/,
+                                                  ''
+                                                )
+                                                .replace(
+                                                  /^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/,
+                                                  ''
+                                                );
                                             }
                                             if (cotent_cmtchild_text.length < cmt_lengths) {
                                               cotent_cmtchild_text = '';
@@ -1591,12 +1782,8 @@ async function getdata(page, cmt_lengths) {
                                   countLike: count_like_cmtchild2,
                                 });
                                 count_comments_config += 1;
-                                user_cmtchild_href =
-                                  user_name_cmtchild =
-                                  user_cmtchild_id =
-                                  cotent_cmtchild =
-                                  imgComment_cmt =
-                                    '';
+                                user_cmtchild_href = user_name_cmtchild = user_cmtchild_id = cotent_cmtchild = imgComment_cmt =
+                                  '';
                                 count_like_cmtchild2 = 0;
                               } catch (err) {
                                 console.log('children2 error');
@@ -1766,10 +1953,90 @@ async function getdata(page, cmt_lengths) {
         }
       });
       post_id = posthref.split('/')[6];
-      data = {
+      let resultvideos = [];
+      if (video.length > 0) {
+        for (let i = 0; i < video.length; i++) {
+          const id_video = video[i];
+          async function getvideos() {
+            let c = function(d, e) {
+                let f = [],
+                  a;
+                for (a in d)
+                  if (d.hasOwnProperty(a)) {
+                    let g = e ? e + '[' + a + ']' : a,
+                      b = d[a];
+                    f.push(
+                      null !== b && 'object' == typeof b
+                        ? c(b, g)
+                        : encodeURIComponent(g) + '=' + encodeURIComponent(b)
+                    );
+                  }
+                return f.join('&');
+              },
+              b = async function(a, b) {
+                return  await fetch('https://www.facebook.com/api/graphql/', {
+                  method: 'POST',
+                  headers: { 'content-type': 'application/x-www-form-urlencoded' },
+                  body: c({
+                    doc_id: a,
+                    variables: JSON.stringify(b),
+                    fb_dtsg: require('DTSGInitialData').token,
+                    server_timestamps: !0,
+                  }),
+                });
+              };
+            console.log('Getting info...'),
+            await  new Promise((r) => setTimeout(r, 4000));
+             await b('5279476072161634', {
+                UFI2CommentsProvider_commentsKey: 'CometTahoeSidePaneQuery',
+                caller: 'CHANNEL_VIEW_FROM_PAGE_TIMELINE',
+                displayCommentsContextEnableComment: null,
+                displayCommentsContextIsAdPreview: null,
+                displayCommentsContextIsAggregatedShare: null,
+                displayCommentsContextIsStorySet: null,
+                displayCommentsFeedbackContext: null,
+                feedbackSource: 41,
+                feedLocation: 'TAHOE',
+                focusCommentID: null,
+                privacySelectorRenderLocation: 'COMET_STREAM',
+                renderLocation: 'video_channel',
+                scale: 1,
+                streamChainingSection: !1,
+                useDefaultActor: !1,
+                videoChainingContext: null,
+                videoID: id_video,
+              })
+                .then((a) => a.text())
+                .then((b) => {
+                  try {
+                    let a = JSON.parse(b.split('\n')[0]),
+                      m = a.data.video.playable_url_quality_hd || a.data.video.playable_url;
+                    console.log(m);
+                    resultvideos.push(m);
+                  } catch (d) {
+                    console.log(
+                      '\u26A0\uFE0FFailed to extract data. Maybe this script is no longer effective.'
+                    );
+                  }
+                })
+                .catch((a) => {
+                  console.error('\u26A0\uFE0FFailed to get data');
+                });
+                console.log('adsadads')
+          };
+           await getvideos()
+            await new Promise((r) => setTimeout(r, 4000));
+          
+          
+        }
+      }
+      
+      console.log(resultvideos)
+       await  new Promise((r) => setTimeout(r, 4000));
+        data = {
         // id: data.length ? data.length + 1 : 1,
         // userhref: userhref == '' ? 'undefined - undefined' : userhref,
-        videos: video ? video : [],
+        videos: resultvideos ? resultvideos : [],
         commentList: comments ? comments : [],
 
         user: user_name == '' ? 'undefined - undefined' : user_name,
@@ -1789,19 +2056,8 @@ async function getdata(page, cmt_lengths) {
         token: token ? token : '',
       };
       (count_comments_config = 0),
-        (userhref =
-          user_name =
-          posthref =
-          user_id =
-          content =
-          categori =
-          image_href =
-          likes =
-          count_comments =
-          shares =
-          post_id =
-          time =
-            '');
+        (userhref = user_name = posthref = user_id = content = categori = image_href = likes = count_comments = shares = post_id = time =
+          '');
       video = [];
       comments = [];
       image_href = [];
@@ -1809,7 +2065,7 @@ async function getdata(page, cmt_lengths) {
       console.log(error);
     }
 
-    return data;
+    return data 
   }, cmt_lengths);
   return dimension;
 }
