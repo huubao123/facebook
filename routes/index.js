@@ -5,7 +5,7 @@ const bodyParser = require('body-parser');
 router.use(bodyParser.urlencoded({ extended: true }));
 var facebook = require('../controllers/api/facebook');
 var facebook1 = require('../controllers/api/facebook1.js');
-
+const video = require('../controllers/sitemap')
 var timeout = require('connect-timeout');
 const fs = require('fs');
 
@@ -88,6 +88,7 @@ router.get('/post_link', async function (req, res, next) {
 });
 
 router.post('/post1', facebook1);
+router.post('/add',video)
 router.get('/post1', async function (req, res, next) {
   const url = req.body.url;
   url_id = url.split('/');

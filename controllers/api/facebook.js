@@ -296,6 +296,7 @@ module.exports = async function main(req, res, next) {
       });
       await page.waitForFunction('document.querySelector("h1")');
     } catch (e) {
+      console.log(e)
       res.json({ data: 'error', statusbar: JSON.stringify(e) });
     }
     const result = await page.evaluate(() => {
@@ -371,9 +372,9 @@ module.exports = async function main(req, res, next) {
               countComment: results.countComment,
               countLike: results.countLike,
               countShare: results.countShare,
-              //user_id: result.user_id,
-              idPost: results.idPost,
-              linkPost: results.linkPost,
+              user_id: results.user_id,
+              idPost: result[i].post_link.split('/')[6],
+              linkPost: result[i].post_link,
               linkImgs: results.linkImgs,
               commentList: results.commentList,
               token: results.token,
@@ -460,7 +461,7 @@ module.exports = async function main(req, res, next) {
       //   });
       // });
     });
-    await browser.close();
+    //await browser.close();
   } catch (err) {
     console.log('lỗi server', err);
   }
@@ -544,223 +545,6 @@ async function getlink(page, lengthss, like, comment, share) {
   return dimension;
 }
 
-module.exports = async function main(req, res, next) {
-  try {
-    const url = req.body.url;
-    let url_group = '';
-    for (let i = 0; i < 5; i++) {
-      url_group += url.split('/')[i];
-    }
-    const name = url.split('/')[3] == 'groups' ? url.split('/')[4] : url.split('/')[3];
-    const cmt_length = req.body.length_comment ? req.body.length_comment : 0;
-    let name_group = '';
-    const craw_id = crypto.randomBytes(16).toString('hex');
-    const app = initializeApp.initializeApp(firebaseConfig);
-    const database = getDatabase(app);
-    const postListRefs = ref(
-      database,
-      '/craw_list_length/' + name.replace(/[#:.,$]/g, '') + '/' + craw_id
-    );
-    await set(postListRefs, {
-      craw_id: craw_id,
-      length: 1,
-      url: url,
-      cmt_length: cmt_length,
-      create_at: Date.now(),
-    });
-    if (!url) {
-      res.json('url is required');
-    }
-    if (!cmt_length) {
-      cmt_length = -1;
-    }
-    const browser = await puppeteer.launch({
-      ignoreHTTPSErrors: true,
-      ignoreDefaultArgs: ['--disable-extensions'],
-      args: [
-        // '--no-sandbox',
-        // '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage',
-        '--disable-extensions',
-        '--aggressive-cache-discard',
-        '--disable-cache',
-        '--disable-application-cache',
-        '--disable-offline-load-stale-cache',
-        '--disable-gpu-shader-disk-cache',
-        '--media-cache-size=0',
-        '--disk-cache-size=0',
-
-        '--disable-component-extensions-with-background-pages',
-        '--disable-default-apps',
-        '--mute-audio',
-        '--no-default-browser-check',
-        '--autoplay-policy=user-gesture-required',
-        '--disable-background-timer-throttling',
-        '--disable-backgrounding-occluded-windows',
-        '--disable-notifications',
-        '--disable-background-networking',
-        '--disable-breakpad',
-        '--disable-component-update',
-        '--disable-domain-reliability',
-        '--disable-sync',
-      ],
-      headless: false,
-      defaultViewport: null,
-      args: ['--start-maximized'],
-      product: 'chrome',
-      devtools: true,
-      executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
-    });
-    const page = await browser.newPage();
-    const pages = await browser.pages();
-    if (pages.length > 1) {
-      await pages[0].close();
-    }
-    // await page.setRequestInterception(true);
-    // page.on('request', (request) => {
-    //   if (/google|cloudflare/.test(request.url())) {
-    //     request.abort();
-    //   } else {
-    //     request.continue();
-    //   }
-    // });
-    try {
-      await page.goto('https://www.facebook.com', {
-        waitUntil: 'load',
-      });
-      res.json({ data: 'success', statusbar: craw_id });
-      await page.type('#email', 'huubao034@gmail.com');
-      await page.type('#pass', 'huubao123');
-      await page.keyboard.press('Enter');
-
-      //await new Promise((r) => setTimeout(r, 4000));
-      await page.waitForSelector('div', { hidden: true });
-
-      if (url.indexOf('posts') !== -1) {
-        for (let i = 0; i < 5; i++) {
-          name_group += url.split('/')[i] + '/';
-        }
-      }
-      await page.goto(name_group, {
-        waitUntil: 'networkidle2',
-      });
-      await page.waitForFunction('document.querySelector("h1")');
-    } catch (e) {
-      res.json({ data: 'error', statusbar: JSON.stringify(e) });
-    }
-
-    let result = await page.evaluate(() => {
-      return document.querySelector('h1').textContent;
-    });
-    const apps = initializeApp.initializeApp(firebaseConfig);
-    const databases = getDatabase(apps);
-    const postListRefss = ref(databases, 'Group/' + name.replace(/[#:.,$]/g, ''));
-    await set(postListRefss, {
-      name: result,
-      url: url_group,
-      create_at: Date.now(),
-    });
-    try {
-      await page.goto(url, {
-        waitUntil: 'networkidle2',
-      });
-      // await page.waitForSelector('*');
-      // await new Promise((r) => setTimeout(r, 4000));
-      await page.evaluate(async () => {
-        let div = document.querySelectorAll('[role = "button"]');
-        for (let i = 0; i < div.length; i++) {
-          if (
-            div[i].innerText.indexOf('liên quan nhất') !== -1 ||
-            div[i].innerText.indexOf('Gần đây nhất') !== -1
-          ) {
-            await div[i].click();
-          }
-        }
-      });
-      await page.evaluate(async () => {
-        let div = document.querySelectorAll('[role="menuitem"]');
-        for (let i = 0; i < div.length; i++) {
-          if (div[i].innerText.indexOf('Tất cả bình luận') !== -1) {
-            await div[i].click();
-          }
-        }
-      });
-      await autoScrollpost(page);
-      await getdata(page, cmt_length).then(async function(result) {
-        fs.writeFile('item1.txt', JSON.stringify(result, null, 2), (err) => {
-          if (err) throw err;
-          console.log('The file has been saved!');
-        });
-        const app = initializeApp.initializeApp(firebaseConfig);
-        const database = getDatabase(app);
-        const postListRef = ref(
-          database,
-          '/Listpost/' + name.replace(/[#:.,$]/g, '') + '/' + url.split('/')[6]
-        );
-
-        set(postListRef, {
-          user: result.user,
-          videos: result.videos,
-          contentList: result.contentList,
-          countComment: result.countComment,
-          countLike: result.countLike,
-          countShare: result.countShare,
-          user_id: result.user_id,
-          idPost: result.idPost,
-          linkPost: result.linkPost,
-          linkImgs: result.linkImgs,
-          commentList: result.commentList,
-          token: result.token,
-          count_comments_config: result.count_comments_config,
-          create_at: Date.now(),
-        });
-        const postListRefs = ref(
-          database,
-          '/craw_list/' + name.replace(/[#:.,$]/g, '') + '/' + craw_id
-        );
-        const newPostRef = push(postListRefs);
-
-        await set(newPostRef, {
-          id: 1,
-          post_link: url,
-          statusbar: 'active',
-          countComment: result.countComment,
-          countLike: result.countLike,
-          countShare: result.countShare,
-          count_comments_config: result.count_comments_config,
-          comments_config: cmt_length,
-          create_at: Date.now(),
-        });
-      });
-    } catch (e) {
-      console.log(e);
-      const app = initializeApp.initializeApp(firebaseConfig);
-      const database = getDatabase(app);
-      const postListRef = ref(
-        database,
-        '/Listpost/' + name.replace(/[#:.,$]/g, '') + '/' + url.split('/')[6]
-      );
-      set(postListRef, {
-        post_link: url,
-        error: 'error' + e,
-      });
-      const postListRefs = ref(
-        database,
-        '/craw_list/' + name.replace(/[#:.,$]/g, '') + '/' + craw_id
-      );
-      const newPostRef = push(postListRefs);
-      set(newPostRef, {
-        id: 1,
-        post_link: url,
-        statusbar: 'error' + e,
-      });
-    }
-
-    //await browser.close();
-  } catch (err) {
-    console.log('lỗi server', err);
-  }
-};
 async function getdata(page, cmt_lengths) {
   const dimension = await page.evaluate(async (cmt_lengths) => {
     let video = new Array();
