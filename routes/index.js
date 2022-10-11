@@ -48,17 +48,8 @@ const app = initializeApp.initializeApp(firebaseConfig);
 const database = getDatabase(app);
 
 router.get('/', async function (req, res, next) {
-  //   console.log(req.headers.cookie);
-  // res.header("token",req.headers.cookie.split('; ')[2].slice(4))
   res.json({ aaa: 'aaaa' });
-  //   res.render('main', {
-  //     layout: 'layout',
-  //     title: 'Social',
-  //     // username: req.user.name,
-  //     // picture: req.user.picture,
-  //     // id: req.user._id,
-  //     // role: req.user.role,
-  //   });
+
 });
 // router.get('/login', login.login);
 router.post('/post', facebook);

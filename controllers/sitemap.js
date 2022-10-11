@@ -38,13 +38,14 @@ module.exports = function json(req, res) {
       console.log(`stderr: ${stderr}`);
       return;
     }
-    console.log( stdout);
 
     const apps = initializeApp.initializeApp(firebaseConfig);
     const databases = getDatabase(apps);
     const postListRefss = ref(databases, 'Sitemap/' + craw_id);
      set(postListRefss, {
-      url: url,
+      url: req.body.url,
+      config: req.body.config,
+      create_at: Date.now(),
       result: stdout,
     });
   });
