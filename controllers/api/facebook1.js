@@ -1565,82 +1565,87 @@ async function getdata(page, cmt_lengths) {
       });
       post_id = posthref.split('/')[6];
       let resultvideos = [];
-      if (video.length > 0) {
-        for (let i = 0; i < video.length; i++) {
-          const id_video = video[i];
-          async function getvideos() {
-            let c = function (d, e) {
-                let f = [],
-                  a;
-                for (a in d)
-                  if (d.hasOwnProperty(a)) {
-                    let g = e ? e + '[' + a + ']' : a,
-                      b = d[a];
-                    f.push(
-                      null !== b && 'object' == typeof b
-                        ? c(b, g)
-                        : encodeURIComponent(g) + '=' + encodeURIComponent(b)
+      try {
+        if (video.length > 0) {
+          for (let i = 0; i < video.length; i++) {
+            const id_video = video[i];
+            async function getvideos() {
+              let c = function (d, e) {
+                  let f = [],
+                    a;
+                  for (a in d)
+                    if (d.hasOwnProperty(a)) {
+                      let g = e ? e + '[' + a + ']' : a,
+                        b = d[a];
+                      f.push(
+                        null !== b && 'object' == typeof b
+                          ? c(b, g)
+                          : encodeURIComponent(g) + '=' + encodeURIComponent(b)
+                      );
+                    }
+                  return f.join('&');
+                },
+                b = async function (a, b) {
+                  return await fetch('https://www.facebook.com/api/graphql/', {
+                    method: 'POST',
+                    headers: { 'content-type': 'application/x-www-form-urlencoded' },
+                    body: c({
+                      doc_id: a,
+                      variables: JSON.stringify(b),
+                      fb_dtsg: require('DTSGInitialData').token,
+                      server_timestamps: !0,
+                    }),
+                  });
+                };
+              console.log('Getting info...'), await new Promise((r) => setTimeout(r, 4000));
+              await b('5279476072161634', {
+                UFI2CommentsProvider_commentsKey: 'CometTahoeSidePaneQuery',
+                caller: 'CHANNEL_VIEW_FROM_PAGE_TIMELINE',
+                displayCommentsContextEnableComment: null,
+                displayCommentsContextIsAdPreview: null,
+                displayCommentsContextIsAggregatedShare: null,
+                displayCommentsContextIsStorySet: null,
+                displayCommentsFeedbackContext: null,
+                feedbackSource: 41,
+                feedLocation: 'TAHOE',
+                focusCommentID: null,
+                privacySelectorRenderLocation: 'COMET_STREAM',
+                renderLocation: 'video_channel',
+                scale: 1,
+                streamChainingSection: !1,
+                useDefaultActor: !1,
+                videoChainingContext: null,
+                videoID: id_video,
+              })
+                .then((a) => a.text())
+                .then((b) => {
+                  try {
+                    let a = JSON.parse(b.split('\n')[0]),
+                      m = a.data.video.playable_url_quality_hd || a.data.video.playable_url;
+                    console.log(m);
+                    resultvideos.push(m);
+                  } catch (d) {
+                    console.log(
+                      '\u26A0\uFE0FFailed to extract data. Maybe this script is no longer effective.'
                     );
                   }
-                return f.join('&');
-              },
-              b = async function (a, b) {
-                return await fetch('https://www.facebook.com/api/graphql/', {
-                  method: 'POST',
-                  headers: { 'content-type': 'application/x-www-form-urlencoded' },
-                  body: c({
-                    doc_id: a,
-                    variables: JSON.stringify(b),
-                    fb_dtsg: require('DTSGInitialData').token,
-                    server_timestamps: !0,
-                  }),
+                })
+                .catch((a) => {
+                  console.error('\u26A0\uFE0FFailed to get data');
                 });
-              };
-            console.log('Getting info...'), await new Promise((r) => setTimeout(r, 4000));
-            await b('5279476072161634', {
-              UFI2CommentsProvider_commentsKey: 'CometTahoeSidePaneQuery',
-              caller: 'CHANNEL_VIEW_FROM_PAGE_TIMELINE',
-              displayCommentsContextEnableComment: null,
-              displayCommentsContextIsAdPreview: null,
-              displayCommentsContextIsAggregatedShare: null,
-              displayCommentsContextIsStorySet: null,
-              displayCommentsFeedbackContext: null,
-              feedbackSource: 41,
-              feedLocation: 'TAHOE',
-              focusCommentID: null,
-              privacySelectorRenderLocation: 'COMET_STREAM',
-              renderLocation: 'video_channel',
-              scale: 1,
-              streamChainingSection: !1,
-              useDefaultActor: !1,
-              videoChainingContext: null,
-              videoID: id_video,
-            })
-              .then((a) => a.text())
-              .then((b) => {
-                try {
-                  let a = JSON.parse(b.split('\n')[0]),
-                    m = a.data.video.playable_url_quality_hd || a.data.video.playable_url;
-                  console.log(m);
-                  resultvideos.push(m);
-                } catch (d) {
-                  console.log(
-                    '\u26A0\uFE0FFailed to extract data. Maybe this script is no longer effective.'
-                  );
-                }
-              })
-              .catch((a) => {
-                console.error('\u26A0\uFE0FFailed to get data');
-              });
-            console.log('adsadads');
+              console.log('adsadads');
+            }
+            await getvideos();
+            await new Promise((r) => setTimeout(r, 4000));
           }
-          await getvideos();
-          await new Promise((r) => setTimeout(r, 4000));
         }
+
+        console.log(resultvideos);
+        await new Promise((r) => setTimeout(r, 4000));
+      } catch (e) {
+        console.log('error video dowload');
       }
 
-      console.log(resultvideos);
-      await new Promise((r) => setTimeout(r, 4000));
       data = {
         // id: data.length ? data.length + 1 : 1,
         // userhref: userhref == '' ? 'undefined - undefined' : userhref,
