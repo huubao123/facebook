@@ -149,7 +149,8 @@ module.exports = async function main(req, res, next) {
       args: ['--start-maximized'],
       product: 'chrome',
       devtools: true,
-      executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+      executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
+      //executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
     });
     const page = await browser.newPage();
     const pages = await browser.pages();
@@ -226,7 +227,7 @@ module.exports = async function main(req, res, next) {
         }
       });
       await autoScrollpost(page);
-      await getdata(page, cmt_length).then(async function(result) {
+      await getdata(page, cmt_length).then(async function (result) {
         fs.writeFile('item1.txt', JSON.stringify(result, null, 2), (err) => {
           if (err) throw err;
           console.log('The file has been saved!');
@@ -307,8 +308,31 @@ async function getdata(page, cmt_lengths) {
     let image_href = new Array();
     let comments = new Array();
     let children = new Array();
-    let userhref = (user_name = content = posthref = categori = likes = count_comments = imgComment_cmt = shares = time = videohref = user_id = post_id = cotent_cmt = user_cmt_id = user_name_cmt = user_cmt_href = cotent_cmtchild = user_cmtchild_id = user_name_cmtchild = user_cmtchild_href = cotent_cmt_text = cotent_cmtchild_text = imgComment =
-      '');
+    let userhref =
+      (user_name =
+      content =
+      posthref =
+      categori =
+      likes =
+      count_comments =
+      imgComment_cmt =
+      shares =
+      time =
+      videohref =
+      user_id =
+      post_id =
+      cotent_cmt =
+      user_cmt_id =
+      user_name_cmt =
+      user_cmt_href =
+      cotent_cmtchild =
+      user_cmtchild_id =
+      user_name_cmtchild =
+      user_cmtchild_href =
+      cotent_cmt_text =
+      cotent_cmtchild_text =
+      imgComment =
+        '');
     let count_comments_config = 0;
     let token = require('DTSGInitialData').token;
     let count_like_cmt = (count_like_cmtchild = count_like_cmtchild2 = 0);
@@ -319,17 +343,48 @@ async function getdata(page, cmt_lengths) {
       }
     });
 
-    post = document.querySelectorAll('[role="main"]')[2];
-    let contens = post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-      .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-      .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[1]
-      .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-      ? post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+    let contens = '';
+
+    try {
+      post = document.querySelectorAll('[role="main"]')[2];
+      if (
+        post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
           .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
           .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[1].childNodes[0]
-      : post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-          .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-          .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[7].childNodes[0];
+          .childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+      ) {
+        contens =
+          post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+            .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+            .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[1].childNodes[0];
+      }
+    } catch (e) {
+      try {
+        if (
+          post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+            .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+            .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[7].childNodes[0]
+        ) {
+          contens =
+            post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+              .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+              .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[7].childNodes[0];
+        }
+      } catch (e) {
+        if (
+          document.querySelector('[aria-posinset="1"]').childNodes[0].childNodes[0].childNodes[0]
+            .childNodes[0].childNodes[0].childNodes[7]
+        ) {
+          contens =
+            document.querySelector('[aria-posinset="1"]').childNodes[0].childNodes[0].childNodes[0]
+              .childNodes[0].childNodes[0].childNodes[7].childNodes[0];
+        } else {
+          contens =
+            document.querySelector('[aria-posinset="1"]').childNodes[0].childNodes[0].childNodes[0]
+              .childNodes[0].childNodes[0].childNodes[1].childNodes[0];
+        }
+      }
+    }
 
     try {
       // contens.childNodes[1].childNodes[0].childNodes[1].childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes.forEach(
@@ -340,248 +395,260 @@ async function getdata(page, cmt_lengths) {
       //     }
       //   }
       // );
-
-      if (
-        contens.childNodes[1].childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes[0]
-          .childNodes[0].childNodes[0].childNodes.length > 1
-      ) {
-        admin =
+      try {
+        if (
           contens.childNodes[1].childNodes[0].childNodes[1].childNodes[0].childNodes[0]
-            .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes;
-      } else {
-        admin =
-          contens.childNodes[1].childNodes[0].childNodes[1].childNodes[0].childNodes[0]
-            .childNodes[0].childNodes[0].childNodes[0].childNodes;
-      }
-      admin.forEach((element) => {
-        if (element.nodeName == 'SPAN') {
-          userhref = element.children[0].href
-            ? element.childNodes[0].href
-            : element.childNodes[0].href;
-          user_name = element.childNodes[0].innerText
-            ? element.childNodes[0].innerText
-            : element.childNodes[0].innerText;
-          user_id = element.childNodes[0].href
-            ? element.childNodes[0].href.split('/')[6]
-            : element.childNodes[0].href.split('/')[6];
-        }
-      });
-      contens.childNodes[2].childNodes.forEach((element, index) => {
-        if (element.className == '') {
-          element.childNodes[0].childNodes.forEach(function(node) {
-            if (node.nodeName == 'SPAN') {
-              for (let c = 0; c < node.childNodes.length; c++) {
-                content += node.childNodes[c].innerHTML
-                  .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
-                  .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
-                  .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
-              }
-            } else {
-              for (let c = 0; c < node.childNodes[0].childNodes[0].childNodes.length; c++) {
-                content += node.childNodes[0].childNodes[0].childNodes[c].innerHTML
-                  .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
-                  .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
-                  .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
-              }
-            }
-          });
-        } else if (element.nodeName == 'BLOCKQUOTE') {
-          console.log('BLOCKQUOTE', content);
-          // content =
-          //   element.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].innerHTML
-          //     .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
-          //     .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
-          //     .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
-
-          // content =
-          //   element.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-          //     .innerHTML;
+            .childNodes[0].childNodes[0].childNodes[0].childNodes.length > 1
+        ) {
+          admin =
+            contens.childNodes[1].childNodes[0].childNodes[1].childNodes[0].childNodes[0]
+              .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes;
         } else {
-          if (
-            element.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes.length == 2
-          ) {
-            checkitemlength =
-              element.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                .childNodes[1].childNodes[0].childNodes[1].childNodes[0].childNodes;
-            if (checkitemlength.length == 7) {
-              if (checkitemlength[5].childNodes.length == 11) {
-                video.push(
-                  checkitemlength[5].childNodes[7].childNodes[0].childNodes[0].childNodes[0].childNodes[0].href.split(
-                    '/'
-                  )[5]
-                );
-              } else if (checkitemlength[5].childNodes.length == 10) {
-                video.push(
-                  checkitemlength[5].childNodes[6].childNodes[0].childNodes[0].childNodes[0].childNodes[0].href.split(
-                    '/'
-                  )[5]
-                );
-              }
-            } else if (checkitemlength.length == 6) {
-              if (checkitemlength[4].childNodes.length == 11) {
-                video.push(
-                  checkitemlength[4].childNodes[7].childNodes[0].childNodes[0].childNodes[0].childNodes[0].href.split(
-                    '/'
-                  )[5]
-                );
-              } else if (checkitemlength[4].childNodes.length == 10) {
-                video.push(
-                  checkitemlength[4].childNodes[6].childNodes[0].childNodes[0].childNodes[0].childNodes[0].href.split(
-                    '/'
-                  )[5]
-                );
-              }
-            } else if (checkitemlength.length == 8) {
-              if (checkitemlength[6].childNodes.length == 11) {
-                video.push(
-                  checkitemlength[4].childNodes[7].childNodes[0].childNodes[0].childNodes[0].childNodes[0].href.split(
-                    '/'
-                  )[5]
-                );
-              } else if (checkitemlength[6].childNodes.length == 10) {
-                video.push(
-                  checkitemlength[4].childNodes[6].childNodes[0].childNodes[0].childNodes[0].childNodes[0].href.split(
-                    '/'
-                  )[5]
-                );
-              }
-            }
-          } else if (
-            element.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes.length == 1
-          ) {
-            try {
-              if (
-                element.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                  .childNodes.length > 1
-              ) {
-                if (
-                  !element.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                    .href
-                ) {
-                  for (
-                    let j = 0;
-                    j <
-                    element.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                      .childNodes.length;
-                    j++
-                  ) {
-                    element.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[
-                      j
-                    ].childNodes[0].href.indexOf('videos') > 0
-                      ? video.push(
-                          element.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[
-                            j
-                          ].childNodes[0].href
-                            .split('/')[6]
-                            .split('?')[0]
-                        )
-                      : image_href.push(
-                          element.childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                            .childNodes[0].childNodes[j].childNodes[0].childNodes[0].childNodes[0]
-                            .childNodes[0].childNodes[0].currentSrc
-                        );
-                  }
+          admin =
+            contens.childNodes[1].childNodes[0].childNodes[1].childNodes[0].childNodes[0]
+              .childNodes[0].childNodes[0].childNodes[0].childNodes;
+        }
+        admin.forEach((element) => {
+          if (element.nodeName == 'SPAN') {
+            userhref = element.children[0].href
+              ? element.childNodes[0].href
+              : element.childNodes[0].href;
+            user_name = element.childNodes[0].innerText
+              ? element.childNodes[0].innerText
+              : element.childNodes[0].innerText;
+            user_id = element.childNodes[0].href
+              ? element.childNodes[0].href.split('/')[6]
+              : element.childNodes[0].href.split('/')[6];
+          }
+        });
+      } catch (e) {
+        console.log('error user ');
+      }
+      try {
+        contens.childNodes[2].childNodes.forEach((element, index) => {
+          if (element.className == '') {
+            element.childNodes[0].childNodes.forEach(function (node) {
+              if (node.nodeName == 'SPAN') {
+                for (let c = 0; c < node.childNodes.length; c++) {
+                  content += node.childNodes[c].innerHTML
+                    .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
+                    .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
+                    .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
                 }
               } else {
-                element.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes.forEach(
-                  function(element) {
-                    if (element.childNodes[0].childNodes[0].nodeName == 'IMG') {
-                      image_href.push(element.childNodes[0].childNodes[0].currentSrc);
-                    } else {
-                      console.log('Warning: Invalid', element.childNodes);
-                      if (element.childNodes.length == 3) {
-                        for (let k = 0; k < element.childNodes.length; k++) {
-                          image_href.push(
+                for (let c = 0; c < node.childNodes[0].childNodes[0].childNodes.length; c++) {
+                  content += node.childNodes[0].childNodes[0].childNodes[c].innerHTML
+                    .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
+                    .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
+                    .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
+                }
+              }
+            });
+          } else if (element.nodeName == 'BLOCKQUOTE') {
+            console.log('BLOCKQUOTE', content);
+            // content =
+            //   element.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].innerHTML
+            //     .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
+            //     .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
+            //     .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
+
+            // content =
+            //   element.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+            //     .innerHTML;
+          } else {
+            if (
+              element.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes.length == 2
+            ) {
+              checkitemlength =
+                element.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                  .childNodes[1].childNodes[0].childNodes[1].childNodes[0].childNodes;
+              if (checkitemlength.length == 7) {
+                if (checkitemlength[5].childNodes.length == 11) {
+                  video.push(
+                    checkitemlength[5].childNodes[7].childNodes[0].childNodes[0].childNodes[0].childNodes[0].href.split(
+                      '/'
+                    )[5]
+                  );
+                } else if (checkitemlength[5].childNodes.length == 10) {
+                  video.push(
+                    checkitemlength[5].childNodes[6].childNodes[0].childNodes[0].childNodes[0].childNodes[0].href.split(
+                      '/'
+                    )[5]
+                  );
+                }
+              } else if (checkitemlength.length == 6) {
+                if (checkitemlength[4].childNodes.length == 11) {
+                  video.push(
+                    checkitemlength[4].childNodes[7].childNodes[0].childNodes[0].childNodes[0].childNodes[0].href.split(
+                      '/'
+                    )[5]
+                  );
+                } else if (checkitemlength[4].childNodes.length == 10) {
+                  video.push(
+                    checkitemlength[4].childNodes[6].childNodes[0].childNodes[0].childNodes[0].childNodes[0].href.split(
+                      '/'
+                    )[5]
+                  );
+                }
+              } else if (checkitemlength.length == 8) {
+                if (checkitemlength[6].childNodes.length == 11) {
+                  video.push(
+                    checkitemlength[4].childNodes[7].childNodes[0].childNodes[0].childNodes[0].childNodes[0].href.split(
+                      '/'
+                    )[5]
+                  );
+                } else if (checkitemlength[6].childNodes.length == 10) {
+                  video.push(
+                    checkitemlength[4].childNodes[6].childNodes[0].childNodes[0].childNodes[0].childNodes[0].href.split(
+                      '/'
+                    )[5]
+                  );
+                }
+              }
+            } else if (
+              element.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes.length == 1
+            ) {
+              try {
+                if (
+                  element.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                    .childNodes.length > 1
+                ) {
+                  if (
+                    !element.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                      .href
+                  ) {
+                    for (
+                      let j = 0;
+                      j <
+                      element.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                        .childNodes.length;
+                      j++
+                    ) {
+                      element.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[
+                        j
+                      ].childNodes[0].href.indexOf('videos') > 0
+                        ? video.push(
+                            element.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[
+                              j
+                            ].childNodes[0].href
+                              .split('/')[6]
+                              .split('?')[0]
+                          )
+                        : image_href.push(
                             element.childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                              .childNodes[0].href
+                              .childNodes[0].childNodes[j].childNodes[0].childNodes[0].childNodes[0]
+                              .childNodes[0].childNodes[0].currentSrc
                           );
-                        }
-                      } else {
-                        element.childNodes.forEach(function(element) {
-                          if (element.childNodes.length == 2) {
-                            console.log('image 3', element.childNodes);
-                            image_href.push(
-                              element.childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                                .childNodes[0].childNodes[0].childNodes[0].childNodes[0].currentSrc
-                            );
-                          } else {
-                            image_href.push(
-                              element.childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                                .childNodes[0].childNodes[0].childNodes[0].childNodes[0].currentSrc
-                            );
-                          }
-                        });
-                      }
                     }
                   }
-                );
-              }
-            } catch (e) {}
-          } else {
-            content = element.childNodes[0].childNodes[0].childNodes[0].innerHTML;
-            // for (var i = 0; i < 2; i++) {
-            //   content += lengths[i].innerHTML;
-            // }
+                } else {
+                  element.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes.forEach(
+                    function (element) {
+                      if (element.childNodes[0].childNodes[0].nodeName == 'IMG') {
+                        image_href.push(element.childNodes[0].childNodes[0].currentSrc);
+                      } else {
+                        console.log('Warning: Invalid', element.childNodes);
+                        if (element.childNodes.length == 3) {
+                          for (let k = 0; k < element.childNodes.length; k++) {
+                            image_href.push(
+                              element.childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                                .childNodes[0].href
+                            );
+                          }
+                        } else {
+                          element.childNodes.forEach(function (element) {
+                            if (element.childNodes.length == 2) {
+                              console.log('image 3', element.childNodes);
+                              image_href.push(
+                                element.childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                                  .childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                                  .currentSrc
+                              );
+                            } else {
+                              image_href.push(
+                                element.childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                                  .childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                                  .currentSrc
+                              );
+                            }
+                          });
+                        }
+                      }
+                    }
+                  );
+                }
+              } catch (e) {}
+            } else {
+              content = element.childNodes[0].childNodes[0].childNodes[0].innerHTML;
+              // for (var i = 0; i < 2; i++) {
+              //   content += lengths[i].innerHTML;
+              // }
+            }
           }
-        }
-      });
-      let divlikecomshare = post.childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-        .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-        .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-        .childNodes[1].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-        ? post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-            .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-            .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[1].childNodes[0]
-        : post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-            .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-            .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[7].childNodes[0];
+        });
+      } catch (e) {
+        console.log('error content ');
+      }
+
+      let divlikecomshare = contens;
 
       let likecomshare = '';
       let divcommment = '';
 
       // lấy categori có thì  divlikecomshare  = 5
-      if (divlikecomshare.childNodes.length == 5) {
-        categori = divlikecomshare.childNodes[3].innerText;
-        likecomshare =
-          divlikecomshare.childNodes[4].childNodes[0].childNodes[0].childNodes[0].childNodes[0];
-        divcommment =
-          divlikecomshare.childNodes[4].childNodes[0].childNodes[0].childNodes[1].childNodes;
-      } else {
-        categori = '';
-        likecomshare =
-          divlikecomshare.childNodes[3].childNodes[0].childNodes[0].childNodes[0].childNodes[0];
+      try {
+        if (divlikecomshare.childNodes.length == 5) {
+          categori = divlikecomshare.childNodes[3].innerText;
+          likecomshare =
+            divlikecomshare.childNodes[4].childNodes[0].childNodes[0].childNodes[0].childNodes[0];
+          divcommment =
+            divlikecomshare.childNodes[4].childNodes[0].childNodes[0].childNodes[1].childNodes;
+        } else {
+          categori = '';
+          likecomshare =
+            divlikecomshare.childNodes[3].childNodes[0].childNodes[0].childNodes[0].childNodes[0];
 
-        divcommment =
-          divlikecomshare.childNodes[3].childNodes[0].childNodes[0].childNodes[1].childNodes;
-      }
+          divcommment =
+            divlikecomshare.childNodes[3].childNodes[0].childNodes[0].childNodes[1].childNodes;
+        }
 
-      if (likecomshare.childNodes.length > 1) {
-        let likecomshares = likecomshare.childNodes[0].childNodes[0].childNodes;
-        likecomshares.forEach((element, index) => {
-          if (index == 0) {
-            likes = element.childNodes ? element.childNodes[1].textContent.split(' ')[0] : '0';
-          }
-          if (index == 1) {
-            count_comments = element.childNodes[1]
-              ? element.childNodes[1].textContent.split(' ')[0]
-              : '0';
-            shares = element.childNodes[2] ? element.childNodes[2].textContent.split(' ')[0] : '0';
-          }
-        });
+        if (likecomshare.childNodes.length > 1) {
+          let likecomshares = likecomshare.childNodes[0].childNodes[0].childNodes;
+          likecomshares.forEach((element, index) => {
+            if (index == 0) {
+              likes = element.childNodes ? element.childNodes[1].textContent.split(' ')[0] : '0';
+            }
+            if (index == 1) {
+              count_comments = element.childNodes[1]
+                ? element.childNodes[1].textContent.split(' ')[0]
+                : '0';
+              shares = element.childNodes[2]
+                ? element.childNodes[2].textContent.split(' ')[0]
+                : '0';
+            }
+          });
+        }
+      } catch (e) {
+        console.log('error: categori ');
       }
 
       divcommment.forEach((element) => {
         if (element.nodeName == 'UL') {
-          div = element.childNodes[0].querySelectorAll('a[role="link"]');
-          for (let k = 0; k < div.length; k++) {
-            if (div[k].href?.indexOf('posts') !== -1) {
-              console.log(div[k].href);
-              for (let j = 0; j < 7; j++) {
-                posthref += div[k].href.split('/')[j] + '/';
+          try {
+            div = element.childNodes[0].querySelectorAll('a[role="link"]');
+            for (let k = 0; k < div.length; k++) {
+              if (div[k].href?.indexOf('posts') !== -1) {
+                console.log(div[k].href);
+                for (let j = 0; j < 7; j++) {
+                  posthref += div[k].href.split('/')[j] + '/';
+                }
+                break;
               }
-              break;
             }
+          } catch (e) {
+            console.log('error post href');
           }
+
           element.childNodes.forEach((elementss) => {
             try {
               if (elementss.childNodes[0].childNodes.length == 2) {
@@ -763,9 +830,8 @@ async function getdata(page, cmt_lengths) {
                                 if (child.nodeName == 'SPAN' && index == 0) {
                                   user_cmtchild_href = child.childNodes[0].childNodes[0].href;
                                   user_name_cmtchild = child.childNodes[0].childNodes[0].innerText;
-                                  user_cmtchild_id = child.childNodes[0].childNodes[0].href.split(
-                                    '/'
-                                  )[6];
+                                  user_cmtchild_id =
+                                    child.childNodes[0].childNodes[0].href.split('/')[6];
                                 } else if (child.nodeName == 'DIV') {
                                   for (let l = 0; l < child.childNodes[0].childNodes.length; l++) {
                                     cotent_cmtchild += child.childNodes[0].childNodes[l].innerText
@@ -847,8 +913,12 @@ async function getdata(page, cmt_lengths) {
                               countLike: count_like_cmtchild,
                             });
                             count_comments_config += 1;
-                            user_cmtchild_href = user_name_cmtchild = user_cmtchild_id = cotent_cmtchild = imgComment_cmt =
-                              '';
+                            user_cmtchild_href =
+                              user_name_cmtchild =
+                              user_cmtchild_id =
+                              cotent_cmtchild =
+                              imgComment_cmt =
+                                '';
                             count_like_cmtchild = 0;
                           } catch (e) {
                             console.log('children error');
@@ -972,9 +1042,8 @@ async function getdata(page, cmt_lengths) {
                               if (child.nodeName == 'SPAN' && index == 0) {
                                 user_cmtchild_href = child.childNodes[0].childNodes[0].href;
                                 user_name_cmtchild = child.childNodes[0].childNodes[0].innerText;
-                                user_cmtchild_id = child.childNodes[0].childNodes[0].href.split(
-                                  '/'
-                                )[6];
+                                user_cmtchild_id =
+                                  child.childNodes[0].childNodes[0].href.split('/')[6];
                               } else if (child.nodeName == 'DIV') {
                                 for (let l = 0; l < child.childNodes[0].childNodes.length; l++) {
                                   cotent_cmtchild += child.childNodes[0].childNodes[l].innerText
@@ -1013,9 +1082,8 @@ async function getdata(page, cmt_lengths) {
                               if (child.nodeName == 'SPAN' && index == 0) {
                                 user_cmtchild_href = child.childNodes[0].childNodes[0].href;
                                 user_name_cmtchild = child.childNodes[0].childNodes[0].innerText;
-                                user_cmtchild_id = child.childNodes[0].childNodes[0].href.split(
-                                  '/'
-                                )[6];
+                                user_cmtchild_id =
+                                  child.childNodes[0].childNodes[0].href.split('/')[6];
                               } else if (child.nodeName == 'DIV') {
                                 for (let l = 0; l < child.childNodes[0].childNodes.length; l++) {
                                   cotent_cmtchild += child.childNodes[0].childNodes[l].innerText
@@ -1059,8 +1127,12 @@ async function getdata(page, cmt_lengths) {
                             countLike: count_like_cmtchild,
                           });
                           count_comments_config += 1;
-                          user_cmtchild_href = user_name_cmtchild = user_cmtchild_id = cotent_cmtchild = imgComment_cmt =
-                            '';
+                          user_cmtchild_href =
+                            user_name_cmtchild =
+                            user_cmtchild_id =
+                            cotent_cmtchild =
+                            imgComment_cmt =
+                              '';
                           count_like_cmtchild = 0;
 
                           if (
@@ -1087,9 +1159,8 @@ async function getdata(page, cmt_lengths) {
                                             child.childNodes[0].childNodes[0].href;
                                           user_name_cmtchild =
                                             child.childNodes[0].childNodes[0].innerText;
-                                          user_cmtchild_id = child.childNodes[0].childNodes[0].href.split(
-                                            '/'
-                                          )[6];
+                                          user_cmtchild_id =
+                                            child.childNodes[0].childNodes[0].href.split('/')[6];
                                         } else if (child.nodeName == 'DIV') {
                                           for (
                                             let l = 0;
@@ -1189,9 +1260,8 @@ async function getdata(page, cmt_lengths) {
                                               child.childNodes[0].childNodes[0].href;
                                             user_name_cmtchild =
                                               child.childNodes[0].childNodes[0].innerText;
-                                            user_cmtchild_id = child.childNodes[0].childNodes[0].href.split(
-                                              '/'
-                                            )[6];
+                                            user_cmtchild_id =
+                                              child.childNodes[0].childNodes[0].href.split('/')[6];
                                           } else if (child.nodeName == 'DIV') {
                                             for (
                                               let l = 0;
@@ -1213,21 +1283,20 @@ async function getdata(page, cmt_lengths) {
                                                   /^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/,
                                                   ''
                                                 );
-                                              cotent_cmtchild_text += child.childNodes[0].childNodes[
-                                                l
-                                              ].innerText
-                                                .replace(
-                                                  /([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/,
-                                                  ''
-                                                )
-                                                .replace(
-                                                  /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/,
-                                                  ''
-                                                )
-                                                .replace(
-                                                  /^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/,
-                                                  ''
-                                                );
+                                              cotent_cmtchild_text +=
+                                                child.childNodes[0].childNodes[l].innerText
+                                                  .replace(
+                                                    /([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/,
+                                                    ''
+                                                  )
+                                                  .replace(
+                                                    /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/,
+                                                    ''
+                                                  )
+                                                  .replace(
+                                                    /^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/,
+                                                    ''
+                                                  );
                                             }
                                             if (cotent_cmtchild_text.length < cmt_lengths) {
                                               cotent_cmtchild_text = '';
@@ -1261,9 +1330,8 @@ async function getdata(page, cmt_lengths) {
                                               child.childNodes[0].childNodes[0].href;
                                             user_name_cmtchild =
                                               child.childNodes[0].childNodes[0].innerText;
-                                            user_cmtchild_id = child.childNodes[0].childNodes[0].href.split(
-                                              '/'
-                                            )[6];
+                                            user_cmtchild_id =
+                                              child.childNodes[0].childNodes[0].href.split('/')[6];
                                           } else if (child.nodeName == 'DIV') {
                                             for (
                                               var l = 0;
@@ -1285,21 +1353,20 @@ async function getdata(page, cmt_lengths) {
                                                   /^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/,
                                                   ''
                                                 );
-                                              cotent_cmtchild_text += child.childNodes[0].childNodes[
-                                                l
-                                              ].innerText
-                                                .replace(
-                                                  /([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/,
-                                                  ''
-                                                )
-                                                .replace(
-                                                  /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/,
-                                                  ''
-                                                )
-                                                .replace(
-                                                  /^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/,
-                                                  ''
-                                                );
+                                              cotent_cmtchild_text +=
+                                                child.childNodes[0].childNodes[l].innerText
+                                                  .replace(
+                                                    /([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/,
+                                                    ''
+                                                  )
+                                                  .replace(
+                                                    /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/,
+                                                    ''
+                                                  )
+                                                  .replace(
+                                                    /^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/,
+                                                    ''
+                                                  );
                                             }
                                             if (cotent_cmtchild_text.length < cmt_lengths) {
                                               cotent_cmtchild_text = '';
@@ -1322,8 +1389,12 @@ async function getdata(page, cmt_lengths) {
                                   countLike: count_like_cmtchild2,
                                 });
                                 count_comments_config += 1;
-                                user_cmtchild_href = user_name_cmtchild = user_cmtchild_id = cotent_cmtchild = imgComment_cmt =
-                                  '';
+                                user_cmtchild_href =
+                                  user_name_cmtchild =
+                                  user_cmtchild_id =
+                                  cotent_cmtchild =
+                                  imgComment_cmt =
+                                    '';
                                 count_like_cmtchild2 = 0;
                               } catch (err) {
                                 console.log('children2 error');
@@ -1498,7 +1569,7 @@ async function getdata(page, cmt_lengths) {
         for (let i = 0; i < video.length; i++) {
           const id_video = video[i];
           async function getvideos() {
-            let c = function(d, e) {
+            let c = function (d, e) {
                 let f = [],
                   a;
                 for (a in d)
@@ -1513,8 +1584,8 @@ async function getdata(page, cmt_lengths) {
                   }
                 return f.join('&');
               },
-              b = async function(a, b) {
-                return  await fetch('https://www.facebook.com/api/graphql/', {
+              b = async function (a, b) {
+                return await fetch('https://www.facebook.com/api/graphql/', {
                   method: 'POST',
                   headers: { 'content-type': 'application/x-www-form-urlencoded' },
                   body: c({
@@ -1525,58 +1596,55 @@ async function getdata(page, cmt_lengths) {
                   }),
                 });
               };
-            console.log('Getting info...'),
-            await  new Promise((r) => setTimeout(r, 4000));
-             await b('5279476072161634', {
-                UFI2CommentsProvider_commentsKey: 'CometTahoeSidePaneQuery',
-                caller: 'CHANNEL_VIEW_FROM_PAGE_TIMELINE',
-                displayCommentsContextEnableComment: null,
-                displayCommentsContextIsAdPreview: null,
-                displayCommentsContextIsAggregatedShare: null,
-                displayCommentsContextIsStorySet: null,
-                displayCommentsFeedbackContext: null,
-                feedbackSource: 41,
-                feedLocation: 'TAHOE',
-                focusCommentID: null,
-                privacySelectorRenderLocation: 'COMET_STREAM',
-                renderLocation: 'video_channel',
-                scale: 1,
-                streamChainingSection: !1,
-                useDefaultActor: !1,
-                videoChainingContext: null,
-                videoID: id_video,
+            console.log('Getting info...'), await new Promise((r) => setTimeout(r, 4000));
+            await b('5279476072161634', {
+              UFI2CommentsProvider_commentsKey: 'CometTahoeSidePaneQuery',
+              caller: 'CHANNEL_VIEW_FROM_PAGE_TIMELINE',
+              displayCommentsContextEnableComment: null,
+              displayCommentsContextIsAdPreview: null,
+              displayCommentsContextIsAggregatedShare: null,
+              displayCommentsContextIsStorySet: null,
+              displayCommentsFeedbackContext: null,
+              feedbackSource: 41,
+              feedLocation: 'TAHOE',
+              focusCommentID: null,
+              privacySelectorRenderLocation: 'COMET_STREAM',
+              renderLocation: 'video_channel',
+              scale: 1,
+              streamChainingSection: !1,
+              useDefaultActor: !1,
+              videoChainingContext: null,
+              videoID: id_video,
+            })
+              .then((a) => a.text())
+              .then((b) => {
+                try {
+                  let a = JSON.parse(b.split('\n')[0]),
+                    m = a.data.video.playable_url_quality_hd || a.data.video.playable_url;
+                  console.log(m);
+                  resultvideos.push(m);
+                } catch (d) {
+                  console.log(
+                    '\u26A0\uFE0FFailed to extract data. Maybe this script is no longer effective.'
+                  );
+                }
               })
-                .then((a) => a.text())
-                .then((b) => {
-                  try {
-                    let a = JSON.parse(b.split('\n')[0]),
-                      m = a.data.video.playable_url_quality_hd || a.data.video.playable_url;
-                    console.log(m);
-                    resultvideos.push(m);
-                  } catch (d) {
-                    console.log(
-                      '\u26A0\uFE0FFailed to extract data. Maybe this script is no longer effective.'
-                    );
-                  }
-                })
-                .catch((a) => {
-                  console.error('\u26A0\uFE0FFailed to get data');
-                });
-                console.log('adsadads')
-          };
-           await getvideos()
-            await new Promise((r) => setTimeout(r, 4000));
-          
-          
+              .catch((a) => {
+                console.error('\u26A0\uFE0FFailed to get data');
+              });
+            console.log('adsadads');
+          }
+          await getvideos();
+          await new Promise((r) => setTimeout(r, 4000));
         }
       }
-      
-      console.log(resultvideos)
-       await  new Promise((r) => setTimeout(r, 4000));
-        data = {
+
+      console.log(resultvideos);
+      await new Promise((r) => setTimeout(r, 4000));
+      data = {
         // id: data.length ? data.length + 1 : 1,
         // userhref: userhref == '' ? 'undefined - undefined' : userhref,
-        
+        videos: resultvideos ? resultvideos : [],
         commentList: comments ? comments : [],
 
         user: user_name == '' ? 'undefined - undefined' : user_name,
@@ -1594,12 +1662,21 @@ async function getdata(page, cmt_lengths) {
         countShare: shares ? shares : '',
 
         token: token ? token : '',
-        videos: resultvideos ? resultvideos : [],
       };
-      console.log(data);
       (count_comments_config = 0),
-        (userhref = user_name = posthref = user_id = content = categori = image_href = likes = count_comments = shares = post_id = time =
-          '');
+        (userhref =
+          user_name =
+          posthref =
+          user_id =
+          content =
+          categori =
+          image_href =
+          likes =
+          count_comments =
+          shares =
+          post_id =
+          time =
+            '');
       video = [];
       comments = [];
       image_href = [];
@@ -1607,7 +1684,7 @@ async function getdata(page, cmt_lengths) {
       console.log(error);
     }
 
-    return data 
+    return data;
   }, cmt_lengths);
   return dimension;
 }
