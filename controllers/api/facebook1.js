@@ -253,6 +253,7 @@ module.exports = async function main(req, res, next) {
           commentList: result.commentList,
           token: result.token,
           count_comments_config: result.count_comments_config,
+          statusbar: 'active',
           create_at: Date.now(),
         });
         const postListRefs = ref(
