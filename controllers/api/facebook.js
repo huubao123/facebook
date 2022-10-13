@@ -19,6 +19,22 @@ const firebaseConfig = {
 };
 // TODO: Replace the following with your app's Firebase project configuration
 // See: https://firebase.google.com/docs/web/learn-more#config-object
+const genSlug = (text) => {
+  text = text.replace(/[^a-zA-Z0-9 ]/g, '');
+  let newData = text.replace(/ /g, '-');
+  newData = newData.toLowerCase();
+  newData = newData.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g, 'a');
+  newData = newData.replace(/è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ/g, 'e');
+  newData = newData.replace(/ì|í|ị|ỉ|ĩ/g, 'i');
+  newData = newData.replace(/ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ/g, 'o');
+  newData = newData.replace(/ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ/g, 'u');
+  newData = newData.replace(/ỳ|ý|ỵ|ỷ|ỹ/g, 'y');
+  newData = newData.replace(/đ/g, 'd');
+  newData = newData.replace(/\u0300|\u0301|\u0303|\u0309|\u0323/g, ''); // Huyền sắc hỏi ngã nặng
+  newData = newData.replace(/\u02C6|\u0306|\u031B/g, ''); // Â, Ê, Ă, Ơ, Ư
+  return newData;
+};
+
 async function autoScrollpost(page) {
   const getdata = await page.evaluate(async () => {
     const data = await new Promise((resolve, reject) => {
@@ -88,6 +104,40 @@ async function autoScrollpost(page) {
   });
   return;
 }
+const createMedia = async (data) => {
+  let response = null;
+  let form = new FormData();
+  console.log(data);
+  if (data.data.length > 0) {
+    data.data.map((item, index) => {
+      form.append(`media[${index}][title]`, item.title);
+      form.append(`media[${index}][alt]`, item.alt);
+      form.append(`media[${index}][file]`, item.file);
+    });
+  }
+
+  await axios({
+    url: 'https://mgs-api-v2.internal.mangoads.com.vn/api/v1/media',
+    method: 'post',
+    data: form,
+    headers: {
+      'content-type': 'application/json',
+      'X-Requested-With': 'XMLHttpRequest',
+      'X-Requested-Store': 'default',
+      accept: 'application/json',
+      Authorization: 'iU9ld6uNhHIKvCIFURWqLyV0kfEGC7OD',
+    },
+  })
+    .then(function (res) {
+      response = res;
+    })
+    .catch(function (response) {
+      //handle error
+      response = null;
+    });
+  return response;
+};
+
 async function autoScroll(page, lengthss, like, comment, share) {
   const getdata = await page.evaluate(
     async (lengthss, like, comment, share) => {
@@ -206,13 +256,11 @@ module.exports = async function main(req, res, next) {
     const like = req.body.like ? req.body.like : 0;
     const comment = req.body.comment ? req.body.comment : 0;
     const share = req.body.share ? req.body.share : 0;
+    const post_type = req.body.post_type ? req.body.post_type : '';
     const craw_id = crypto.randomBytes(16).toString('hex');
     const app = initializeApp.initializeApp(firebaseConfig);
     const database = getDatabase(app);
-    const postListRefs = ref(
-      database,
-      '/craw_list_length/' + name.replace(/[#:.,$]/g, '') + '/' + craw_id
-    );
+    const postListRefs = ref(database, 'post_type/' + name.replace(/[#:.,$]/g, '') + '/' + craw_id);
     await set(postListRefs, {
       craw_id: craw_id,
       length: lengths,
@@ -359,31 +407,163 @@ module.exports = async function main(req, res, next) {
             }
           });
           await autoScrollpost(page);
-          await getdata(page, (cmt_lengths = cmt_length)).then(async function (results) {
+          await getdata(page, cmt_length).then(async function (results) {
             linkPost.push(results);
             const app = initializeApp.initializeApp(firebaseConfig);
             const database = getDatabase(app);
             const postListRef = ref(
               database,
-              '/Listpost/' + name.replace(/[#:.,$]/g, '') + '/' + result[i].post_link.split('/')[6]
+              post_type +
+                '/' +
+                name.replace(/[#:.,$]/g, '') +
+                '/' +
+                result[i].post_link.split('/')[6]
             );
+            let titles = '';
+            let short_descriptions = '';
+            let arrVid = null;
+            let arrImage = null;
+            let flagimage = true;
+            let flagvideo = true;
+            let short_description = results.contentList
+              ? results.contentList.replaceAll(/(<([^>]+)>)/gi, '')
+              : '';
+            for (let i = 0; i < 100; i++) {
+              let lengths = short_description.split(' ').length;
+              short_descriptions += short_description.split(' ')[i] + ' ';
+              if (lengths - 1 == i) {
+                break;
+              }
+            }
+            for (let i = 0; i < 100; i++) {
+              let lengths = short_description.length;
+              titles += short_description[i];
+              if (lengths - 1 == i) {
+                break;
+              }
+            }
+            if (results.videos.length > 2) {
+              arrVid = await Promise.all(
+                results.videos.map(async (video) => {
+                  let resultss = await fetch(video);
+                  resultss = await result.blob();
+                  if (resultss.size / 1024 / 1024 > 1) {
+                    return null;
+                  }
+                  let resultAddVid = await createMedia({
+                    data: [
+                      {
+                        alt: result[i].post_link.split('/')[6]
+                          ? result[i].post_link.split('/')[6]
+                          : '',
+                        title: result[i].post_link.split('/')[6]
+                          ? result[i].post_link.split('/')[6]
+                          : '',
+                        file: result,
+                      },
+                    ],
+                  });
+                  if (resultAddVid) {
+                    return { link_video: resultAddVid.data.data[0].path };
+                  } else {
+                    flagvideo = false;
+                    return;
+                  }
+                })
+              );
+            }
+            if (results.imageList.length > 0) {
+              arrImage = await Promise.all(
+                results.imageList.map(async (image) => {
+                  let result = await fetch(image);
+                  result = await result.blob();
+                  let resultAddImage = await createMedia({
+                    data: [
+                      {
+                        alt: result[i].post_link.split('/')[6]
+                          ? result[i].post_link.split('/')[6]
+                          : '',
+                        title: result[i].post_link.split('/')[6]
+                          ? result[i].post_link.split('/')[6]
+                          : '',
+                        file: result,
+                      },
+                    ],
+                  });
+                  if (resultAddImage) {
+                    return resultAddImage.data.data[0];
+                  } else {
+                    flagimage = false;
+                    return null;
+                  }
+                })
+              );
+            }
+            if (arrImage && arrImage.length > 0) {
+              for (let j = 0; j < arrImage.length; j++) {
+                if (arrImage[j] === undefined) {
+                  arrImage = undefined;
+                  break;
+                }
+              }
+            }
+            let arrImages = arrImage && arrImage.length !== 0 ? arrImage[0].id : null;
+            let basic_fields = {
+              title: titles,
+              short_description: short_descriptions,
+              long_description: results.contentList
+                ? results.contentList.replaceAll('https://l.facebook.com/l.php?', '')
+                : '',
+              slug: genSlug(titles),
+              session_tags: {
+                tags: [],
+              },
+              categorialue: [],
+              key: genSlug(titles),
+              name: titles,
+              featured_image: arrImages,
+              type: 'facebook10',
+              attributes: [],
+              status: 'publish',
+              seo_tags: {
+                meta_title: 'New Post Facebook',
+                meta_description: 'New Post Facebook',
+              },
+            };
+            let custom_fields = {
+              video: arrVid && arrVid[0] !== null ? arrVid : null,
+              date: results.date ? results.date : '',
+              post_id: results.idPost ? results.idPost : '',
+              post_link: results.linkPost ? results.linkPost : '',
+              user_id: results.user_id ? results.user_id : 'undefined',
+              user_name: results.user ? results.user : 'undefined',
+              count_like: results.countLike ? results.countLike : 0,
+              count_comment: results.countComment ? results.countComment : 0,
+              count_share: results.countShare ? results.countShare : 0,
+              featured_image: arrImage ? arrImage.map((image) => ({ img: image.path })) : [],
+              comments: results.commentList
+                ? results.commentList.map((item) => ({
+                    content: item.contentComment,
+                    count_like: item.countLike,
+                    user_id: item.userIDComment,
+                    user_name: item.usernameComment,
+                    imgComment: item.imageComment ? item.imageComment : '',
+                    children: item.children
+                      ? item.children.map((child) => ({
+                          content: child.contentComment,
+                          count_like: child.countLike,
+                          user_id: child.userIDComment,
+                          user_name: child.usernameComment,
+                          imageComment: child.imageComment ? child.imageComment : '',
+                        }))
+                      : [],
+                  }))
+                : [],
+            };
+            data_post = {};
             await set(postListRef, {
-              user: results.user,
-              videos: results.videos,
-              contentList: results.contentList,
-              countComment: results.countComment,
-              countLike: results.countLike,
-              countShare: results.countShare,
-              user_id: results.user_id,
-              idPost: result[i].post_link.split('/')[6],
-              linkPost: result[i].post_link,
-              linkImgs: results.linkImgs,
-              commentList: results.commentList,
-              token: results.token,
-              count_comments_config: results.count_comments_config,
-              comment_config: cmt_length,
-              statusbar :'active',
-              create_at: Date.now(),
+              basic_fields: basic_fields,
+              custom_fields: custom_fields,
             });
             const postListRefs = ref(
               database,
@@ -408,7 +588,7 @@ module.exports = async function main(req, res, next) {
           const database = getDatabase(app);
           const postListRef = ref(
             database,
-            '/Listpost/' + name.replace(/[#:.,$]/g, '') + '/' + result[i].post_link.split('/')[6]
+            post_type + name.replace(/[#:.,$]/g, '') + '/' + result[i].post_link.split('/')[6]
           );
           set(postListRef, {
             post_link: result[i].post_link,

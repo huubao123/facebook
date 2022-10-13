@@ -5,10 +5,19 @@ const bodyParser = require('body-parser');
 router.use(bodyParser.urlencoded({ extended: true }));
 var facebook = require('../controllers/api/facebook');
 var facebook1 = require('../controllers/api/facebook1.js');
-const video = require('../controllers/sitemap')
+const video = require('../controllers/sitemap');
 var timeout = require('connect-timeout');
 const fs = require('fs');
-
+var kue = require('kue'),
+  redis = require('redis');
+kue.redis.createClient = function () {
+  var client = redis.createClient({ url: 'redis://redis:6379' });
+  client.on('error', function (err) {
+    console.log('trolllolo');
+  });
+  return client;
+};
+jobs = kue.createQueue();
 const initializeApp = require('firebase/app');
 
 const getDatabase = require('firebase/database').getDatabase;
@@ -49,7 +58,6 @@ const database = getDatabase(app);
 
 router.get('/', async function (req, res, next) {
   res.json({ aaa: 'aaaa' });
-
 });
 // router.get('/login', login.login);
 router.post('/post', facebook);
@@ -79,7 +87,25 @@ router.get('/post_link', async function (req, res, next) {
 });
 
 router.post('/post1', facebook1);
-router.post('/add',video)
+router.post('/add', video);
+router.get('/test', async function (req, res, next) {
+  // queue
+  //   .on('job enqueue', function (id, type) {
+  //     console.log('Job %s got queued of type %s', id, type);
+  //     new Promise((r) => setTimeout(r, 4000));
+  //     res.json({ data: 'error', statusbar: 'ok' });
+  //   })
+  //   .on('job complete', function (id, result) {
+  //     kue.Job.get(id, function (err, job) {
+  //       if (err) return;
+  //       job.remove(function (err) {
+  //         if (err) throw err;
+  //         console.log('removed completed job #%d', job.id);
+  //       });
+  //     });
+  //   });
+});
+
 router.get('/post1', async function (req, res, next) {
   const url = req.body.url;
   url_id = url.split('/');

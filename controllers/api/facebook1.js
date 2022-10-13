@@ -94,6 +94,8 @@ module.exports = async function main(req, res, next) {
     const name = url.split('/')[3] == 'groups' ? url.split('/')[4] : url.split('/')[3];
     const cmt_length = req.body.length_comment ? req.body.length_comment : 0;
     let name_group = '';
+    const post_type = req.body.post_type ? req.body.post_type : '';
+
     const craw_id = crypto.randomBytes(16).toString('hex');
     const app = initializeApp.initializeApp(firebaseConfig);
     const database = getDatabase(app);
