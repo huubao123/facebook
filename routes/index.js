@@ -110,17 +110,15 @@ router.post('/post', async function (req, res, next) {
   const delay = processAt - currentTime;
 
   res.json({ data: 'success', statusbar: 'ok', jobId: jobId });
-  await facebook(req.body);
-  //await queue.add({ data: req.body }, { delay: delay, jobId: jobId });
-  
+
+  await queue.add({ data: req.body }, { delay: delay, jobId: jobId });
 });
 queue.process(async (job, done) => {
-  await new Promise((r) => setTimeout(r, 4000));
-  console.log(job.data);
+  await facebook(job);
   // if (job.data.url.indexOf('posts') > -1) {
   //   await facebook1(job);
   // }
-
+  job.progress(100);
   done();
 });
 queue1.process(async (job, done) => {
