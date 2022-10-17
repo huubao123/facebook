@@ -197,26 +197,30 @@ module.exports = async function main(req) {
     const url = req.data.data.link;
     const lengths = req.data.data.count == '' ? 0 : req.data.data.count;
     const cmt_length = req.data.data.length_comment == '' ? 0 : req.data.data.length_comment;
-    const conten_length = req.length_content == '' ? 0 : req.length_content;
+    const conten_length = req.data.data.length_content == '' ? 0 : req.data.data.length_content;
     const name = url.split('/')[3] == 'groups' ? url.split('/')[4] : url.split('/')[3];
     const like = req.data.data.like ? req.data.data.like : 0;
     const comment = req.data.data.comment ? req.data.data.comment : 0;
     const share = req.data.data.share ? req.data.data.share : 0;
     const post_type = req.data.data.posttype ? req.data.data.posttype : '';
     const craw_id = crypto.randomBytes(16).toString('hex');
-    // const app = initializeApp.initializeApp(firebaseConfig);
-    // const database = getDatabase(app);
-    // const postListRefs = ref(database, 'post_type/' + name.replace(/[#:.,$]/g, '') + '/' + craw_id);
-    // await set(postListRefs, {
-    //   craw_id: craw_id,
-    //   length: lengths,
-    //   cmt_length: cmt_length,
-    //   like: like,
-    //   share: share,
-    //   comment: comment,
-    //   url: url,
-    //   create_at: Date.now(),
-    // });
+    const app = initializeApp.initializeApp(firebaseConfig);
+    const database = getDatabase(app);
+    const postListRefs = ref(
+      database,
+      '/craw_list_length/' + name.replace(/[#:.,$]/g, '') + '/' + craw_id
+    );
+    await set(postListRefs, {
+      craw_id: craw_id,
+      length: lengths,
+      cmt_length: cmt_length,
+      like: like,
+      share: share,
+      comment: comment,
+      content_length: conten_length,
+      url: url,
+      create_at: Date.now(),
+    });
     const browser = await puppeteer.launch({
       ignoreHTTPSErrors: true,
       ignoreDefaultArgs: ['--disable-extensions'],
@@ -287,18 +291,18 @@ module.exports = async function main(req) {
     } catch (e) {
       console.log(e);
     }
-    // const result = await page.evaluate(() => {
-    //   return document.querySelector('h1').textContent;
-    // });
+    const result = await page.evaluate(() => {
+      return document.querySelector('h1').textContent;
+    });
 
-    // const apps = initializeApp.initializeApp(firebaseConfig);
-    // const databases = getDatabase(apps);
-    // const postListRefss = ref(databases, 'Group/' + name.replace(/[#:.,$]/g, ''));
-    // await set(postListRefss, {
-    //   name: result,
-    //   url: url,
-    //   create_at: Date.now(),
-    // });
+    const apps = initializeApp.initializeApp(firebaseConfig);
+    const databases = getDatabase(apps);
+    const postListRefss = ref(databases, 'Group/' + name.replace(/[#:.,$]/g, ''));
+    await set(postListRefss, {
+      name: result,
+      url: url,
+      create_at: Date.now(),
+    });
 
     await autoScroll(page, lengths, like, comment, share);
     // await page.evaluate(() => {
@@ -315,9 +319,9 @@ module.exports = async function main(req) {
       });
       let process = 0;
       for (let i = 0; i < result.length; i++) {
-        process += (Math.round((result.length * 80) / 100) / result.length) * 10;
-        console.log('Processing ' + typeof process.toFixed(2));
-        await req.progress(parseInt(process.toFixed(2)) + 20);
+        process += Math.round((result.length * 80) / 100) / parseInt(result.length);
+        console.log('Processing ' + (parseInt(process.toFixed(2)) / result.length) * 100);
+        await req.progress((parseInt(process.toFixed(2)) / result.length) * 100 + 20);
         try {
           // fs.writeFile('item.txt', JSON.stringify(result, null, 2), (err) => {
           //   if (err) throw err;s
@@ -535,21 +539,43 @@ module.exports = async function main(req) {
               basic_fields: basic_fields,
               custom_fields: custom_fields,
             });
-            // const postListRefs = ref(
-            //   database,
-            //   '/craw_list/' + name.replace(/[#:.,$]/g, '') + '/' + craw_id
-            // );
-            // const newPostRef = push(postListRefs);
-            // await set(newPostRef, {
-            //   id: i,
-            //   post_link: result[i].post_link,
-            //   statusbar: 'active',
-            //   countComment: results.countComment,
-            //   countLike: results.countLike,
-            //   countShare: results.countShare,
-            //   count_comments_config: results.count_comments_config,
-            //   create_at: Date.now(),
-            // });
+            const postListRefss = ref(
+              database,
+              '/Listpost/' + name.replace(/[#:.,$]/g, '') + '/' + url.split('/')[6]
+            );
+
+            set(postListRefss, {
+              user: results.user,
+              videos: results.videos,
+              contentList: results.contentList,
+              countComment: results.countComment,
+              countLike: results.countLike,
+              countShare: results.countShare,
+              user_id: results.user_id,
+              idPost: result[i].post_link.split('/')[6],
+              linkPost: result[i].post_link,
+              linkImgs: results.linkImgs,
+              commentList: results.commentList,
+              token: results.token,
+              count_comments_config: results.count_comments_config,
+              statusbar: 'active',
+              create_at: Date.now(),
+            });
+            const postListRefs = ref(
+              database,
+              '/craw_list/' + name.replace(/[#:.,$]/g, '') + '/' + craw_id
+            );
+            const newPostRef = push(postListRefs);
+            await set(newPostRef, {
+              id: i,
+              post_link: result[i].post_link,
+              statusbar: 'active',
+              countComment: results.countComment,
+              countLike: results.countLike,
+              countShare: results.countShare,
+              count_comments_config: results.count_comments_config,
+              create_at: Date.now(),
+            });
           });
         } catch (e) {
           console.log(e);
@@ -569,16 +595,24 @@ module.exports = async function main(req) {
             post_link: result[i].post_link,
             error: 'error' + e,
           });
-          // const postListRefs = ref(
-          //   database,
-          //   '/craw_list/' + name.replace(/[#:.,$]/g, '') + '/' + craw_id
-          // );
-          // const newPostRef = push(postListRefs);
-          // set(newPostRef, {
-          //   id: i,
-          //   post_link: result[i].post_link,
-          //   statusbar: 'error' + e,
-          // });
+          const postListRefss = ref(
+            database,
+            '/Listpost/' + name.replace(/[#:.,$]/g, '') + '/' + url.split('/')[6]
+          );
+          set(postListRefss, {
+            post_link: url,
+            error: 'error' + e,
+          });
+          const postListRefs = ref(
+            database,
+            '/craw_list/' + name.replace(/[#:.,$]/g, '') + '/' + craw_id
+          );
+          const newPostRef = push(postListRefs);
+          set(newPostRef, {
+            id: i,
+            post_link: result[i].post_link,
+            statusbar: 'error' + e,
+          });
         }
       }
       // fs.writeFile('item2.txt', JSON.stringify(linkPost, null, 2), (err) => {
