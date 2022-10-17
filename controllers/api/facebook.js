@@ -193,15 +193,16 @@ async function autoScroll(page, lengthss, like, comment, share) {
 }
 module.exports = async function main(req) {
   try {
-    const url = req.link;
-    const lengths = req.count == '' ? 0 : req.count;
-    const cmt_length = req.length_comment == '' ? 0 : req.length_comment;
+    await req.progress(10);
+    const url = req.data.data.link;
+    const lengths = req.data.data.count == '' ? 0 : req.data.data.count;
+    const cmt_length = req.data.data.length_comment == '' ? 0 : req.data.data.length_comment;
     const conten_length = req.length_content == '' ? 0 : req.length_content;
     const name = url.split('/')[3] == 'groups' ? url.split('/')[4] : url.split('/')[3];
-    const like = req.like ? req.like : 0;
-    const comment = req.comment ? req.comment : 0;
-    const share = req.share ? req.share : 0;
-    const post_type = req.posttype ? req.posttype : '';
+    const like = req.data.data.like ? req.data.data.like : 0;
+    const comment = req.data.data.comment ? req.data.data.comment : 0;
+    const share = req.data.data.share ? req.data.data.share : 0;
+    const post_type = req.data.data.posttype ? req.data.data.posttype : '';
     const craw_id = crypto.randomBytes(16).toString('hex');
     // const app = initializeApp.initializeApp(firebaseConfig);
     // const database = getDatabase(app);
@@ -251,9 +252,9 @@ module.exports = async function main(req) {
       args: ['--start-maximized'],
       product: 'chrome',
       devtools: false,
-      //executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
+      executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
 
-      executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+      //executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
     });
     const page = await browser.newPage();
     const pages = await browser.pages();
@@ -312,11 +313,14 @@ module.exports = async function main(req) {
         if (err) throw err;
         console.log('The file has been saved!');
       });
-
+      let process = 0;
       for (let i = 0; i < result.length; i++) {
+        process += (Math.round((result.length * 80) / 100) / result.length) * 10;
+        console.log('Processing ' + typeof process.toFixed(2));
+        await req.progress(parseInt(process.toFixed(2)) + 20);
         try {
           // fs.writeFile('item.txt', JSON.stringify(result, null, 2), (err) => {
-          //   if (err) throw err;
+          //   if (err) throw err;s
           //   console.log('The file has been saved!');
           // });
           await page.goto(result[i].post_link, {
@@ -450,6 +454,7 @@ module.exports = async function main(req) {
                 ? results.contentList.replaceAll('https://l.facebook.com/l.php?', '')
                 : '',
               slug: '',
+              featured_image: results.linkImgs ? results.linkImgs[0] : '',
               session_tags: {
                 tags: [],
               },
@@ -473,20 +478,36 @@ module.exports = async function main(req) {
               user_id: results.user_id ? results.user_id : 'undefined',
               user_name: results.user ? results.user : 'undefined',
               count_like: results.countLike
-                ? results.countLike.toString().split(' ')[0].replace('K', '00').replace(',', '')
+                ? parseInt(
+                    results.countLike.toString().split(' ')[0].replace('K', '00').replace(',', '')
+                  )
                 : 0,
               count_comment: results.countComment
-                ? results.countComment.toString().split(' ')[0].replace('K', '00').replace(',', '')
+                ? parseInt(
+                    results.countComment
+                      .toString()
+                      .split(' ')[0]
+                      .replace('K', '00')
+                      .replace(',', '')
+                  )
                 : 0,
               count_share: results.countShare
-                ? results.countShare.toString().split(' ')[0].replace('K', '00').replace(',', '')
+                ? parseInt(
+                    results.countShare.toString().split(' ')[0].replace('K', '00').replace(',', '')
+                  )
                 : 0,
               featured_image: results.linkImgs ? results.linkImgs : '',
               comments: results.commentList
                 ? results.commentList.map((item) => ({
                     content: item.contentComment,
                     count_like: item.countLike
-                      ? item.countLike.toString().split(' ')[0].replace('K', '00').replace(',', '')
+                      ? parseInt(
+                          item.countLike
+                            .toString()
+                            .split(' ')[0]
+                            .replace('K', '00')
+                            .replace(',', '')
+                        )
                       : 0,
                     user_id: item.userIDComment,
                     user_name: item.usernameComment,
@@ -538,7 +559,8 @@ module.exports = async function main(req) {
           const postListRef = ref(
             database,
             'post_type/' +
-              post_type +'/' +
+              post_type +
+              '/' +
               name.replace(/[#:.,$]/g, '') +
               '/' +
               result[i].post_link.split('/')[6]
@@ -758,9 +780,9 @@ async function getdata(page, cmt_lengths) {
       post = document.querySelectorAll('[role="main"]')[2];
       if (
         post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-          .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-          .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[1].childNodes[0]
-          .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+          .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+          .childNodes[0].childNodes[0].childNodes[0].childNodes[1].childNodes[0].childNodes[0]
+          .childNodes[0].childNodes[0].childNodes[0].childNodes[0]
       ) {
         contens =
           post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
@@ -770,9 +792,9 @@ async function getdata(page, cmt_lengths) {
     } catch (e) {
       try {
         if (
-          post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+          post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
             .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-            .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[7].childNodes[0]
+            .childNodes[0].childNodes[0].childNodes[0].childNodes[7].childNodes[0]
         ) {
           contens =
             post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
@@ -794,13 +816,13 @@ async function getdata(page, cmt_lengths) {
         }
       }
     }
-    if(contens = ''){
-      post.forEach((e)=>{
-        if(e.childNodes.length >13){
-            contens = e.childNodes[7].childNodes[0]
-        }
-    })
-    }
+    // if(contens = ''){
+    //   post.forEach((e)=>{
+    //     if(e.childNodes.length >13){
+    //         contens = e.childNodes[7].childNodes[0]
+    //     }
+    // })
+    // }
     try {
       // contens.childNodes[1].childNodes[0].childNodes[1].childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes.forEach(
       //   (ele) => {
