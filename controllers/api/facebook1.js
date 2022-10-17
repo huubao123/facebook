@@ -84,17 +84,17 @@ async function autoScrollpost(page) {
   return;
 }
 
-module.exports = async function main(req, res, next) {
+module.exports = async function main(req) {
   try {
-    const url = req.body.url;
+    const url = req.data.data.url;
     let url_group = '';
     for (let i = 0; i < 5; i++) {
       url_group += url.split('/')[i];
     }
     const name = url.split('/')[3] == 'groups' ? url.split('/')[4] : url.split('/')[3];
-    const cmt_length = req.body.length_comment ? req.body.length_comment : 0;
+    const cmt_length = req.data.data.length_comment ? req.data.data.length_comment : 0;
     let name_group = '';
-    const post_type = req.body.post_type ? req.body.post_type : '';
+    const post_type = req.data.data.post_type ? req.data.data.post_type : '';
 
     const craw_id = crypto.randomBytes(16).toString('hex');
     const app = initializeApp.initializeApp(firebaseConfig);

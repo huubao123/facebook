@@ -8,6 +8,7 @@ var cors = require('cors');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var timeout = require('connect-timeout'); //express v4
+const monitoro = require('monitoro');
 
 var app = express();
 
@@ -26,6 +27,35 @@ app.use(haltOnTimedout);
 function haltOnTimedout(req, res, next) {
   if (!req.timedout) next();
 }
+
+const Queue = require('bull');
+const QueueMQ = require('bullmq').Queue;
+const { createBullBoard } = require('@bull-board/api');
+const { BullAdapter } = require('@bull-board/api/bullAdapter');
+const { BullMQAdapter } = require('@bull-board/api/bullMQAdapter');
+
+const { ExpressAdapter } = require('@bull-board/express');
+const someQueue = new Queue('facebook', {
+  redis: { port: 6379, host: '127.0.0.1' },
+}); // if you have a special connection to redis.
+const someOtherQueue = new Queue('facebook1', { redis: { port: 6379, host: '127.0.0.1' } });
+const queueMQ = new QueueMQ('queueMQName');
+
+const serverAdapter = new ExpressAdapter();
+serverAdapter.setBasePath('/admin/queues');
+
+const { addQueue, removeQueue, setQueues, replaceQueues } = createBullBoard({
+  queues: [new BullAdapter(someQueue), new BullAdapter(someOtherQueue), new BullMQAdapter(queueMQ)],
+  serverAdapter: serverAdapter,
+});
+queueConfigArray = [
+  {
+    name: 'facebook',
+    url: 'localhost://127.0.0.1:6379',
+  },
+];
+app.locals.MonitoroQueues = queueConfigArray;
+
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE');
@@ -34,7 +64,8 @@ app.use((req, res, next) => {
 });
 
 app.use('/', indexRouter);
-app.use('/users', usersRouter);
+app.use('/admin/queues', serverAdapter.getRouter());
+app.use('/foo/bar', monitoro);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

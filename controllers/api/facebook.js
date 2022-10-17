@@ -20,19 +20,19 @@ const firebaseConfig = {
 // TODO: Replace the following with your app's Firebase project configuration
 // See: https://firebase.google.com/docs/web/learn-more#config-object
 const genSlug = (text) => {
-  text = text.replace(/[^a-zA-Z0-9 ]/g, '');
-  let newData = text.replace(/ /g, '-');
-  newData = newData.toLowerCase();
-  newData = newData.replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g, 'a');
-  newData = newData.replace(/è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ/g, 'e');
-  newData = newData.replace(/ì|í|ị|ỉ|ĩ/g, 'i');
-  newData = newData.replace(/ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ/g, 'o');
-  newData = newData.replace(/ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ/g, 'u');
-  newData = newData.replace(/ỳ|ý|ỵ|ỷ|ỹ/g, 'y');
-  newData = newData.replace(/đ/g, 'd');
-  newData = newData.replace(/\u0300|\u0301|\u0303|\u0309|\u0323/g, ''); // Huyền sắc hỏi ngã nặng
-  newData = newData.replace(/\u02C6|\u0306|\u031B/g, ''); // Â, Ê, Ă, Ơ, Ư
-  return newData;
+  str = str
+    .toLowerCase()
+    .replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g, 'a')
+    .replace(/è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ/g, 'e')
+    .replace(/ì|í|ị|ỉ|ĩ/g, 'i')
+    .replace(/ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ/g, 'o')
+    .replace(/ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ/g, 'u')
+    .replace(/ỳ|ý|ỵ|ỷ|ỹ/g, 'y')
+    .replace(/đ/g, 'd')
+    .replace(/\s+/g, '-')
+    .replace(/[^A-Za-z0-9_-]/g, '')
+    .replace(/-+/g, '-');
+  return str;
 };
 
 async function autoScrollpost(page) {
@@ -108,8 +108,8 @@ const createMedia = async (data) => {
   let response = null;
   let form = new FormData();
   console.log(data);
-  if (data.data.length > 0) {
-    data.data.map((item, index) => {
+  if (length > 0) {
+    map((item, index) => {
       form.append(`media[${index}][title]`, item.title);
       form.append(`media[${index}][alt]`, item.alt);
       form.append(`media[${index}][file]`, item.file);
@@ -161,7 +161,6 @@ async function autoScroll(page, lengthss, like, comment, share) {
           }
 
           let post_length = document.querySelectorAll('[role="feed"]')[0].childNodes.length;
-          let post = document.querySelectorAll('[role="feed"]')[0].childNodes;
           let isbottom = document.body.scrollHeight;
           let istop = parseInt(document.documentElement.scrollTop + window.innerHeight);
           if (isbottom === istop) {
@@ -169,63 +168,8 @@ async function autoScroll(page, lengthss, like, comment, share) {
             resolve();
           }
 
-          for (let i = 1; i < post_length - 3; i++) {
-            try {
-              let count_like = (count_comment = count_share = '');
-              let lengths = post[i].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[7]
-                .childNodes[0].childNodes
-                ? post[i].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                    .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[7]
-                    .childNodes[0].childNodes
-                : post[i].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                    .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[1]
-                    .childNodes[0].childNodes;
-              if (lengths.length == 5) {
-                div_commment_yes = lengths[4].childNodes[0];
-              } else {
-                div_commment_yes = lengths[3].childNodes[0];
-              }
-
-              let likecomshares =
-                div_commment_yes.childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                  .childNodes[0].childNodes;
-              likecomshares.forEach((element, index) => {
-                if (index == 0) {
-                  count_like = element.childNodes
-                    ? element.childNodes[1].textContent
-                        .split(' ')[0]
-                        .replace('K', '00')
-                        .replace(',', '')
-                    : 0;
-                }
-                if (index == 1) {
-                  count_comment = element.childNodes[1]
-                    ? element.childNodes[1].textContent
-                        .split(' ')[0]
-                        .replace('K', '00')
-                        .replace(',', '')
-                    : '0';
-                  count_share = element.childNodes[2]
-                    ? element.childNodes[2].textContent
-                        .split(' ')[0]
-                        .replace('K', '00')
-                        .replace(',', '')
-                    : '0';
-                }
-              });
-              console.log('count_share', count_share);
-              console.log('count_comment', count_comment);
-              console.log('count_like', count_like);
-              if (count_like >= like && count_comment >= comment && count_share >= share) {
-                length_post += 1;
-              }
-            } catch (error) {
-              console.log(error);
-            }
-          }
           console.log(length_post);
-          if (length_post - 3 >= lengthss) {
+          if (post_length - 5 >= lengthss) {
             clearInterval(timer);
             resolve();
           }
@@ -247,36 +191,31 @@ async function autoScroll(page, lengthss, like, comment, share) {
   );
   return;
 }
-module.exports = async function main(req, res, next) {
+module.exports = async function main(req) {
   try {
-    const url = req.body.url;
-    const lengths = req.body.length_post == '' ? 0 : req.body.length_post;
-    const cmt_length = req.body.length_comment == '' ? 0 : req.body.length_comment;
+    const url = req.link;
+    const lengths = req.count == '' ? 0 : req.count;
+    const cmt_length = req.length_comment == '' ? 0 : req.length_comment;
+    const conten_length = req.length_content == '' ? 0 : req.length_content;
     const name = url.split('/')[3] == 'groups' ? url.split('/')[4] : url.split('/')[3];
-    const like = req.body.like ? req.body.like : 0;
-    const comment = req.body.comment ? req.body.comment : 0;
-    const share = req.body.share ? req.body.share : 0;
-    const post_type = req.body.post_type ? req.body.post_type : '';
+    const like = req.like ? req.like : 0;
+    const comment = req.comment ? req.comment : 0;
+    const share = req.share ? req.share : 0;
+    const post_type = req.posttype ? req.posttype : '';
     const craw_id = crypto.randomBytes(16).toString('hex');
-    const app = initializeApp.initializeApp(firebaseConfig);
-    const database = getDatabase(app);
-    const postListRefs = ref(database, 'post_type/' + name.replace(/[#:.,$]/g, '') + '/' + craw_id);
-    await set(postListRefs, {
-      craw_id: craw_id,
-      length: lengths,
-      cmt_length: cmt_length,
-      like: like,
-      share: share,
-      comment: comment,
-      url: url,
-      create_at: Date.now(),
-    });
-    if (!url || url == '') {
-      res.json('url is required');
-    }
-    if (!lengths || lengths == 0) {
-      res.json('length is required');
-    }
+    // const app = initializeApp.initializeApp(firebaseConfig);
+    // const database = getDatabase(app);
+    // const postListRefs = ref(database, 'post_type/' + name.replace(/[#:.,$]/g, '') + '/' + craw_id);
+    // await set(postListRefs, {
+    //   craw_id: craw_id,
+    //   length: lengths,
+    //   cmt_length: cmt_length,
+    //   like: like,
+    //   share: share,
+    //   comment: comment,
+    //   url: url,
+    //   create_at: Date.now(),
+    // });
     const browser = await puppeteer.launch({
       ignoreHTTPSErrors: true,
       ignoreDefaultArgs: ['--disable-extensions'],
@@ -334,7 +273,6 @@ module.exports = async function main(req, res, next) {
       await page.goto('https://www.facebook.com', {
         waitUntil: 'load',
       });
-      res.json({ data: 'success', statusbar: craw_id });
       await page.type('#email', 'huubao034@gmail.com');
       await page.type('#pass', 'huubao123');
       await page.keyboard.press('Enter');
@@ -347,20 +285,19 @@ module.exports = async function main(req, res, next) {
       await page.waitForFunction('document.querySelector("h1")');
     } catch (e) {
       console.log(e);
-      res.json({ data: 'error', statusbar: JSON.stringify(e) });
     }
-    const result = await page.evaluate(() => {
-      return document.querySelector('h1').textContent;
-    });
+    // const result = await page.evaluate(() => {
+    //   return document.querySelector('h1').textContent;
+    // });
 
-    const apps = initializeApp.initializeApp(firebaseConfig);
-    const databases = getDatabase(apps);
-    const postListRefss = ref(databases, 'Group/' + name.replace(/[#:.,$]/g, ''));
-    await set(postListRefss, {
-      name: result,
-      url: url,
-      create_at: Date.now(),
-    });
+    // const apps = initializeApp.initializeApp(firebaseConfig);
+    // const databases = getDatabase(apps);
+    // const postListRefss = ref(databases, 'Group/' + name.replace(/[#:.,$]/g, ''));
+    // await set(postListRefss, {
+    //   name: result,
+    //   url: url,
+    //   create_at: Date.now(),
+    // });
 
     await autoScroll(page, lengths, like, comment, share);
     // await page.evaluate(() => {
@@ -370,14 +307,13 @@ module.exports = async function main(req, res, next) {
     //   });
     // });
 
-    await getlink(page, lengths, like, comment, share).then(async function (result) {
+    await getlink(page, conten_length, like, comment, share).then(async function (result) {
       fs.writeFile('item.txt', JSON.stringify(result, null, 2), (err) => {
         if (err) throw err;
         console.log('The file has been saved!');
       });
 
-      let linkPost = new Array();
-      for (let i = 0; i < parseInt(lengths); i++) {
+      for (let i = 0; i < result.length; i++) {
         try {
           // fs.writeFile('item.txt', JSON.stringify(result, null, 2), (err) => {
           //   if (err) throw err;
@@ -386,7 +322,6 @@ module.exports = async function main(req, res, next) {
           await page.goto(result[i].post_link, {
             waitUntil: 'networkidle2',
           });
-
           await page.evaluate(async () => {
             let div = document.querySelectorAll('[role = "button"]');
             for (let i = 0; i < div.length; i++) {
@@ -408,12 +343,12 @@ module.exports = async function main(req, res, next) {
           });
           await autoScrollpost(page);
           await getdata(page, cmt_length).then(async function (results) {
-            linkPost.push(results);
             const app = initializeApp.initializeApp(firebaseConfig);
             const database = getDatabase(app);
             const postListRef = ref(
               database,
-              post_type +
+              'post_type/' +
+                post_type +
                 '/' +
                 name.replace(/[#:.,$]/g, '') +
                 '/' +
@@ -514,15 +449,15 @@ module.exports = async function main(req, res, next) {
               long_description: results.contentList
                 ? results.contentList.replaceAll('https://l.facebook.com/l.php?', '')
                 : '',
-              slug: genSlug(titles),
+              slug: '',
               session_tags: {
                 tags: [],
               },
               categorialue: [],
-              key: genSlug(titles),
-              name: titles,
+              key: '',
+              name: '',
               featured_image: arrImages,
-              type: 'facebook10',
+              type: post_type,
               attributes: [],
               status: 'publish',
               seo_tags: {
@@ -531,27 +466,41 @@ module.exports = async function main(req, res, next) {
               },
             };
             let custom_fields = {
-              video: arrVid && arrVid[0] !== null ? arrVid : null,
+              video: results.videos,
               date: results.date ? results.date : '',
               post_id: results.idPost ? results.idPost : '',
               post_link: results.linkPost ? results.linkPost : '',
               user_id: results.user_id ? results.user_id : 'undefined',
               user_name: results.user ? results.user : 'undefined',
-              count_like: results.countLike ? results.countLike : 0,
-              count_comment: results.countComment ? results.countComment : 0,
-              count_share: results.countShare ? results.countShare : 0,
-              featured_image: arrImage ? arrImage.map((image) => ({ img: image.path })) : [],
+              count_like: results.countLike
+                ? results.countLike.toString().split(' ')[0].replace('K', '00').replace(',', '')
+                : 0,
+              count_comment: results.countComment
+                ? results.countComment.toString().split(' ')[0].replace('K', '00').replace(',', '')
+                : 0,
+              count_share: results.countShare
+                ? results.countShare.toString().split(' ')[0].replace('K', '00').replace(',', '')
+                : 0,
+              featured_image: results.linkImgs ? results.linkImgs : '',
               comments: results.commentList
                 ? results.commentList.map((item) => ({
                     content: item.contentComment,
-                    count_like: item.countLike,
+                    count_like: item.countLike
+                      ? item.countLike.toString().split(' ')[0].replace('K', '00').replace(',', '')
+                      : 0,
                     user_id: item.userIDComment,
                     user_name: item.usernameComment,
                     imgComment: item.imageComment ? item.imageComment : '',
                     children: item.children
                       ? item.children.map((child) => ({
                           content: child.contentComment,
-                          count_like: child.countLike,
+                          count_like: child.countLike
+                            ? child.countLike
+                                .toString()
+                                .split(' ')[0]
+                                .replace('K', '00')
+                                .replace(',', '')
+                            : 0,
                           user_id: child.userIDComment,
                           user_name: child.usernameComment,
                           imageComment: child.imageComment ? child.imageComment : '',
@@ -565,21 +514,21 @@ module.exports = async function main(req, res, next) {
               basic_fields: basic_fields,
               custom_fields: custom_fields,
             });
-            const postListRefs = ref(
-              database,
-              '/craw_list/' + name.replace(/[#:.,$]/g, '') + '/' + craw_id
-            );
-            const newPostRef = push(postListRefs);
-            await set(newPostRef, {
-              id: i,
-              post_link: result[i].post_link,
-              statusbar: 'active',
-              countComment: results.countComment,
-              countLike: results.countLike,
-              countShare: results.countShare,
-              count_comments_config: results.count_comments_config,
-              create_at: Date.now(),
-            });
+            // const postListRefs = ref(
+            //   database,
+            //   '/craw_list/' + name.replace(/[#:.,$]/g, '') + '/' + craw_id
+            // );
+            // const newPostRef = push(postListRefs);
+            // await set(newPostRef, {
+            //   id: i,
+            //   post_link: result[i].post_link,
+            //   statusbar: 'active',
+            //   countComment: results.countComment,
+            //   countLike: results.countLike,
+            //   countShare: results.countShare,
+            //   count_comments_config: results.count_comments_config,
+            //   create_at: Date.now(),
+            // });
           });
         } catch (e) {
           console.log(e);
@@ -588,22 +537,26 @@ module.exports = async function main(req, res, next) {
           const database = getDatabase(app);
           const postListRef = ref(
             database,
-            post_type + name.replace(/[#:.,$]/g, '') + '/' + result[i].post_link.split('/')[6]
+            'post_type/' +
+              post_type +
+              name.replace(/[#:.,$]/g, '') +
+              '/' +
+              result[i].post_link.split('/')[6]
           );
           set(postListRef, {
             post_link: result[i].post_link,
             error: 'error' + e,
           });
-          const postListRefs = ref(
-            database,
-            '/craw_list/' + name.replace(/[#:.,$]/g, '') + '/' + craw_id
-          );
-          const newPostRef = push(postListRefs);
-          set(newPostRef, {
-            id: i,
-            post_link: result[i].post_link,
-            statusbar: 'error' + e,
-          });
+          // const postListRefs = ref(
+          //   database,
+          //   '/craw_list/' + name.replace(/[#:.,$]/g, '') + '/' + craw_id
+          // );
+          // const newPostRef = push(postListRefs);
+          // set(newPostRef, {
+          //   id: i,
+          //   post_link: result[i].post_link,
+          //   statusbar: 'error' + e,
+          // });
         }
       }
       // fs.writeFile('item2.txt', JSON.stringify(linkPost, null, 2), (err) => {
@@ -650,16 +603,16 @@ module.exports = async function main(req, res, next) {
   }
 };
 
-async function getlink(page, lengthss, like, comment, share) {
+async function getlink(page, conten_length, like, comment, share) {
   const dimension = await page.evaluate(
-    async (lengthss, like, comment, share) => {
+    async (conten_length, like, comment, share) => {
       post = document.querySelectorAll('[role="feed"]')[0].childNodes;
       let data = [];
-      let posts_href = '';
-
       for (let i = 1; i < post.length; i++) {
         try {
-          let count_like = (count_comment = count_share = 0);
+          let posts_href = '';
+          let count_like = (count_comment = count_share = count_content = 0);
+          let content = '';
           let lengths = post[i].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
             .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[7]
             .childNodes[0].childNodes
@@ -669,6 +622,27 @@ async function getlink(page, lengthss, like, comment, share) {
             : post[i].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
                 .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[1].childNodes[0]
                 .childNodes;
+          lengths[2].childNodes.forEach((element, index) => {
+            if (element.className == '') {
+              element.childNodes[0].childNodes.forEach(function (node) {
+                if (node.nodeName == 'SPAN') {
+                  for (let c = 0; c < node.childNodes.length; c++) {
+                    content += node.childNodes[c].innerHTML
+                      .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
+                      .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
+                      .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
+                  }
+                } else {
+                  for (let c = 0; c < node.childNodes[0].childNodes[0].childNodes.length; c++) {
+                    content += node.childNodes[0].childNodes[0].childNodes[c].innerHTML
+                      .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
+                      .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
+                      .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
+                  }
+                }
+              });
+            }
+          });
           if (lengths.length == 5) {
             div_commment_yes = lengths[4].childNodes[0];
           } else {
@@ -693,7 +667,15 @@ async function getlink(page, lengthss, like, comment, share) {
                 : '0';
             }
           });
-          if (count_like < like && count_comment < comment && count_share < share) {
+          if (
+            parseInt(count_like.toString().split(' ')[0].replace('K', '00').replace(',', '')) <
+              10 ||
+            parseInt(count_comment.toString().split(' ')[0].replace('K', '00').replace(',', '')) <
+              10 ||
+            parseInt(count_share.toString().split(' ')[0].replace('K', '00').replace(',', '')) <
+              10 ||
+            content.length < 10
+          ) {
             console.log(asd);
           }
           if (!div) {
@@ -709,18 +691,19 @@ async function getlink(page, lengthss, like, comment, share) {
             }
             data.push({
               id: data.length ? data.length + 1 : 1,
-              post_link: posts_href == '' ? abc : posts_href,
+              post_link: posts_href == '' ? asd : posts_href,
             });
-            posts_href = '';
           }
         } catch (error) {
           console.log(error);
         }
       }
-
+      data.filter(async function (e) {
+        return e;
+      });
       return data;
     },
-    lengthss,
+    conten_length,
     like,
     comment,
     share

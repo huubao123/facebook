@@ -1,0 +1,1550 @@
+{
+  "videos": [],
+  "commentList": [
+    {
+      "contentComment": "Có cho đổ xe 2 bánh 1 Euro, xe hơi 20 Euro ko b?",
+      "usernameComment": "Ngọc Quang",
+      "userIDComment": "100007350553115",
+      "imageComment": null,
+      "countLike": 0,
+      "children": []
+    },
+    {
+      "contentComment": "Cua gắt đấy",
+      "usernameComment": "Trinh Loc",
+      "userIDComment": "100000019320155",
+      "imageComment": null,
+      "countLike": 0,
+      "children": []
+    },
+    {
+      "contentComment": "Tư bản nó khổ vãi đái thật ",
+      "usernameComment": "Phú Phạm",
+      "userIDComment": "100006480389646",
+      "imageComment": null,
+      "countLike": 0,
+      "children": []
+    },
+    {
+      "contentComment": "Ko có chiêu gì mới hơn",
+      "usernameComment": "Tuan Anh Tran Quang",
+      "userIDComment": "100013333423797",
+      "imageComment": null,
+      "countLike": 0,
+      "children": []
+    },
+    {
+      "contentComment": "Chắc người Pháp Vân quá ",
+      "usernameComment": "Nguyễn Hoàng Giang",
+      "userIDComment": "100000127124064",
+      "imageComment": null,
+      "countLike": 1,
+      "children": []
+    },
+    {
+      "contentComment": "Ở vn thì ko thấy lên bài toàn lo cho tụi tư bản",
+      "usernameComment": "Huỳnh Minh Tài",
+      "userIDComment": "100000795259018",
+      "imageComment": null,
+      "countLike": "2",
+      "children": [
+        {
+          "usernameComment": "Nguyễn Khôi",
+          "userIDComment": "100039666741266",
+          "contentComment": "Huỳnh Minh Tài Còn lo cho cả tư bán thối nát , thu nhập bình quân đầu người 40-50k usd/năm chết đói, chết rét cơ mà.",
+          "imageComment": null,
+          "countLike": "3"
+        },
+        {
+          "usernameComment": "Minh Anh",
+          "userIDComment": "100006075364213",
+          "contentComment": "Huỳnh Minh Tài Bài hết xăng mấy ngày nay rồi, báo lẫn mấy group đăng ỳ đùng",
+          "imageComment": null,
+          "countLike": 0
+        },
+        {
+          "usernameComment": "Tùng Lê",
+          "userIDComment": "100006615941867",
+          "contentComment": "Huỳnh Minh Tài ko thấy hay ko đọc thế ",
+          "imageComment": null,
+          "countLike": 0
+        }
+      ]
+    },
+    {
+      "contentComment": "Hoá ra xứ tư bản thối nát và xứ thiên đường cũng giống như nhau.",
+      "usernameComment": "Ngọc Quang",
+      "userIDComment": "100007350553115",
+      "imageComment": null,
+      "countLike": 0,
+      "children": []
+    },
+    {
+      "contentComment": "Tưởng vn cũng đang vậy mà",
+      "usernameComment": "Đình Toàn",
+      "userIDComment": "100015196150045",
+      "imageComment": null,
+      "countLike": 0,
+      "children": []
+    },
+    {
+      "contentComment": "Nguyễn Vinh lên bài liền ",
+      "usernameComment": "Nguyễn Nhân",
+      "userIDComment": "100002631034942",
+      "imageComment": null,
+      "countLike": "2",
+      "children": [
+        {
+          "usernameComment": "Nguyễn Vinh",
+          "userIDComment": "100002916218697",
+          "contentComment": "Nguyễn Nhân thương dân Pháp vl :))))))))",
+          "imageComment": null,
+          "countLike": 1
+        }
+      ]
+    },
+    {
+      "contentComment": ":))))Bài này bị ép deadline, đáng nhẽ đăng vào giờ vàng tối qua nhưng không kịp nên sáng đăng sớm cho bà con có bài mà đọc, đặng tí nữa đi làm xếp hàng mua xăng cho đỡ hậm hực.",
+      "usernameComment": "Tam Long",
+      "userIDComment": "100021506910760",
+      "imageComment": null,
+      "countLike": 0,
+      "children": []
+    },
+    {
+      "contentComment": "Có người đặt bài phải tăng ca viết chứ sao",
+      "usernameComment": "Long Tin Bui",
+      "userIDComment": "100005282442945",
+      "imageComment": null,
+      "countLike": 0,
+      "children": []
+    },
+    {
+      "contentComment": "Pháp Vân a ",
+      "usernameComment": "Tran Viet Khanh",
+      "userIDComment": "1234611798",
+      "imageComment": null,
+      "countLike": 1,
+      "children": []
+    },
+    {
+      "contentComment": "Pháp ăn c, VN cũng phải ăn c",
+      "usernameComment": "Phạm Tấn Thanh",
+      "userIDComment": "100003876932302",
+      "imageComment": null,
+      "countLike": 1,
+      "children": []
+    },
+    {
+      "contentComment": "Thấy người ta ăn cơm nhưng báo phải muốn ăn cám chung để dân ngạo nghễ",
+      "usernameComment": "Linh Huỳnh",
+      "userIDComment": "100077712234495",
+      "imageComment": null,
+      "countLike": 0,
+      "children": []
+    },
+    {
+      "contentComment": "Hoá ra cũng thối nát như nhau ",
+      "usernameComment": "Duong Nguyen",
+      "userIDComment": "100024136454593",
+      "imageComment": null,
+      "countLike": 0,
+      "children": []
+    },
+    {
+      "contentComment": "Lèo lái dắt hay quá :))",
+      "usernameComment": "Trần Quân",
+      "userIDComment": "100002163123608",
+      "imageComment": null,
+      "countLike": 0,
+      "children": []
+    },
+    {
+      "contentComment": "4h sáng đã đi làm rồi, vkl nhà báo",
+      "usernameComment": "Trần Huy",
+      "userIDComment": "100080358846995",
+      "imageComment": null,
+      "countLike": 1,
+      "children": [
+        {
+          "usernameComment": "Vũ Tuấn Tú",
+          "userIDComment": "100001179992460",
+          "contentComment": "Trần Huy thấy đúng 04:00 nên chắc là set lịch thôi",
+          "imageComment": null,
+          "countLike": 0
+        }
+      ]
+    },
+    {
+      "contentComment": "Nguyên Thế Nguyễn lại lo xa kìa",
+      "usernameComment": "Nhựt Nguyễn",
+      "userIDComment": "100005343571352",
+      "imageComment": null,
+      "countLike": 0,
+      "children": [
+        {
+          "usernameComment": "Nguyên Thế Nguyễn",
+          "userIDComment": "1535032310",
+          "contentComment": "ôi, chít mịa tôi zồi, dân tây Phi đi lấy cái can mua xăng trữ đây ",
+          "imageComment": null,
+          "countLike": 0
+        }
+      ]
+    },
+    {
+      "contentComment": "lều báo !!",
+      "usernameComment": "Võ Minh Thiện",
+      "userIDComment": "100000216771093",
+      "imageComment": null,
+      "countLike": "2",
+      "children": []
+    },
+    {
+      "contentComment": "Thời nào rồi còn vậy ",
+      "usernameComment": "Lê Quốc Tùng",
+      "userIDComment": "100012392045253",
+      "imageComment": null,
+      "countLike": 1,
+      "children": []
+    },
+    {
+      "contentComment": "Lại lèo lái dư luận :)). Mấy cây xăng thuê viết bài à",
+      "usernameComment": "Nguyễn Khánh Dương",
+      "userIDComment": "100003001978868",
+      "imageComment": null,
+      "countLike": "2",
+      "children": []
+    },
+    {
+      "contentComment": "Bên bển do Công nhân mất quyền lợi nên đình công dẫn đến thiếu nguồn cung.Ở đông lào do điều hành giá ngân đù nên DN bán lẻ \"đình công\".Giống thế đéo nào được. :))Đúng là loài đĩ bút.",
+      "usernameComment": "Vuong Khang",
+      "userIDComment": "100003170227312",
+      "imageComment": null,
+      "countLike": "7",
+      "children": []
+    },
+    {
+      "contentComment": "Phải lên đúng lúc này để xoa dịu dư luận chứ ",
+      "usernameComment": "M Dung Nguyen",
+      "userIDComment": "1436820706",
+      "imageComment": null,
+      "countLike": "2",
+      "children": []
+    },
+    {
+      "contentComment": "Bài này đang ngủ đang chệt cũng thức dậy đăng nà đúng hơm? Mà rồi mắc gì đem so với pháp, pháp ăn shit mình cũng vậy ha gì ?",
+      "usernameComment": "Riêng Một Cách Nhìn",
+      "userIDComment": "100003081328300",
+      "imageComment": null,
+      "countLike": "6",
+      "children": []
+    },
+    {
+      "contentComment": "Truyền thông VN là công cụ định hướng của họ mà thôi .",
+      "usernameComment": "Trần Linh",
+      "userIDComment": "100000471304395",
+      "imageComment": null,
+      "countLike": 1,
+      "children": []
+    },
+    {
+      "contentComment": "dân giờ khôn ra rồi mấy thằng nhà báo",
+      "usernameComment": "Nguyễn Tuấn Vũ",
+      "userIDComment": "100005166829300",
+      "imageComment": null,
+      "countLike": 0,
+      "children": []
+    },
+    {
+      "contentComment": "Lái dư luận à",
+      "usernameComment": "Quang Thông",
+      "userIDComment": "100064143618068",
+      "imageComment": null,
+      "countLike": 0,
+      "children": []
+    },
+    {
+      "contentComment": "Rút củi đáy nồi ",
+      "usernameComment": "Thanh Nguyen",
+      "userIDComment": "100045464643904",
+      "imageComment": null,
+      "countLike": 0,
+      "children": []
+    },
+    {
+      "contentComment": "Đọc xong bài này kiểu \" Sáng đi lm đổ xăng xếp hàng dài đỡ bực\"",
+      "usernameComment": "Hoàng Thái",
+      "userIDComment": "100017721453541",
+      "imageComment": null,
+      "countLike": 0,
+      "children": []
+    },
+    {
+      "contentComment": "Đúng quy trình r",
+      "usernameComment": "Quang Trung",
+      "userIDComment": "100015376600810",
+      "imageComment": null,
+      "countLike": 0,
+      "children": []
+    },
+    {
+      "contentComment": "Lèo lái người dân ..",
+      "usernameComment": "Lợm Lê",
+      "userIDComment": "100010540689543",
+      "imageComment": null,
+      "countLike": 0,
+      "children": []
+    },
+    {
+      "contentComment": "cưởi ẻSao ko thấy báo đưa tin lúc xăng lên trên 30k cây xăng lãi cả khúc vậy ",
+      "usernameComment": "Pham Vandoan",
+      "userIDComment": "100007674043546",
+      "imageComment": null,
+      "countLike": 0,
+      "children": []
+    },
+    {
+      "contentComment": "\"Thiên đường \"có là mấy chỗ khác cũng phải có thôi,chứ ko bỏ \"thiên đường\" đi sao ",
+      "usernameComment": "Khang Ngọc Nguyễn",
+      "userIDComment": "100005717977974",
+      "imageComment": null,
+      "countLike": 1,
+      "children": []
+    },
+    {
+      "contentComment": "2 đứa kia chết chẳng thấy báo đăng nhiều , mà kỳ này lo ở nước pháp xa xôi , bình thường là cây nào hết xăng thấy rút giấy phép các kiểu mà ta",
+      "usernameComment": "Truong Khoi",
+      "userIDComment": "100000181975027",
+      "imageComment": null,
+      "countLike": "5",
+      "children": [
+        {
+          "usernameComment": "Huỳnh Hữu Nghị",
+          "userIDComment": "100012319876498",
+          "contentComment": "Truong Khoi rút hết giấy phép thì giống như mấy ngày nay đi xếp hàng đỗ xăng ",
+          "imageComment": null,
+          "countLike": 1
+        },
+        {
+          "usernameComment": "Truong Khoi",
+          "userIDComment": "100000181975027",
+          "contentComment": "Huỳnh Hữu Nghị sai từ trên rồi sao đè thằng dưới đập được",
+          "imageComment": null,
+          "countLike": 0
+        },
+        {
+          "usernameComment": "Người Dùng Facebօօk",
+          "userIDComment": "100029763289426",
+          "contentComment": "Truong Khoi vì đơn giản cơ chế đang làm lợi cho thằng đầu nguồn, mấy dn tư nhân bị chèn thì họ đồng loạt chơi vậy. Đâu phải tự dưng đồng loạt dntn đồng lòng, đơn giản tất cả họ đều vì quyền lợi",
+          "imageComment": null,
+          "countLike": 1
+        }
+      ]
+    },
+    {
+      "contentComment": "Bên ĐSQ Pháp mời lên nó vả cho vỡ mồm bây giờ’",
+      "usernameComment": "Sa Cửu",
+      "userIDComment": "100077126827953",
+      "imageComment": null,
+      "countLike": "6",
+      "children": []
+    },
+    {
+      "contentComment": "Có xăng đổ là may rồi. Nhìn tụi Âu nè . Tối đội mưa rồng rắn mới tìm dc chỗ đỗ xăng . Sáng đọc cái này ấm lòng lại. Cảm ơn Zing",
+      "usernameComment": "Vũ Cường",
+      "userIDComment": "100013396622779",
+      "imageComment": "https://scontent.fsgn5-11.fna.fbcdn.net/v/t39.30808-6/309764014_1617941075329098_5090219961662521764_n.jpg?stp=dst-jpg_s851x315&_nc_cat=110&ccb=1-7&_nc_sid=dbeb18&_nc_ohc=9jvlMq5mqHgAX8S_Cd0&_nc_ht=scontent.fsgn5-11.fna&oh=00_AT9GdUynDveamGqTSMEruTxN9YFG9b8d_U1H96j7AoHwig&oe=634AC8FB",
+      "countLike": "15",
+      "children": []
+    },
+    {
+      "contentComment": "Cách giải quyết vấn đề là lên bài định hướng ",
+      "usernameComment": "Bui Phong",
+      "userIDComment": "100026204677349",
+      "imageComment": null,
+      "countLike": "4",
+      "children": []
+    },
+    {
+      "contentComment": "Người đông Lào xếp hàng 8h chờ đổ xăng",
+      "usernameComment": "Hải Hà",
+      "userIDComment": "100084200885078",
+      "imageComment": null,
+      "countLike": 0,
+      "children": []
+    },
+    {
+      "contentComment": "Đó thấy chưa, pháp mà còn phải xếp hàng 40p thì nước ta thì hề hấn gì. Nước ta vừa trải qua 2 cuộc... à mà thôi.",
+      "usernameComment": "Ngô Hải Triều",
+      "userIDComment": "100003359813212",
+      "imageComment": null,
+      "countLike": "15",
+      "children": [
+        {
+          "usernameComment": "Tú Võ",
+          "userIDComment": "100007104972272",
+          "contentComment": "Ngô Hải Triều thêm ngàn năm đô hộ nữa",
+          "imageComment": null,
+          "countLike": "5"
+        }
+      ]
+    },
+    {
+      "contentComment": "Dương Thụy Bảo vn xếp hàng từ 12h khuya",
+      "usernameComment": "Tú Võ",
+      "userIDComment": "100007104972272",
+      "imageComment": null,
+      "countLike": 1,
+      "children": []
+    },
+    {
+      "contentComment": "https://vnexpress.net/dan-sri-lanka-xep-hang-10-ngay-cho...",
+      "usernameComment": "Vũ Tuấn Ngọc",
+      "userIDComment": "100002612402589",
+      "imageComment": "https://external.fsgn5-6.fna.fbcdn.net/emg1/v/t13/11234865158949232960?url=https%3A%2F%2Fi2-vnexpress.vnecdn.net%2F2022%2F07%2F18%2Fafp-com-20220716-partners-075-3598-9202-1658127966.jpg%3Fw%3D1200%26h%3D0%26q%3D100%26dpr%3D1%26fit%3Dcrop%26s%3D1ofyM4vS_XCmdcSl9D7gMw&fb_obo=1&utld=vnecdn.net&stp=c0.5000x0.5000f_dst-emg0_p98x98_q75&ccb=13-1&oh=06_Aaqok2uYitcPGnYtuf2YWJY83U7R82hiCWl3vA_jT0hH9g&oe=6346B5CB&_nc_sid=fcbacf",
+      "countLike": "7",
+      "children": [
+        {
+          "usernameComment": "Minh Ken",
+          "userIDComment": "100001621723699",
+          "contentComment": "Vũ Tuấn Ngọc mai ra tin dân Mỹ đánh nhau vì chen lấn đổ xăng do chờ nhiều ngày mà ko đến lượt. ",
+          "imageComment": null,
+          "countLike": "3"
+        }
+      ]
+    },
+    {
+      "contentComment": "Lê Chí Thông in tiền hỗ trợ DN. ta theo chuyên chính vô sản ko sợ lạm phát. xời. easy game",
+      "usernameComment": "Nguyễn Hùng Vỹ",
+      "userIDComment": "100005739763116",
+      "imageComment": null,
+      "countLike": 1,
+      "children": [
+        {
+          "usernameComment": "Lê Chí Thông",
+          "userIDComment": "100004789741633",
+          "contentComment": "Nguyễn Hùng Vỹ giỏi tháng này lên lương 4 dích",
+          "imageComment": null,
+          "countLike": 1
+        }
+      ]
+    },
+    {
+      "contentComment": "Ý Đảng là nước người ta bị lâu rồi, nên nước mình bị vậy là bình thường. ",
+      "usernameComment": "Duy Bình",
+      "userIDComment": "100009862271725",
+      "imageComment": null,
+      "countLike": 0,
+      "children": []
+    },
+    {
+      "contentComment": "Cũng muốn gánh thay sự cực khổ này cho người anh em fap",
+      "usernameComment": "Lê TTuấn",
+      "userIDComment": "100011285777056",
+      "imageComment": null,
+      "countLike": 0,
+      "children": []
+    },
+    {
+      "contentComment": "Không lạ với cái kiểu đăng bài hùa thế này",
+      "usernameComment": "Duc Thang Tran",
+      "userIDComment": "100000124093144",
+      "imageComment": null,
+      "countLike": 0,
+      "children": []
+    },
+    {
+      "contentComment": "Để giải quyết vấn đề thì đầu tiên là định hướng tư tưởng. Nước nào có xếp hàng thì cho lên hẳn 1 bài :))",
+      "usernameComment": "Bùi Hùng Vương",
+      "userIDComment": "100002950689128",
+      "imageComment": null,
+      "countLike": 0,
+      "children": []
+    },
+    {
+      "contentComment": "Người ta thiếu nguồn cung cấp. Con vn chờ giá tăng và sợ thiếu chiết khấu",
+      "usernameComment": "Dũng",
+      "userIDComment": "100003903854191",
+      "imageComment": null,
+      "countLike": 0,
+      "children": []
+    },
+    {
+      "contentComment": "Ở vn lo chưa xong đã… sang pháp mà viết bài…:)))",
+      "usernameComment": "Neko Neko Dễ Thương",
+      "userIDComment": "100076554807829",
+      "imageComment": null,
+      "countLike": 0,
+      "children": []
+    },
+    {
+      "contentComment": "đúng là cái lũ báo đời. -__-",
+      "usernameComment": "Trí Tuệ",
+      "userIDComment": "100080792753624",
+      "imageComment": null,
+      "countLike": 0,
+      "children": []
+    },
+    {
+      "contentComment": "Bọn giãy chết sao so được với xứ thiên đường. Lịt pẹ thèng nhà báo.",
+      "usernameComment": "Son PT",
+      "userIDComment": "100007840385174",
+      "imageComment": null,
+      "countLike": 0,
+      "children": []
+    },
+    {
+      "contentComment": "Nhưng mà lý do ở pháp khác việt nam thì phải.vn chiết khấu thấp đợi cao ms bán cơ",
+      "usernameComment": "Dat Tran",
+      "userIDComment": "100005359389150",
+      "imageComment": null,
+      "countLike": 0,
+      "children": []
+    },
+    {
+      "contentComment": "Mấy báo lá cải này toàn trích dịch lại báo ngoại chứ nó làm j có phóng viên mà sang đấy?",
+      "usernameComment": "Phan Trí",
+      "userIDComment": "100005564719209",
+      "imageComment": null,
+      "countLike": "14",
+      "children": [
+        {
+          "usernameComment": "Chú Mười",
+          "userIDComment": "1590167430",
+          "contentComment": "Phan Trí trích dịch nói làm gì. Chế ra tin lun",
+          "imageComment": null,
+          "countLike": "22"
+        },
+        {
+          "usernameComment": "Phan Trí",
+          "userIDComment": "100005564719209",
+          "contentComment": "Chú Mười ở trong nó vẫn dẫn nguồn các báo ngoại kìa, ko bịa vô lí quá là dc, nhưng về phần dịch sang Tiếng Việt, nó có thể dịch ko sát nghĩa làm sai lệch nội dung",
+          "imageComment": null,
+          "countLike": 0
+        },
+        {
+          "usernameComment": "Leon Nguyễn",
+          "userIDComment": "100002834312259",
+          "contentComment": "Phan Trí bài này nhà báo tự nghĩ ra viết 100% nha bạn, lâu lâu cắt 1 - 2 chỗ dẫn AFP này nọ thôi còn nếu mà dịch nguyên văn từ báo nước ngoài thì cuối bài sẽ trích nguồn từ 1 báo thôi",
+          "imageComment": null,
+          "countLike": 1
+        },
+        {
+          "usernameComment": "Thanh Phong",
+          "userIDComment": "100035372104172",
+          "contentComment": "Chú Mười nó chế ra bậy bạ chứ gì nữa.",
+          "imageComment": null,
+          "countLike": 1
+        },
+        {
+          "usernameComment": "Thành Nguyễn",
+          "userIDComment": "100053342842202",
+          "contentComment": "Chú Mười à thế à",
+          "imageComment": "https://scontent.fsgn5-10.fna.fbcdn.net/v/t39.30808-6/311592702_639054117882677_6367289163593126335_n.jpg?stp=dst-jpg_s851x315&_nc_cat=107&ccb=1-7&_nc_sid=dbeb18&_nc_ohc=7pwZ9bELk-0AX_GDM1f&tn=dxKXh3DguKD7uzim&_nc_ht=scontent.fsgn5-10.fna&oh=00_AT9gBI5XwCbOBKmJWNy2gMX33AVCtutdJ8sa6yxAG4CLTA&oe=634A29A5",
+          "countLike": 0
+        },
+        {
+          "usernameComment": "Nguyễn Hương",
+          "userIDComment": "100003155270238",
+          "contentComment": "Chú Mười có thật nha. Hôm mình ra sân bay sáng t7 2 cửa hàng TOTAL đóng cửa liên tục, tưởng đình công hay sớm quá chưa mở hay gì, sợ ko đủ xăng ra sb về VN nhưng hoá ra là lí do tương tự như ở VN 2 ngày nay.",
+          "imageComment": null,
+          "countLike": 0
+        }
+      ]
+    },
+    {
+      "contentComment": "Đúng Pháp … vân rồi",
+      "usernameComment": "Tình Phạm Ertech",
+      "userIDComment": "100000345933267",
+      "imageComment": null,
+      "countLike": 0,
+      "children": []
+    },
+    {
+      "contentComment": "Mua xe điện đi nha mọi người",
+      "usernameComment": "Trương Bảo Giang",
+      "userIDComment": "100004508979778",
+      "imageComment": null,
+      "countLike": 0,
+      "children": []
+    },
+    {
+      "contentComment": "Cứ lần nào xảy ra vi j là zing lại lên trò mèo này. Mai tớit Anh thieu, Mốt Mỹ và Đức thiếu. Nên tẩy chai nững tờ báo đưa tin ko thật",
+      "usernameComment": "Chú Mười",
+      "userIDComment": "1590167430",
+      "imageComment": null,
+      "countLike": 0,
+      "children": []
+    },
+    {
+      "contentComment": "Chắc là đi sớm để đổ xăng nên lên cơ quan sớm",
+      "usernameComment": "Loc Nguyen",
+      "userIDComment": "100004690981529",
+      "imageComment": null,
+      "countLike": 0,
+      "children": []
+    },
+    {
+      "contentComment": "Tư tưởng “ở đâu cũng thế” kêu ca cái gì ",
+      "usernameComment": "Thang Phung",
+      "userIDComment": "100000052769525",
+      "imageComment": null,
+      "countLike": 1,
+      "children": []
+    },
+    {
+      "contentComment": "Vùng quê ngoài bắc vẫn đổ xăng như bình thường!",
+      "usernameComment": "Quang Nguyễn",
+      "userIDComment": "100003078946759",
+      "imageComment": null,
+      "countLike": 0,
+      "children": []
+    },
+    {
+      "contentComment": "Tư duy thằng kia ăn đc *ứt thì mình cũng ăn đc. Cái bọn bút nô. T khinh.",
+      "usernameComment": "Aco Nguyen",
+      "userIDComment": "100000725311336",
+      "imageComment": null,
+      "countLike": "10",
+      "children": []
+    },
+    {
+      "contentComment": "Cái méo gì làm không xong là lấy báo lá cải đưa vô ... mục đích là tây nó còn chờ đổ xăng huống hồ là mình. Từ tham nhũng covid, đến lạm phát ... mục đích che giấu sự kém cõi",
+      "usernameComment": "Daison Gaming",
+      "userIDComment": "100003552171009",
+      "imageComment": null,
+      "countLike": "10",
+      "children": []
+    },
+    {
+      "contentComment": "Lúc lên bài là đang xếp hàng đổ xăng đó bác",
+      "usernameComment": "Linh Tinh",
+      "userIDComment": "100000219346823",
+      "imageComment": null,
+      "countLike": "3",
+      "children": []
+    },
+    {
+      "contentComment": "KhinhPhải dẫn các nước âu mỹ cũng xếp hàng đổ xăng để dân ta đỡ chửi.",
+      "usernameComment": "Hoàng Đế",
+      "userIDComment": "100013603443285",
+      "imageComment": null,
+      "countLike": 1,
+      "children": []
+    },
+    {
+      "contentComment": "Chờ ngoáy mũi còn đc, đổ xăng ăn thua gì các bác :))",
+      "usernameComment": "Đinh Quang Vinh",
+      "userIDComment": "100004070175000",
+      "imageComment": null,
+      "countLike": 0,
+      "children": []
+    },
+    {
+      "contentComment": "Châu âu kêu luôn c.a giải tán .",
+      "usernameComment": "Thai Nguyen",
+      "userIDComment": "100004036141977",
+      "imageComment": "https://scontent.fsgn5-15.fna.fbcdn.net/v/t39.30808-6/310857342_2951796181631558_1774980229095687061_n.jpg?stp=cp6_dst-jpg_s851x315&_nc_cat=111&ccb=1-7&_nc_sid=dbeb18&_nc_ohc=dX3QffIR41gAX-azefg&_nc_ht=scontent.fsgn5-15.fna&oh=00_AT-9r6P4a1iKNvrwYPdZFZbN-0pTnO7C6arjChpNbhAZLA&oe=634AD730",
+      "countLike": 0,
+      "children": []
+    },
+    {
+      "contentComment": "Đợt vừa rồi tăng giá xăng, doanh số xe điện tăng đáng kể, đợt thiếu hụt xăng lần này dự lại bán đc nhiều xe điện hơn nữa ",
+      "usernameComment": "Phong Vũ",
+      "userIDComment": "100007574552019",
+      "imageComment": null,
+      "countLike": 0,
+      "children": []
+    },
+    {
+      "contentComment": "Người ta là đình công. Còn mấy ông là làm việc vô dụng",
+      "usernameComment": "NH Nguyen",
+      "userIDComment": "100077592065032",
+      "imageComment": null,
+      "countLike": 0,
+      "children": []
+    },
+    {
+      "contentComment": "3 tiếng sạc xe điện xong luôn rồi. ",
+      "usernameComment": "Nhân Huỳnh",
+      "userIDComment": "100001946504922",
+      "imageComment": null,
+      "countLike": 0,
+      "children": []
+    },
+    {
+      "contentComment": "Xh giờ vẫn còn kiểu nhồi nhét\nĐúng là ko thể tả bọn báo thổ tả này!. Chúng nhồi nhét vô tội vạ",
+      "usernameComment": "Vic Bui",
+      "userIDComment": "100001382136546",
+      "imageComment": null,
+      "countLike": 1,
+      "children": []
+    },
+    {
+      "contentComment": "Ai cũng lái thuyền giỏi",
+      "usernameComment": "Ngô Hiểu Minh",
+      "userIDComment": "1153078135",
+      "imageComment": null,
+      "countLike": 0,
+      "children": []
+    },
+    {
+      "contentComment": "Ghê trời, vậy chứ ở việt nam chắc không xếp hàng??",
+      "usernameComment": "Trịnh Hải Đăng",
+      "userIDComment": "100007751358983",
+      "imageComment": null,
+      "countLike": 0,
+      "children": []
+    },
+    {
+      "contentComment": "Giờ còn kiu lừa đảo người dân bằng những bài viết xàm xí.",
+      "usernameComment": "Trần Tài",
+      "userIDComment": "100007353090268",
+      "imageComment": null,
+      "countLike": 0,
+      "children": []
+    },
+    {
+      "contentComment": "ôi...Ý là xếp hạng dân ta như tây vậy,kkk",
+      "usernameComment": "Nguyễn Hải",
+      "userIDComment": "100005559151356",
+      "imageComment": null,
+      "countLike": 1,
+      "children": []
+    },
+    {
+      "contentComment": "Deadline dạo này chạy gắt quá nhỉ ",
+      "usernameComment": "Tài Lê",
+      "userIDComment": "100000091704854",
+      "imageComment": null,
+      "countLike": 1,
+      "children": []
+    },
+    {
+      "contentComment": "Báo lá cải thường làm chuyện ruồi bu",
+      "usernameComment": "Nguyễn Anh Tuấn",
+      "userIDComment": "100001976198473",
+      "imageComment": null,
+      "countLike": "4",
+      "children": [
+        {
+          "usernameComment": "Giang Nguyễn",
+          "userIDComment": "100004006196043",
+          "contentComment": "Nguyễn Anh Tuấn k ai rãnh nếu ko đc chỉ thị phải viết cả ngay thơ quá b",
+          "imageComment": null,
+          "countLike": 1
+        }
+      ]
+    },
+    {
+      "contentComment": "Và bên báo khác cũng vậy, ae nhà báo tối đi nhậu chung tăng ca kinh thật ",
+      "usernameComment": "Leon Nguyễn",
+      "userIDComment": "100002834312259",
+      "imageComment": "https://scontent.fsgn5-10.fna.fbcdn.net/v/t39.30808-6/311567731_5112999472137813_8592002190878878870_n.jpg?stp=dst-jpg_s851x315&_nc_cat=107&ccb=1-7&_nc_sid=dbeb18&_nc_ohc=_c7WJ6Ls7wsAX-wSIPk&_nc_ht=scontent.fsgn5-10.fna&oh=00_AT_NmZKtfOSxwfC1QNDZ2mvprHJpxnRTUkZJm_hjrnvtfQ&oe=634ACF71",
+      "countLike": "3",
+      "children": [
+        {
+          "usernameComment": "Tùng Lê",
+          "userIDComment": "100006615941867",
+          "contentComment": "Leon Nguyễn báo nước họ cũng vậy mà. Chắc nhậu chung online rồi.",
+          "imageComment": null,
+          "countLike": 0
+        },
+        {
+          "usernameComment": "Vương Vũ",
+          "userIDComment": "100007080587500",
+          "contentComment": "Leon Nguyễn đi nhậu mỗi đứa cầm 1 cái chày ra sục, sục chảy máu luôn =))",
+          "imageComment": null,
+          "countLike": 0
+        }
+      ]
+    },
+    {
+      "contentComment": "Cứ nuoc ngoài sao mình phải vậy á.tại sao k khác bọt đi",
+      "usernameComment": "Hao Vu",
+      "userIDComment": "100001551870008",
+      "imageComment": null,
+      "countLike": 0,
+      "children": []
+    },
+    {
+      "contentComment": "Zing càng lúc càng đi bên phải, nhưng nd bài là không phải thiếu hụt xăng dầu, mà là do công nhân đình công, bối cảnh và hoàn cảnh khác hoàn toàn, báo phải hay ba phải và ráng \"cưỡng ép\"",
+      "usernameComment": "Hung Truong",
+      "userIDComment": "100002119168588",
+      "imageComment": null,
+      "countLike": "3",
+      "children": []
+    },
+    {
+      "contentComment": "Thằng zing này trở thành bút nô luôn r sao ",
+      "usernameComment": "Giang Nguyễn",
+      "userIDComment": "100004006196043",
+      "imageComment": null,
+      "countLike": "3",
+      "children": []
+    },
+    {
+      "contentComment": "Mấy trang lá cải",
+      "usernameComment": "Jos Phan Hùng",
+      "userIDComment": "100005664600283",
+      "imageComment": null,
+      "countLike": 0,
+      "children": []
+    },
+    {
+      "contentComment": "hèn gì \nĐặng Việt Phương suốt ngày ao ước làm nhà báo",
+      "usernameComment": "Nhat Nhat",
+      "userIDComment": "100011522745323",
+      "imageComment": null,
+      "countLike": 0,
+      "children": []
+    },
+    {
+      "contentComment": "VN mình mới chờ có 3 tiếng rưỡi mà ae xoắn lên",
+      "usernameComment": "Ho Duc Ai",
+      "userIDComment": "100004000105496",
+      "imageComment": null,
+      "countLike": 0,
+      "children": []
+    },
+    {
+      "contentComment": "Phạm Thị Thuý An",
+      "usernameComment": "Nhi Nguyễn",
+      "userIDComment": "100008027114269",
+      "imageComment": null,
+      "countLike": 0,
+      "children": [
+        {
+          "usernameComment": "Phạm Thị Thuý An",
+          "userIDComment": "100050711476386",
+          "contentComment": "Nhi Nguyễn ulatr",
+          "imageComment": null,
+          "countLike": 0
+        }
+      ]
+    },
+    {
+      "contentComment": "Mịe ,chuyện nhà .khôg lo , lo chuyện hàng xóm .",
+      "usernameComment": "Xuan Ty",
+      "userIDComment": "100080644116152",
+      "imageComment": null,
+      "countLike": 1,
+      "children": []
+    },
+    {
+      "contentComment": "Lại dẫn dắt và lại định hướng , các báo đồng loạt đánh",
+      "usernameComment": "Lee Taii",
+      "userIDComment": "100001871024533",
+      "imageComment": null,
+      "countLike": 1,
+      "children": []
+    },
+    {
+      "contentComment": "KhỏeXoa dịu kịp thời quá huu",
+      "usernameComment": "Sản Xuất Giấy Tissiu",
+      "userIDComment": "100012082721116",
+      "imageComment": "https://scontent.fsgn5-14.fna.fbcdn.net/v/t39.30808-6/310298648_5446703405447542_1494057044679438683_n.jpg?stp=dst-jpg_p160x160&_nc_cat=106&ccb=1-7&_nc_sid=dbeb18&_nc_ohc=PNHxADJ6pWsAX_BhXXX&tn=dxKXh3DguKD7uzim&_nc_ht=scontent.fsgn5-14.fna&oh=00_AT_IVo9qmKDvkatXZebnxFA0EqxJn5Zrrp01y0V86n-VIw&oe=634A31F4",
+      "countLike": "5",
+      "children": []
+    },
+    {
+      "contentComment": "Xứ tư bản giãy chết còn thế thì ae hãy thông cảm bỏ qua cho xứ thiên đường đi ",
+      "usernameComment": "Sơn Nguyễn",
+      "userIDComment": "100005342258629",
+      "imageComment": null,
+      "countLike": "2",
+      "children": []
+    },
+    {
+      "contentComment": "Nãy VTV nói dân châu âu xài củi sưởi ấm",
+      "usernameComment": "Phan Duy Hùng",
+      "userIDComment": "100002561052164",
+      "imageComment": null,
+      "countLike": 0,
+      "children": []
+    },
+    {
+      "contentComment": "Báo nước nào cũng giành phần hay về nước mình để viết th \n cái nào cũng có mục đích riêng và tốt đẹp, cái rác rưởi vô dụng ở đây là ý kiến của mấy thằng 3 sọc th bác",
+      "usernameComment": "Nguyễn Văn Thịnh",
+      "userIDComment": "100058671031366",
+      "imageComment": null,
+      "countLike": 0,
+      "children": [
+        {
+          "usernameComment": "Qi Tới Chơi Bro",
+          "userIDComment": "100082320453926",
+          "contentComment": "Nguyễn Văn Thịnh lo học đi con trai",
+          "imageComment": null,
+          "countLike": "16"
+        },
+        {
+          "usernameComment": "Nguyễn Quang Thịnh",
+          "userIDComment": "100004543354690",
+          "contentComment": "Qi Tới Chơi Bro đẻ ra ngành báo chí để làm mấy chuyện này. Chứ m nghĩ nó nói sai à. Cmt như mấy thằng ngáo!",
+          "imageComment": null,
+          "countLike": 0
+        },
+        {
+          "usernameComment": "Nguyễn Văn Thịnh",
+          "userIDComment": "100058671031366",
+          "contentComment": "Qi Tới Chơi Bro thấy chưa \n ba que này, từ cái tên đã rác r đâu cần nghe ý kiến ",
+          "imageComment": null,
+          "countLike": 0
+        },
+        {
+          "usernameComment": "Tùng Lê",
+          "userIDComment": "100006615941867",
+          "contentComment": "Nguyễn Văn Thịnh tác hại của đưa thông tin cá nhân lên mạng đấy. Không đưa thì chúng bảo nick ảo. Đưa thì nó vô soi xong cắn bậy. Điều đang bàn luận ko thấy đâu.",
+          "imageComment": null,
+          "countLike": 0
+        },
+        {
+          "usernameComment": "Tùng Lê",
+          "userIDComment": "100006615941867",
+          "contentComment": "Qi Tới Chơi Bro lo tập làm người đi con bò.",
+          "imageComment": null,
+          "countLike": 1
+        },
+        {
+          "usernameComment": "Nhan Tam Vu",
+          "userIDComment": "100084508513031",
+          "contentComment": "Nguyễn Văn Thịnh chắc báo Tây nó ưa chính quyền",
+          "imageComment": "https://scontent.fsgn5-10.fna.fbcdn.net/v/t39.30808-6/310096862_127291700097780_2240686148694771141_n.jpg?stp=dst-jpg_s851x315&_nc_cat=107&ccb=1-7&_nc_sid=dbeb18&_nc_ohc=1r14BvNosRYAX-uuOZ7&tn=dxKXh3DguKD7uzim&_nc_ht=scontent.fsgn5-10.fna&oh=00_AT_ER1EZJ9AB4cEK9dFR7c1Unn81yOGbSV4CexwnX8LtZQ&oe=634B0727",
+          "countLike": 0
+        },
+        {
+          "usernameComment": "Nguyễn Văn Thịnh",
+          "userIDComment": "100058671031366",
+          "contentComment": "Nhan Tam Vu chắc bên mỹ có một mình cái cnn :))) bên mỹ có cnn thì việt nam có báo tuổi trẻ. Khác ở chỗ nếu chuyện như chuyện lãnh đạo tố cáo một bài báo ở việt nam thì tụi mày sẽ bảo là độc tài, là đàn áp báo chí",
+          "imageComment": null,
+          "countLike": 0
+        },
+        {
+          "usernameComment": "Nguyễn Văn Thịnh",
+          "userIDComment": "100058671031366",
+          "contentComment": "Nhan Tam Vu bởi tao mới coi quan điểm và ý kiến của bọn mày là rác rưởi hiểu chứ",
+          "imageComment": null,
+          "countLike": 0
+        },
+        {
+          "usernameComment": "Nhan Tam Vu",
+          "userIDComment": "100084508513031",
+          "contentComment": "Nguyễn Văn Thịnh báo tuổi trẻ của bé nè",
+          "imageComment": null,
+          "countLike": 0
+        },
+        {
+          "usernameComment": "Nguyễn Văn Thịnh",
+          "userIDComment": "100058671031366",
+          "contentComment": "Nhan Tam Vu m để avt hình con lợn chắc hẳn phải có lý do nhỉ \n nó đăng bài sai sự thật về tao ngay trong nhà tao mà mong đéo ăn đấm à?",
+          "imageComment": null,
+          "countLike": 0
+        },
+        {
+          "usernameComment": "Nguyễn Văn Thịnh",
+          "userIDComment": "100058671031366",
+          "contentComment": "Nhan Tam Vu và đ phải nó bị phạt 1 lần đâu nhé",
+          "imageComment": null,
+          "countLike": 0
+        },
+        {
+          "usernameComment": "Nhan Tam Vu",
+          "userIDComment": "100084508513031",
+          "contentComment": "Nguyễn Văn Thịnh chắc là nghiệp vụ báo chí của mấy báo kì cựu như Thanh niên Tuổi trẻ với Tổng biên tập do Chính quyền VN chỉ định có thể đưa tin sai xuyên tạc nhỉ",
+          "imageComment": "https://scontent.fsgn5-8.fna.fbcdn.net/v/t39.30808-6/309878343_127310700095880_2091622362687380397_n.jpg?stp=dst-jpg_s851x315&_nc_cat=109&ccb=1-7&_nc_sid=dbeb18&_nc_ohc=C2-MVsh-bt4AX94J7Ni&_nc_ht=scontent.fsgn5-8.fna&oh=00_AT-NxDRrtMBwrgwiNii3HxZeTIcW1Id-b2JjlPnUW6H_uQ&oe=6349B83D",
+          "countLike": 0
+        },
+        {
+          "usernameComment": "Nguyễn Văn Thịnh",
+          "userIDComment": "100058671031366",
+          "contentComment": "Nhan Tam Vu thật ra định k tranh luận với lợn nữa đâu \n nhưng mà không phân biệt được tin xuyên tạc với tin sai sự thật thì tranh luận đ gì? Thứ t đề cập nãy giờ là cách lãnh đạo xử lí khi có báo đài đăng tin sai sự thật",
+          "imageComment": null,
+          "countLike": 0
+        },
+        {
+          "usernameComment": "Nguyễn Văn Thịnh",
+          "userIDComment": "100058671031366",
+          "contentComment": "Nhan Tam Vu và bên mỹ thì tụi mày tung hô, còn ở việt nam là độc tài chính trị ",
+          "imageComment": null,
+          "countLike": 0
+        },
+        {
+          "usernameComment": "Nhan Tam Vu",
+          "userIDComment": "100084508513031",
+          "contentComment": "Nguyễn Văn Thịnh https://www.reuters.com/.../france-has-no-plans-yet.../ ngay từ đầu cái ý \" Báo nước nào cũng giành phần hay về nước mình để viết\" là lạc đề rồi. Zing news trích bài của Báo Tây vụ xếp hàng mua xăng từ tháng 8 để mị dân VN chuyện thiếu xăng đang diễn ra ở VN thôi. Reuters ko khen ngợi nước Pháp nhé",
+          "imageComment": "https://external.fsgn5-6.fna.fbcdn.net/emg1/v/t13/6648192014535040770?url=https%3A%2F%2Fwww.reuters.com%2Fresizer%2F4sxh4aRs2oYd8hsRDtVcJNPg4nA%3D%2F1200x628%2Fsmart%2Ffilters%3Aquality%2880%29%2Fcloudfront-us-east-2.images.arcpublishing.com%2Freuters%2FIQ3SLLPXHNPSDM5JJMDZALTDHI.jpg&fb_obo=1&utld=reuters.com&stp=c0.5000x0.5000f_dst-emg0_p98x98_q75&ccb=13-1&oh=06_Aar0ZjD2LLoKaADP_BLVEJnEOEUvz98gc9NNYOzwJvUuqw&oe=63468663&_nc_sid=d9b6e0",
+          "countLike": 1
+        },
+        {
+          "usernameComment": "Thanh Michael",
+          "userIDComment": "100000853777443",
+          "contentComment": "Nguyễn Văn Thịnh đúng là ngưu lâu dốt bền khó đào tạo",
+          "imageComment": null,
+          "countLike": 0
+        }
+      ]
+    },
+    {
+      "contentComment": "Không thấy tuoitre đăng bài thế này, ok, giờ chuyển qua đọc tuoitre vậy :))",
+      "usernameComment": "Duy Nguyễn",
+      "userIDComment": "100000383005507",
+      "imageComment": null,
+      "countLike": 0,
+      "children": []
+    },
+    {
+      "contentComment": "Combo những ngày này là nước ngập + đợi đổ xăng",
+      "usernameComment": "Ngọc Thắng",
+      "userIDComment": "100005421932573",
+      "imageComment": null,
+      "countLike": 1,
+      "children": []
+    },
+    {
+      "contentComment": "Mịa, lo cho dân mình éo lo, đi lo cho ngta...so sánh cái nồn",
+      "usernameComment": "Robert Vo",
+      "userIDComment": "1756310544",
+      "imageComment": null,
+      "countLike": "2",
+      "children": []
+    },
+    {
+      "contentComment": "Những lúc ntn thì k thấy giải pháp thực tế đâu. Mà quay qua đi so sánh thụt lùi @@",
+      "usernameComment": "Dương Mạnh Quân",
+      "userIDComment": "100006374020221",
+      "imageComment": null,
+      "countLike": 1,
+      "children": []
+    },
+    {
+      "contentComment": "Tối ngày ru ngủ, xoa dịu quy chụp ",
+      "usernameComment": "Vũ Ngô",
+      "userIDComment": "100009753815169",
+      "imageComment": null,
+      "countLike": 1,
+      "children": []
+    },
+    {
+      "contentComment": "T thấy lạ không thấy lên bài phương án nào hỗ trợ giải quyết xử lý mà truyền thông lại toàn đưa tin kiểu “ à bên nước ngoài cũng vậy nè nên tụi bây an phận đi” :)) k hiểu nổi",
+      "usernameComment": "Yuh Ngô",
+      "userIDComment": "100074902340608",
+      "imageComment": null,
+      "countLike": 1,
+      "children": []
+    },
+    {
+      "contentComment": "Kkk y rằng, định mệnh cái tốt đẹp, cái phát triển của ngta thi im re ko thấy mở mõm",
+      "usernameComment": "Thái Dương",
+      "userIDComment": "100013776002680",
+      "imageComment": null,
+      "countLike": 1,
+      "children": []
+    },
+    {
+      "contentComment": "Dm nó mới chơi về còn phê viết luôn",
+      "usernameComment": "Quân Tín",
+      "userIDComment": "100007919165917",
+      "imageComment": null,
+      "countLike": "3",
+      "children": []
+    },
+    {
+      "contentComment": "Lúc đấy mới đi xếp hàng đổ xăng về nhé",
+      "usernameComment": "An Thanh Hải",
+      "userIDComment": "100000011300748",
+      "imageComment": null,
+      "countLike": "2",
+      "children": []
+    },
+    {
+      "contentComment": "Tây cũng khổ như mình",
+      "usernameComment": "Alan Vuu",
+      "userIDComment": "100000188246403",
+      "imageComment": null,
+      "countLike": 0,
+      "children": []
+    },
+    {
+      "contentComment": "Toàn chơi chiêu cũ, xưa dắt được nguyên đàn giờ dắt được 30 - 40 sắp xuống lỗ",
+      "usernameComment": "Vũ Đạt",
+      "userIDComment": "100003226286334",
+      "imageComment": null,
+      "countLike": 1,
+      "children": []
+    },
+    {
+      "contentComment": "cũng may là có bọn \"đế quốc Pháp\"...nó gỡ gạt cho uy tín của bộ trưởng Công Thương Nguyễn Hồng Diên...cùng với những lời \"nịnh trong sáng\" ngài TBT...chắc là y cũng sẽ được một nhiệm kỳ nữa...\nhttps://vietnamnet.vn/truong-hop-dac-biet-ve-tuoi-nhu...",
+      "usernameComment": "Van Nin Le",
+      "userIDComment": "100070195083822",
+      "imageComment": "https://external.fsgn5-6.fna.fbcdn.net/emg1/v/t13/18338363501539611543?url=https%3A%2F%2Fvnn-imgs-f.vgcloud.vn%2F2020%2F05%2F27%2F11%2Ftruong-hop-dac-biet-cua-tong-bi-thu-la-hanh-phuc-cua-dang-cua-dan-toc.jpg&fb_obo=1&utld=vgcloud.vn&stp=c0.5000x0.5000f_dst-emg0_p98x98_q75&ccb=13-1&oh=06_AaoC0f36376pWhRO3LIPX60M6zLUV9k7Ar_gwjRB6fU5oQ&oe=634680E4&_nc_sid=fcbacf",
+      "countLike": "2",
+      "children": []
+    },
+    {
+      "contentComment": "Lun phải có 1 cái gì đó để so sánh… nên mọi ngừoi đừng than nữa :)). Định hướng vậy roi",
+      "usernameComment": "Phuoc Long Nguyen",
+      "userIDComment": "100000665148348",
+      "imageComment": null,
+      "countLike": "3",
+      "children": []
+    },
+    {
+      "contentComment": "đủ xăng để đỗ 3 tiếng là ok rồi",
+      "usernameComment": "Hoàng Mạnh Cường",
+      "userIDComment": "1097996889",
+      "imageComment": null,
+      "countLike": 0,
+      "children": [
+        {
+          "usernameComment": "VaNy Nguyen",
+          "userIDComment": "100005649277970",
+          "contentComment": "Hoàng Mạnh Cường ngta ngồi oto xếp hàng. ",
+          "imageComment": null,
+          "countLike": 0
+        }
+      ]
+    },
+    {
+      "contentComment": "dậy sớm đề...thành côn nha",
+      "usernameComment": "De Doan Nam",
+      "userIDComment": "100004697282846",
+      "imageComment": null,
+      "countLike": 0,
+      "children": []
+    },
+    {
+      "contentComment": "Gửi bài cho đsq Fap xem họ có phản ứng gì không, chứ im im bị dân an nam dèm pha quá ",
+      "usernameComment": "Toàn Phan",
+      "userIDComment": "100010789681951",
+      "imageComment": null,
+      "countLike": 0,
+      "children": []
+    },
+    {
+      "contentComment": "Dân xứ thiên đường mà cứ thích khóc thuê cho tư bản giẫy... Chết :))",
+      "usernameComment": "Thang Cao",
+      "userIDComment": "100001415823805",
+      "imageComment": null,
+      "countLike": 0,
+      "children": []
+    },
+    {
+      "contentComment": "Qua Nga ở thôi , mua xăng về tắm cũng được:v",
+      "usernameComment": "Nguyen Duc",
+      "userIDComment": "100014349495143",
+      "imageComment": null,
+      "countLike": 0,
+      "children": []
+    },
+    {
+      "contentComment": "Pháp thiếu nguồn cung. Còn ở VN, ông Bộ bảo k thiếu. Mà lại để dân phải xếp hàng thì ai chịu trách nhiệm",
+      "usernameComment": "VaNy Nguyen",
+      "userIDComment": "100005649277970",
+      "imageComment": null,
+      "countLike": 0,
+      "children": []
+    },
+    {
+      "contentComment": "Link báo nước ngoài cho mấy thằng tinh tướng",
+      "usernameComment": "Thành Nguyễn",
+      "userIDComment": "100053342842202",
+      "imageComment": "https://scontent.fsgn5-6.fna.fbcdn.net/v/t39.30808-6/310993802_639054851215937_1279447849984728966_n.jpg?stp=dst-jpg_s851x315&_nc_cat=108&ccb=1-7&_nc_sid=dbeb18&_nc_ohc=KQT_PByZmY0AX-6hoLr&_nc_ht=scontent.fsgn5-6.fna&oh=00_AT9U6QhOIL3CRbb5klqjF7n6UMihaR-J-_LV0nMkuizbGQ&oe=63497199",
+      "countLike": "6",
+      "children": [
+        {
+          "usernameComment": "Nhan Tam Vu",
+          "userIDComment": "100084508513031",
+          "contentComment": "Thành Nguyễn là bị đình công mà",
+          "imageComment": null,
+          "countLike": 0
+        },
+        {
+          "usernameComment": "Thành Nguyễn",
+          "userIDComment": "100053342842202",
+          "contentComment": "Nhan Tam Vu thì zing nó có nói sai đâu.",
+          "imageComment": "https://scontent.fsgn5-14.fna.fbcdn.net/v/t39.30808-6/309631690_639084451212977_1764715636597437140_n.jpg?stp=dst-jpg_s851x315&_nc_cat=101&ccb=1-7&_nc_sid=dbeb18&_nc_ohc=dbVga6nBcxkAX_ykDAK&_nc_ht=scontent.fsgn5-14.fna&oh=00_AT-siauUuWRdxk5_JiYv6l30EO9gXzJuq_2aajdlKHOE-w&oe=634ABB8E",
+          "countLike": 0
+        },
+        {
+          "usernameComment": "Nhan Tam Vu",
+          "userIDComment": "100084508513031",
+          "contentComment": "Thành Nguyễn vấn đề xếp hàng đổ xăng ở VN là do doanh nghiệp phân phối xăng đình công vì bị buộc bán lỗ pk",
+          "imageComment": null,
+          "countLike": 0
+        },
+        {
+          "usernameComment": "Thành Nguyễn",
+          "userIDComment": "100053342842202",
+          "contentComment": "Nhan Tam Vu đấy là vấn đề của VN. Chứ tôi đang nói đến bài báo mà ?",
+          "imageComment": null,
+          "countLike": 0
+        }
+      ]
+    },
+    {
+      "contentComment": "Tụi nó là \"tư bản giãy chết\" thì đáng đời, còn mình là \"xứ thiên đường\" lại đi giống nó thì \"giang hồ\" coi ra gì nữa?",
+      "usernameComment": "Nguyễn Phong",
+      "userIDComment": "1062201315",
+      "imageComment": null,
+      "countLike": 1,
+      "children": []
+    },
+    {
+      "contentComment": "Đang bị nguyên combo mưa, ngập, chờ đổ xăng ko có mà đi lo chuyện thế giới",
+      "usernameComment": "Robert Vo",
+      "userIDComment": "1756310544",
+      "imageComment": null,
+      "countLike": 0,
+      "children": []
+    },
+    {
+      "contentComment": "Hôm qua mình đi đổ xăng, đứng chờ 5p mà mình ngỡ đâu 3 tiếng",
+      "usernameComment": "Lê Trung Hiếu",
+      "userIDComment": "100005942464503",
+      "imageComment": null,
+      "countLike": 0,
+      "children": []
+    },
+    {
+      "contentComment": "Móa có bài định hướng liền đúng lều báo, bao nhiêu cái văn minh không thấy đủy bút nó lên bài",
+      "usernameComment": "Ông Tám Khu Phố",
+      "userIDComment": "100072570215701",
+      "imageComment": null,
+      "countLike": 1,
+      "children": []
+    },
+    {
+      "contentComment": "Lại khóc thuê r",
+      "usernameComment": "Phạm Trung Hiếu",
+      "userIDComment": "100002384679242",
+      "imageComment": null,
+      "countLike": 0,
+      "children": []
+    },
+    {
+      "contentComment": "Nhờ ơn cấm vận của thằng Mẽo mà cả thế giới phải xếp hàng đổ xăng",
+      "usernameComment": "Triệu Tiến",
+      "userIDComment": "100010588803488",
+      "imageComment": null,
+      "countLike": 1,
+      "children": []
+    },
+    {
+      "contentComment": "các báo nhà ta lại đồng loạt lấy ví dụ minh họa cho việc lên TV mà mua xăng đây!",
+      "usernameComment": "Vo Tien Sinh",
+      "userIDComment": "100001630054008",
+      "imageComment": null,
+      "countLike": 1,
+      "children": []
+    },
+    {
+      "contentComment": "Đấy thấy chưa, bên Phập nó còn khổ thế, bên mình còn sướng chán , kêu ca cái zè ",
+      "usernameComment": "Nguyễn Anh Quân",
+      "userIDComment": "100004109102982",
+      "imageComment": null,
+      "countLike": 0,
+      "children": []
+    },
+    {
+      "contentComment": "Minh Hoàng qua Pháp đổ xăng đi ",
+      "usernameComment": "Huỳnh Bảo",
+      "userIDComment": "100054627293125",
+      "imageComment": null,
+      "countLike": 1,
+      "children": [
+        {
+          "usernameComment": "Minh Hoàng",
+          "userIDComment": "100006514233611",
+          "contentComment": "Huỳnh Bảo Minh Hoàng Phóng Viên Thường Trú Tại HCM",
+          "imageComment": "https://scontent.fsgn5-2.fna.fbcdn.net/v/t39.30808-6/311587708_3609589279268178_6972347791801896252_n.jpg?stp=dst-jpg_p280x280&_nc_cat=105&ccb=1-7&_nc_sid=dbeb18&_nc_ohc=j_vE8xbe6hMAX-ZnfMT&_nc_ht=scontent.fsgn5-2.fna&oh=00_AT97SOiRkbw6EQv3_WZkh4FGxgwXzo8aN-BNZu6HvLpeVw&oe=634A570B",
+          "countLike": 1
+        }
+      ]
+    },
+    {
+      "contentComment": "Bác không biết tính năng hẹn giờ gửi Gmail à ",
+      "usernameComment": "Tuấn Lee",
+      "userIDComment": "100012766021595",
+      "imageComment": null,
+      "countLike": 0,
+      "children": []
+    },
+    {
+      "contentComment": "Nguyễn Nguyên Sâm :))",
+      "usernameComment": "Dinh Tri Cuong",
+      "userIDComment": "100005680153360",
+      "imageComment": null,
+      "countLike": 1,
+      "children": [
+        {
+          "usernameComment": "Nguyễn Nguyên Sâm",
+          "userIDComment": "100007654634072",
+          "contentComment": "Dinh Tri Cuong :))) không ai biết tự ý đóng cửa không bán sẽ bị tước giấy hoạt động và bị phạt 500tr bonus ở tù 3 năm.",
+          "imageComment": null,
+          "countLike": 1
+        }
+      ]
+    },
+    {
+      "contentComment": "Cây xăng bên Thái đây ,vắng hoe \n đổ xăng màu cam Super xịn nhất",
+      "usernameComment": "Nguyen Vinh Hoang",
+      "userIDComment": "1158833488",
+      "imageComment": "https://scontent.fsgn5-2.fna.fbcdn.net/v/t39.30808-6/310295791_10226511110421545_2635915024001541713_n.jpg?stp=dst-jpg_s526x296&_nc_cat=105&ccb=1-7&_nc_sid=dbeb18&_nc_ohc=sNKENtyB-c0AX-YlSWC&_nc_ht=scontent.fsgn5-2.fna&oh=00_AT-VyHMfXwhY1RDTyzgNG7rvKwnTQwrR-drcfUqFBzFf2A&oe=6349B2AB",
+      "countLike": 0,
+      "children": []
+    },
+    {
+      "contentComment": "Khi nào báo đăng tin đê quốc Mỹ mình mới tin",
+      "usernameComment": "Huỳnh Bảo",
+      "userIDComment": "100000043026390",
+      "imageComment": null,
+      "countLike": "2",
+      "children": [
+        {
+          "usernameComment": "Elvis Nguyen",
+          "userIDComment": "570974390",
+          "contentComment": "Huỳnh Bảo mỹ...tho nha",
+          "imageComment": null,
+          "countLike": 0
+        },
+        {
+          "usernameComment": "Huỳnh Bảo",
+          "userIDComment": "100000043026390",
+          "contentComment": "Elvis Nguyen im i9",
+          "imageComment": null,
+          "countLike": 1
+        },
+        {
+          "usernameComment": "Elvis Nguyen",
+          "userIDComment": "570974390",
+          "contentComment": "Huỳnh Bảo nhớ.....",
+          "imageComment": null,
+          "countLike": 0
+        }
+      ]
+    },
+    {
+      "contentComment": "Nguyen Son Duong rút hết giấy phép kinh doanh lại ngoan ngay :))",
+      "usernameComment": "Lê Gia Dương Hoàng",
+      "userIDComment": "100028979032394",
+      "imageComment": null,
+      "countLike": "3",
+      "children": [
+        {
+          "usernameComment": "Nam Nguyen",
+          "userIDComment": "100001905189625",
+          "contentComment": "Nhớ clozLê Gia Dương Hoàng rút được để đổ tội chả rút vội ",
+          "imageComment": null,
+          "countLike": 1
+        }
+      ]
+    },
+    {
+      "contentComment": "Dạo gần đây được trải nghiệm cái gọi là Thời Bao Cấp như trong truyền thuyết ông bà\nDịch bệnh thì thiếu lương thực , Y tế Thì thiếu Vật tư , ngân hàng Dân xếp hàng lãnh tiền , bây giờ thì thiếu xăng dầu\nVài bữa nữa không biết tới gì nữa đây ",
+      "usernameComment": "Trung Bn",
+      "userIDComment": "100014385061573",
+      "imageComment": null,
+      "countLike": 1,
+      "children": []
+    },
+    {
+      "contentComment": "VN mình tốt quá toàn lo cho tụi tư bản chết rét, thiếu ăn, thiếu xăng.........sợ tụi nó chuẩn bị di cư qua VN tị nạn :)))",
+      "usernameComment": "Nguyễn Chí",
+      "userIDComment": "100001159955434",
+      "imageComment": null,
+      "countLike": 1,
+      "children": []
+    },
+    {
+      "contentComment": "May quá ! Yên tâm rồi ",
+      "usernameComment": "Phan Đăng Hợp",
+      "userIDComment": "100002371729868",
+      "imageComment": null,
+      "countLike": 0,
+      "children": []
+    },
+    {
+      "contentComment": "09:32\nAI ĐANG CÓ NHU CẦU VAY VỐN, VƯỚNG NỢ XẤU, NỢ CHÚ Ý LIÊN HỆ: 0879.947.234-VƯƠNG MẠNH HÙNG ĐỂ ĐƯỢC HƯỚNG DẪN HỖ TRỢ LÀM HỒ SƠ KHOẢN VAY TỪ 20TR-500TR, GIẢI NGÂN TRONG NGÀY.",
+      "usernameComment": "Đặng Xuân Hoa",
+      "userIDComment": "100052175559287",
+      "imageComment": null,
+      "countLike": 0,
+      "children": []
+    },
+    {
+      "contentComment": "Lên cái bài cho ổn định nhân tâm :)))))",
+      "usernameComment": "Linh Pham",
+      "userIDComment": "100001292130901",
+      "imageComment": null,
+      "countLike": 0,
+      "children": []
+    },
+    {
+      "contentComment": "Ai tin chớ tôi không tin mấy tờ báo trong nước",
+      "usernameComment": "Khang Huy",
+      "userIDComment": "100044773451750",
+      "imageComment": null,
+      "countLike": "2",
+      "children": []
+    },
+    {
+      "contentComment": "Icon Facebook",
+      "usernameComment": "Khang Huy",
+      "userIDComment": "100044773451750",
+      "imageComment": "https://scontent.fsgn5-8.fna.fbcdn.net/v/t39.30808-6/311218625_652670586235384_2643547840796161106_n.jpg?stp=dst-jpg_s851x315&_nc_cat=109&ccb=1-7&_nc_sid=dbeb18&_nc_ohc=oAkenTsiDKEAX9gype7&tn=dxKXh3DguKD7uzim&_nc_ht=scontent.fsgn5-8.fna&oh=00_AT-qpLjxFtmljwDgp6OoETby9xSzOpBqNzjhmk8k1k1nXw&oe=634A9908",
+      "countLike": 0,
+      "children": [
+        {
+          "usernameComment": "Khang Huy",
+          "userIDComment": "100044773451750",
+          "contentComment": "Cũng là tờ Zing",
+          "imageComment": null,
+          "countLike": 0
+        }
+      ]
+    },
+    {
+      "contentComment": "Đang chấm KPI",
+      "usernameComment": "Nguyễn Đăng Tiến",
+      "userIDComment": "100000065831684",
+      "imageComment": null,
+      "countLike": "2",
+      "children": [
+        {
+          "usernameComment": "Cuong Viet Le",
+          "userIDComment": "100000909159125",
+          "contentComment": "Nguyễn Đăng Tiến đài rfi có nói đó anh!",
+          "imageComment": null,
+          "countLike": 0
+        }
+      ]
+    },
+    {
+      "contentComment": "Định hướng",
+      "usernameComment": "Quốc Trung",
+      "userIDComment": "100011342902579",
+      "imageComment": null,
+      "countLike": 0,
+      "children": []
+    },
+    {
+      "contentComment": "Người cầu tiến thì luôn nhìn những người làm tốt hơn mình để học theo. Còn ngược lại chỉ biết nhòm ngó cái kém hơn thì cả đời cũng chỉ là con ếch ngồi đáy giếng.",
+      "usernameComment": "Khanh Chau",
+      "userIDComment": "100003546264305",
+      "imageComment": null,
+      "countLike": 1,
+      "children": []
+    },
+    {
+      "contentComment": "Lol báo đời",
+      "usernameComment": "Vũ Khắc Tiệp",
+      "userIDComment": "100016472445303",
+      "imageComment": null,
+      "countLike": 0,
+      "children": []
+    },
+    {
+      "contentComment": "Nhà báo nói láo ăn tiền",
+      "usernameComment": "Lý Đạt Hào",
+      "userIDComment": "100004960328289",
+      "imageComment": null,
+      "countLike": 0,
+      "children": [
+        {
+          "usernameComment": "Nguyễn Anh Tuấn",
+          "userIDComment": "100001976198473",
+          "contentComment": "Lý Đạt Hào em nói zing xàm, thằng kia nó nói em ngây thơ.",
+          "imageComment": null,
+          "countLike": 0
+        }
+      ]
+    },
+    {
+      "contentComment": "Nguyen Thien Nhan h cái gì cũng so sánh đc",
+      "usernameComment": "Trần Công Minh",
+      "userIDComment": "100049951224305",
+      "imageComment": null,
+      "countLike": 0,
+      "children": []
+    },
+    {
+      "contentComment": "Cũng ko có gì căng thẳng lắm, mình mới xếp hàng tầm 30p thôi, ai cũng chờ đợi với nụ cười trên môi và thái độ lạc quan ",
+      "usernameComment": "Leon Nguyễn",
+      "userIDComment": "100002834312259",
+      "imageComment": "https://scontent.fsgn5-14.fna.fbcdn.net/v/t39.30808-6/310806530_5113625928741834_588511064885401209_n.jpg?stp=dst-jpg_s526x296&_nc_cat=106&ccb=1-7&_nc_sid=dbeb18&_nc_ohc=azBkO4DmsM8AX8FBkDV&tn=dxKXh3DguKD7uzim&_nc_ht=scontent.fsgn5-14.fna&oh=00_AT-Hm7XATeRtSQGYIa4YkmoSxTu0Oi85V3TF8Dm6T0iz6A&oe=6349252D",
+      "countLike": 0,
+      "children": []
+    },
+    {
+      "contentComment": "chân dung tài xế Thierry khi phải xếp hàng quá lâu :))",
+      "usernameComment": "Bo Be Bong",
+      "userIDComment": "736892834",
+      "imageComment": "https://scontent.fsgn5-14.fna.fbcdn.net/v/t39.30808-6/311586914_10161846413982835_7247602323865536117_n.jpg?stp=dst-jpg_s851x315&_nc_cat=101&ccb=1-7&_nc_sid=dbeb18&_nc_ohc=KhsvlPZFTFwAX-MI_wN&_nc_ht=scontent.fsgn5-14.fna&oh=00_AT_UP5sm_x5XiZT2xLoboslNnsQlQDyui9zYd48P2WU-kg&oe=634AB6F8",
+      "countLike": 1,
+      "children": []
+    },
+    {
+      "contentComment": "Hên quá chỗ mình vẫn ra hô tràn bình dc",
+      "usernameComment": "Thu Ny",
+      "userIDComment": "100055811355979",
+      "imageComment": null,
+      "countLike": 1,
+      "children": []
+    },
+    {
+      "contentComment": "Mọi người yên tâm rồi nhé ",
+      "usernameComment": "Trach Huynh",
+      "userIDComment": "100004527061100",
+      "imageComment": null,
+      "countLike": 0,
+      "children": []
+    },
+    {
+      "contentComment": "Chịu khó đưa tin quá",
+      "usernameComment": "Sinh Nguyen",
+      "userIDComment": "100004081355162",
+      "imageComment": null,
+      "countLike": 1,
+      "children": []
+    },
+    {
+      "contentComment": "Báo tào lao",
+      "usernameComment": "Tốt Văn Trương",
+      "userIDComment": "100000052219661",
+      "imageComment": null,
+      "countLike": 1,
+      "children": []
+    },
+    {
+      "contentComment": "Dẫn chứng đường link báo nào pháp viết?",
+      "usernameComment": "Nguyễn Trường",
+      "userIDComment": "100002987423635",
+      "imageComment": null,
+      "countLike": 0,
+      "children": []
+    },
+    {
+      "contentComment": "Tội mấy a pháp vl",
+      "usernameComment": "Nguyễn Phương",
+      "userIDComment": "100004335879933",
+      "imageComment": null,
+      "countLike": 0,
+      "children": []
+    }
+  ],
+  "user": "Leon Nguyễn",
+  "date": "",
+  "contentList": "<div dir=\"auto\" style=\"text-align: start;\">Zinh lên bài rồi ae yên tâm, Pháp xa xôi còn xếp hàng, ae chịu khó tí <span class=\"x3nfvp2 x1j61x8r x1fcty0u xdj266r xhhsvwb xat24cr xgzva0m xxymvpz xlup9mm x1kky2od\"><img height=\"16\" width=\"16\" alt=\"😂\" referrerpolicy=\"origin-when-cross-origin\" src=\"https://static.xx.fbcdn.net/images/emoji.php/v9/t29/1.5/16/1f602.png\"></span> ( mà lên bài lúc 4:00 sáng, nhà báo tăng ca ghê quá) </div><div dir=\"auto\" style=\"text-align: start;\"><span><a class=\"x1i10hfl xjbqb8w x6umtig x1b1mbwd xaqea5y xav7gou x9f619 x1ypdohk xt0psk2 xe8uvvx xdj266r x11i5rnm xat24cr x1mh8g0r xexx8yu x4uap5 x18d9i69 xkhd6sd x16tdsg8 x1hl2dhg xggy1nq x1a2a7pz xt0b8zv x1fey0fg\" href=\"https://zingnews.vn/nguoi-phap-xep-hang-3-tieng-cho-do-xang-post1363946.html?fbclid=IwAR2KtpcD_V_Sj2WP7mFwCRExqdyQWcy-r3TY8o9FtLc3g_7IA6zuAlfmkVI\" rel=\"nofollow noopener\" role=\"link\" tabindex=\"0\" target=\"_blank\">https://zingnews.vn/nguoi-phap-xep-hang-3-tieng-cho-do...</a></span></div>",
+  "linkImgs": [
+    "https://scontent.fsgn5-6.fna.fbcdn.net/v/t39.30808-6/311453148_5112655792172181_5056000948721257621_n.jpg?stp=cp6_dst-jpg_p843x403&_nc_cat=1&ccb=1-7&_nc_sid=5cd70e&_nc_ohc=XuFjoBJig8cAX_EEOIm&_nc_ht=scontent.fsgn5-6.fna&oh=00_AT_arpTxZeKuy7R556T8nazv1XgJFRZk6tO6B6E63Q7-hw&oe=634A4FB8"
+  ],
+  "countLike": "848",
+  "linkPost": "https://www.facebook.com/groups/Grouptinhte/posts/4073371872786727/",
+  "idPost": "4073371872786727",
+  "imageList": [],
+  "countComment": "202",
+  "user_id": "100002834312259",
+  "count_comments_config": 195,
+  "countShare": "6",
+  "token": "NAcOJZXAW1PXYTLRqiMohWzZjjVVdIoIJxdl8OlguGKy3G6mEBeoXVA:9:1665475757"
+}

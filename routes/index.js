@@ -6,18 +6,26 @@ router.use(bodyParser.urlencoded({ extended: true }));
 var facebook = require('../controllers/api/facebook');
 var facebook1 = require('../controllers/api/facebook1.js');
 const video = require('../controllers/sitemap');
-var timeout = require('connect-timeout');
 const fs = require('fs');
-var kue = require('kue'),
-  redis = require('redis');
-kue.redis.createClient = function () {
-  var client = redis.createClient({ url: 'redis://redis:6379' });
-  client.on('error', function (err) {
-    console.log('trolllolo');
-  });
-  return client;
-};
-jobs = kue.createQueue();
+const Queue = require('bull');
+const crypto = require('crypto');
+
+const queue = new Queue('facebook', { redis: { port: 6379, host: '127.0.0.1' } });
+const queue1 = new Queue('facebook1', { redis: { port: 6379, host: '127.0.0.1' } });
+
+// main().catch(console.error);
+// var q = kue.createQueue({
+//   prefix: 'q',
+//   redis: {
+//     port: 6379,
+//     host: '127.0.0.1',
+//     db: 3, // if provided select a non-default redis db
+//     options: {
+//       // see https://github.com/mranney/node_redis#rediscreateclient
+//     },
+//   },
+// });
+// const queue = kue.createQueue();
 const initializeApp = require('firebase/app');
 
 const getDatabase = require('firebase/database').getDatabase;
@@ -60,7 +68,7 @@ router.get('/', async function (req, res, next) {
   res.json({ aaa: 'aaaa' });
 });
 // router.get('/login', login.login);
-router.post('/post', facebook);
+// router.post('/post', facebook);
 router.post('/post2', async (req, res, next) => {
   var arr = ['success', 'error'];
   res.json({ data: arr[Math.floor(Math.random() * arr.length)], status: 'adsdasds' });
@@ -86,26 +94,39 @@ router.get('/post_link', async function (req, res, next) {
   });
 });
 
-router.post('/post1', facebook1);
-router.post('/add', video);
-router.get('/test', async function (req, res, next) {
-  // queue
-  //   .on('job enqueue', function (id, type) {
-  //     console.log('Job %s got queued of type %s', id, type);
-  //     new Promise((r) => setTimeout(r, 4000));
-  //     res.json({ data: 'error', statusbar: 'ok' });
-  //   })
-  //   .on('job complete', function (id, result) {
-  //     kue.Job.get(id, function (err, job) {
-  //       if (err) return;
-  //       job.remove(function (err) {
-  //         if (err) throw err;
-  //         console.log('removed completed job #%d', job.id);
-  //       });
-  //     });
-  //   });
+router.post('/post1', async (req, res) => {
+  const jobId = crypto.randomBytes(10).toString('hex');
+  const currentTime = new Date().getTime();
+  const processAt = new Date(req.body.datetime).getTime();
+  const delay = processAt - currentTime;
+  await queue1.add({ data: req.body }, { delay: delay, jobId: jobId });
+  res.json({ data: 'success', statusbar: 'ok', jobId: jobId });
 });
+router.post('/add', video);
+router.post('/post', async function (req, res, next) {
+  const jobId = crypto.randomBytes(10).toString('hex');
+  const currentTime = new Date().getTime();
+  const processAt = new Date(req.body.datetime).getTime();
+  const delay = processAt - currentTime;
+  await facebook(req.body);
+  //await queue.add({ data: req.body }, { delay: delay, jobId: jobId });
+  res.json({ data: 'success', statusbar: 'ok', jobId: jobId });
+});
+queue.process(async (job, done) => {
+  await new Promise((r) => setTimeout(r, 4000));
+  console.log(job.data);
+  // if (job.data.url.indexOf('posts') > -1) {
+  //   await facebook1(job);
+  // }
 
+  done();
+});
+queue1.process(async (job, done) => {
+  await new Promise((r) => setTimeout(r, 4000));
+  console.log(job.data);
+  //await facebook1(job);
+  done();
+});
 router.get('/post1', async function (req, res, next) {
   const url = req.body.url;
   url_id = url.split('/');
