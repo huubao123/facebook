@@ -108,9 +108,11 @@ router.post('/post', async function (req, res, next) {
   const currentTime = new Date().getTime();
   const processAt = new Date(req.body.datetime).getTime();
   const delay = processAt - currentTime;
+
+  res.json({ data: 'success', statusbar: 'ok', jobId: jobId });
   await facebook(req.body);
   //await queue.add({ data: req.body }, { delay: delay, jobId: jobId });
-  res.json({ data: 'success', statusbar: 'ok', jobId: jobId });
+  
 });
 queue.process(async (job, done) => {
   await new Promise((r) => setTimeout(r, 4000));

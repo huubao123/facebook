@@ -251,9 +251,9 @@ module.exports = async function main(req) {
       args: ['--start-maximized'],
       product: 'chrome',
       devtools: false,
-      executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
+      //executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
 
-      //executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+      executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
     });
     const page = await browser.newPage();
     const pages = await browser.pages();
@@ -538,7 +538,7 @@ module.exports = async function main(req) {
           const postListRef = ref(
             database,
             'post_type/' +
-              post_type +
+              post_type +'/' +
               name.replace(/[#:.,$]/g, '') +
               '/' +
               result[i].post_link.split('/')[6]
@@ -669,12 +669,12 @@ async function getlink(page, conten_length, like, comment, share) {
           });
           if (
             parseInt(count_like.toString().split(' ')[0].replace('K', '00').replace(',', '')) <
-              10 ||
+              like ||
             parseInt(count_comment.toString().split(' ')[0].replace('K', '00').replace(',', '')) <
-              10 ||
+              comment ||
             parseInt(count_share.toString().split(' ')[0].replace('K', '00').replace(',', '')) <
-              10 ||
-            content.length < 10
+              share ||
+            content.length < conten_length
           ) {
             console.log(asd);
           }
@@ -758,26 +758,26 @@ async function getdata(page, cmt_lengths) {
       post = document.querySelectorAll('[role="main"]')[2];
       if (
         post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-          .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+          .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
           .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[1].childNodes[0]
-          .childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+          .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
       ) {
         contens =
           post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
             .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-            .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[1].childNodes[0];
+            .childNodes[0].childNodes[0].childNodes[0].childNodes[1].childNodes[0];
       }
     } catch (e) {
       try {
         if (
-          post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+          post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
             .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
             .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[7].childNodes[0]
         ) {
           contens =
             post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
               .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-              .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[7].childNodes[0];
+              .childNodes[0].childNodes[0].childNodes[0].childNodes[7].childNodes[0];
         }
       } catch (e) {
         if (
@@ -794,7 +794,13 @@ async function getdata(page, cmt_lengths) {
         }
       }
     }
-
+    if(contens = ''){
+      post.forEach((e)=>{
+        if(e.childNodes.length >13){
+            contens = e.childNodes[7].childNodes[0]
+        }
+    })
+    }
     try {
       // contens.childNodes[1].childNodes[0].childNodes[1].childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes.forEach(
       //   (ele) => {
