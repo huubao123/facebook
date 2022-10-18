@@ -122,9 +122,9 @@ queue.process(async (job, done) => {
   done();
 });
 queue1.process(async (job, done) => {
-  await new Promise((r) => setTimeout(r, 4000));
-  console.log(job.data);
-  //await facebook1(job);
+ // await new Promise((r) => setTimeout(r, 4000));
+  // console.log(job.data);
+  await facebook1(job);
   done();
 });
 router.get('/post1', async function (req, res, next) {

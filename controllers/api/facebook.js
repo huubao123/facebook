@@ -263,6 +263,7 @@ module.exports = async function main(req) {
       //executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
     });
     const page = await browser.newPage();
+    await page.setDefaultNavigationTimeout(0);
     const pages = await browser.pages();
     if (pages.length > 1) {
       await pages[0].close();
