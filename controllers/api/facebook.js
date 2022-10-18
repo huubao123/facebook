@@ -225,8 +225,8 @@ module.exports = async function main(req) {
       ignoreHTTPSErrors: true,
       ignoreDefaultArgs: ['--disable-extensions'],
       args: [
-        // '--no-sandbox',
-        // '--disable-setuid-sandbox',
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
         '--disable-dev-shm-usage',
         '--disable-extensions',
         '--aggressive-cache-discard',
@@ -254,10 +254,12 @@ module.exports = async function main(req) {
       headless: false,
       defaultViewport: null,
       args: ['--start-maximized'],
-      product: 'chrome',
-      devtools: false,
-      executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
 
+      //product: 'chrome',
+      devtools: true,
+      //executablePath : 'C:/Program Files/Mozilla Firefox/firefox.exe'
+      executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
+      //executablePath: '"C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe"',
       //executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
     });
     const page = await browser.newPage();
@@ -278,7 +280,7 @@ module.exports = async function main(req) {
       await page.goto('https://www.facebook.com', {
         waitUntil: 'load',
       });
-      await page.type('#email', 'huubao034@gmail.com');
+      await page.type('#email', 'huub3999@gmail.com');
       await page.type('#pass', 'huubao123');
       await page.keyboard.press('Enter');
 
@@ -330,7 +332,7 @@ module.exports = async function main(req) {
           //   console.log('The file has been saved!');
           // });
           await page.goto(result[i].post_link, {
-            waitUntil: 'networkidle2',
+            waitUntil: 'load',
           });
           await page.evaluate(async () => {
             let div = document.querySelectorAll('[role = "button"]');
@@ -671,15 +673,15 @@ async function getlink(page, conten_length, like, comment, share) {
           let posts_href = '';
           let count_like = (count_comment = count_share = count_content = 0);
           let content = '';
-          let lengths = post[i].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-            .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[7]
-            .childNodes[0].childNodes
-            ? post[i].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[7].childNodes[0]
-                .childNodes
-            : post[i].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[1].childNodes[0]
-                .childNodes;
+          let lengths =
+            post[i].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+              .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[7] !== undefined
+              ? post[i].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                  .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[7]
+                  .childNodes[0].childNodes
+              : post[i].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                  .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[1]
+                  .childNodes[0].childNodes;
           lengths[2].childNodes.forEach((element, index) => {
             if (element.className == '') {
               element.childNodes[0].childNodes.forEach(function (node) {
@@ -756,6 +758,7 @@ async function getlink(page, conten_length, like, comment, share) {
           console.log(error);
         }
       }
+      console.log(data);
       data.filter(async function (e) {
         return e;
       });
