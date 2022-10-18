@@ -290,6 +290,7 @@ module.exports = async function main(req) {
       await page.goto(url, {
         waitUntil: 'load',
       });
+      //aaa
       await page.waitForFunction('document.querySelector("h1")');
     } catch (e) {
       console.log(e);
