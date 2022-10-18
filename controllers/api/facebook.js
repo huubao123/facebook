@@ -258,9 +258,9 @@ module.exports = async function main(req) {
       //product: 'chrome',
       devtools: false,
       //executablePath : 'C:/Program Files/Mozilla Firefox/firefox.exe'
-      executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
+      //executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
       //executablePath: '"C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe"',
-      //executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+      executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
     });
     const page = await browser.newPage();
     await page.setDefaultNavigationTimeout(0);
