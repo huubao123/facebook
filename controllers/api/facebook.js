@@ -256,11 +256,11 @@ module.exports = async function main(req) {
       args: ['--start-maximized'],
 
       //product: 'chrome',
-      devtools: true,
+      devtools: false,
       //executablePath : 'C:/Program Files/Mozilla Firefox/firefox.exe'
-      executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
+      //executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
       //executablePath: '"C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe"',
-      //executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+      executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
     });
     const page = await browser.newPage();
     const pages = await browser.pages();
@@ -807,16 +807,23 @@ async function getdata(page, cmt_lengths) {
     let token = require('DTSGInitialData').token;
     let count_like_cmt = (count_like_cmtchild = count_like_cmtchild2 = 0);
     //
-    document.querySelectorAll('div').forEach((e) => {
-      if (e.hasAttribute('aria-describedby')) {
-        post = e[0];
-      }
-    });
+    // document.querySelectorAll('div').forEach((e) => {
+    //   if (e.hasAttribute('aria-describedby')) {
+    //     post = e[0];
+    //   }
+    // });
 
     let contens = '';
-
-    try {
-      post = document.querySelectorAll('[role="main"]')[2];
+    let post = document.querySelectorAll('[role="main"]')[2];
+    if(!post){
+      let post1 = document.querySelectorAll('[role="article"]')[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+      if(post1.childNodes.length >5){
+        contens = post1.childNodes[7].childNodes[0]
+      }else{
+        contens = post1.childNodes[1].childNodes[0]
+      }
+    }else{
+       try {
       if (
         post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
           .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
@@ -855,6 +862,8 @@ async function getdata(page, cmt_lengths) {
         }
       }
     }
+    }
+   
     // if(contens = ''){
     //   post.forEach((e)=>{
     //     if(e.childNodes.length >13){
