@@ -319,9 +319,11 @@ module.exports = async function main(req) {
       });
       let process = 0;
       for (let i = 0; i < result.length; i++) {
-        process += Math.round((result.length * 80) / 100) / parseInt(result.length);
+        process +=
+          (Math.round(Math.round((result.length * 80) / 100) / result.length) / result.length) *
+          100;
         console.log('Processing ' + (parseInt(process.toFixed(2)) / result.length) * 100);
-        await req.progress((parseInt(process.toFixed(2)) / result.length) * 100 + 20);
+        await req.progress(parseInt(process.toFixed(2)));
         try {
           // fs.writeFile('item.txt', JSON.stringify(result, null, 2), (err) => {
           //   if (err) throw err;s
