@@ -86,7 +86,8 @@ async function autoScrollpost(page) {
 
 module.exports = async function main(req) {
   try {
-    const url = req.data.data.url;
+    console.log(req.data.data);
+    const url = req.data.data.link;
     let url_group = '';
     for (let i = 0; i < 5; i++) {
       url_group += url.split('/')[i];
@@ -110,9 +111,6 @@ module.exports = async function main(req) {
       cmt_length: cmt_length,
       create_at: Date.now(),
     });
-    if (!url) {
-      res.json('url is required');
-    }
     if (!cmt_length) {
       cmt_length = -1;
     }
@@ -171,8 +169,7 @@ module.exports = async function main(req) {
       await page.goto('https://www.facebook.com', {
         waitUntil: 'load',
       });
-      res.json({ data: 'success', statusbar: craw_id });
-      await page.type('#email', 'huubao034@gmail.com');
+      await page.type('#email', 'huub3999@gmail.com');
       await page.type('#pass', 'huubao123');
       await page.keyboard.press('Enter');
 
@@ -188,9 +185,7 @@ module.exports = async function main(req) {
         waitUntil: 'networkidle2',
       });
       await page.waitForFunction('document.querySelector("h1")');
-    } catch (e) {
-      res.json({ data: 'error', statusbar: JSON.stringify(e) });
-    }
+    } catch (e) {}
 
     let result = await page.evaluate(() => {
       return document.querySelector('h1').textContent;
@@ -234,14 +229,200 @@ module.exports = async function main(req) {
           if (err) throw err;
           console.log('The file has been saved!');
         });
-        const app = initializeApp.initializeApp(firebaseConfig);
-        const database = getDatabase(app);
         const postListRef = ref(
           database,
           '/Listpost/' + name.replace(/[#:.,$]/g, '') + '/' + url.split('/')[6]
         );
 
         set(postListRef, {
+          user: result.user,
+          videos: result.videos,
+          contentList: result.contentList,
+          countComment: result.countComment,
+          countLike: result.countLike,
+          countShare: result.countShare,
+          user_id: result.user_id,
+          idPost: url.split('/')[6],
+          linkPost: url,
+          linkImgs: result.linkImgs,
+          commentList: result.commentList,
+          token: result.token,
+          count_comments_config: result.count_comments_config,
+          statusbar: 'active',
+          create_at: Date.now(),
+        });
+
+        const postListRefss = ref(
+          database,
+          'post_type/' + post_type + '/' + name.replace(/[#:.,$]/g, '') + '/' + url.split('/')[6]
+        );
+        let titles = '';
+        let short_descriptions = '';
+        let arrVid = null;
+        let arrImage = null;
+        let flagimage = true;
+        let flagvideo = true;
+        let short_description = result.contentList
+          ? result.contentList.replaceAll(/(<([^>]+)>)/gi, '')
+          : '';
+        for (let i = 0; i < 100; i++) {
+          let lengths = short_description.split(' ').length;
+          short_descriptions += short_description.split(' ')[i] + ' ';
+          if (lengths - 1 == i) {
+            break;
+          }
+        }
+        for (let i = 0; i < 100; i++) {
+          let lengths = short_description.length;
+          titles += short_description[i];
+          if (lengths - 1 == i) {
+            break;
+          }
+        }
+        if (result.videos.length > 2) {
+          arrVid = await Promise.all(
+            result.videos.map(async (video) => {
+              let result = await fetch(video);
+              result = await result.blob();
+              if (result.size / 1024 / 1024 > 1) {
+                return null;
+              }
+              let resultAddVid = await createMedia({
+                data: [
+                  {
+                    alt: result.post_link.split('/')[6] ? result.post_link.split('/')[6] : '',
+                    title: result.post_link.split('/')[6] ? result.post_link.split('/')[6] : '',
+                    file: result,
+                  },
+                ],
+              });
+              if (resultAddVid) {
+                return { link_video: resultAddVid.data.data[0].path };
+              } else {
+                flagvideo = false;
+                return;
+              }
+            })
+          );
+        }
+        if (result.imageList.length > 0) {
+          arrImage = await Promise.all(
+            result.imageList.map(async (image) => {
+              let result = await fetch(image);
+              result = await result.blob();
+              let resultAddImage = await createMedia({
+                data: [
+                  {
+                    alt: result.post_link.split('/')[6] ? result.post_link.split('/')[6] : '',
+                    title: result.post_link.split('/')[6] ? result.post_link.split('/')[6] : '',
+                    file: result,
+                  },
+                ],
+              });
+              if (resultAddImage) {
+                return resultAddImage.data.data[0];
+              } else {
+                flagimage = false;
+                return null;
+              }
+            })
+          );
+        }
+        if (arrImage && arrImage.length > 0) {
+          for (let j = 0; j < arrImage.length; j++) {
+            if (arrImage[j] === undefined) {
+              arrImage = undefined;
+              break;
+            }
+          }
+        }
+        let arrImages = arrImage && arrImage.length !== 0 ? arrImage[0].id : null;
+        let basic_fields = {
+          title: titles,
+          short_description: short_descriptions,
+          long_description: result.contentList
+            ? result.contentList.replaceAll('https://l.facebook.com/l.php?', '')
+            : '',
+          slug: '',
+          featured_image: result.linkImgs ? result.linkImgs[0] : '',
+          session_tags: {
+            tags: [],
+          },
+          categorialue: [],
+          key: '',
+          name: '',
+          featured_image: arrImages,
+          type: post_type,
+          attributes: [],
+          status: 'publish',
+          seo_tags: {
+            meta_title: 'New Post Facebook',
+            meta_description: 'New Post Facebook',
+          },
+        };
+        let custom_fields = {
+          video: result.videos,
+          date: result.date ? result.date : '',
+          post_id: result.idPost ? result.idPost : '',
+          post_link: result.linkPost ? result.linkPost : '',
+          user_id: result.user_id ? result.user_id : 'undefined',
+          user_name: result.user ? result.user : 'undefined',
+          count_like: result.countLike
+            ? parseInt(
+                result.countLike.toString().split(' ')[0].replace('K', '00').replace(',', '')
+              )
+            : 0,
+          count_comment: result.countComment
+            ? parseInt(
+                result.countComment.toString().split(' ')[0].replace('K', '00').replace(',', '')
+              )
+            : 0,
+          count_share: result.countShare
+            ? parseInt(
+                result.countShare.toString().split(' ')[0].replace('K', '00').replace(',', '')
+              )
+            : 0,
+          featured_image: result.linkImgs ? result.linkImgs : '',
+          comments: result.commentList
+            ? result.commentList.map((item) => ({
+                content: item.contentComment,
+                count_like: item.countLike
+                  ? parseInt(
+                      item.countLike.toString().split(' ')[0].replace('K', '00').replace(',', '')
+                    )
+                  : 0,
+                user_id: item.userIDComment,
+                user_name: item.usernameComment,
+                imgComment: item.imageComment ? item.imageComment : '',
+                children: item.children
+                  ? item.children.map((child) => ({
+                      content: child.contentComment,
+                      count_like: child.countLike
+                        ? child.countLike
+                            .toString()
+                            .split(' ')[0]
+                            .replace('K', '00')
+                            .replace(',', '')
+                        : 0,
+                      user_id: child.userIDComment,
+                      user_name: child.usernameComment,
+                      imageComment: child.imageComment ? child.imageComment : '',
+                    }))
+                  : [],
+              }))
+            : [],
+        };
+        data_post = {};
+        await set(postListRefss, {
+          basic_fields: basic_fields,
+          custom_fields: custom_fields,
+        });
+        const postListRefsss = ref(
+          database,
+          '/Listpost/' + name.replace(/[#:.,$]/g, '') + '/' + url.split('/')[6]
+        );
+
+        await set(postListRefsss, {
           user: result.user,
           videos: result.videos,
           contentList: result.contentList,
@@ -278,13 +459,23 @@ module.exports = async function main(req) {
       });
     } catch (e) {
       console.log(e);
+      console.log(e);
+      console.log('lỗi error');
       const app = initializeApp.initializeApp(firebaseConfig);
       const database = getDatabase(app);
       const postListRef = ref(
         database,
+        'post_type/' + post_type + '/' + name.replace(/[#:.,$]/g, '') + '/' + url.split('/')[6]
+      );
+      await set(postListRef, {
+        post_link: url,
+        error: 'error' + e,
+      });
+      const postListRefss = ref(
+        database,
         '/Listpost/' + name.replace(/[#:.,$]/g, '') + '/' + url.split('/')[6]
       );
-      set(postListRef, {
+      await set(postListRefss, {
         post_link: url,
         error: 'error' + e,
       });
@@ -293,8 +484,8 @@ module.exports = async function main(req) {
         '/craw_list/' + name.replace(/[#:.,$]/g, '') + '/' + craw_id
       );
       const newPostRef = push(postListRefs);
-      set(newPostRef, {
-        id: 1,
+      await set(newPostRef, {
+        id: i,
         post_link: url,
         statusbar: 'error' + e,
       });
@@ -340,55 +531,66 @@ async function getdata(page, cmt_lengths) {
     let token = require('DTSGInitialData').token;
     let count_like_cmt = (count_like_cmtchild = count_like_cmtchild2 = 0);
     //
-    document.querySelectorAll('div').forEach((e) => {
-      if (e.hasAttribute('aria-describedby')) {
-        post = e[0];
-      }
-    });
-
     let contens = '';
-
-    try {
-      post = document.querySelectorAll('[role="main"]')[2];
-      if (
-        post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-          .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-          .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[1].childNodes[0]
-          .childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-      ) {
-        contens =
-          post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-            .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-            .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[1].childNodes[0];
+    let post = document.querySelectorAll('[role="main"]')[2];
+    if (!post) {
+      let post1 =
+        document.querySelectorAll('[role="article"]')[0].childNodes[0].childNodes[0].childNodes[0]
+          .childNodes[0].childNodes[0];
+      if (post1.childNodes.length > 5) {
+        contens = post1.childNodes[7].childNodes[0];
+      } else {
+        contens = post1.childNodes[1].childNodes[0];
       }
-    } catch (e) {
+    } else {
       try {
         if (
           post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
             .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-            .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[7].childNodes[0]
+            .childNodes[0].childNodes[0].childNodes[0].childNodes[1].childNodes[0].childNodes[0]
+            .childNodes[0].childNodes[0].childNodes[0].childNodes[0]
         ) {
           contens =
             post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
               .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-              .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[7].childNodes[0];
+              .childNodes[0].childNodes[0].childNodes[0].childNodes[1].childNodes[0];
         }
       } catch (e) {
-        if (
-          document.querySelector('[aria-posinset="1"]').childNodes[0].childNodes[0].childNodes[0]
-            .childNodes[0].childNodes[0].childNodes[7]
-        ) {
-          contens =
+        try {
+          if (
+            post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+              .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+              .childNodes[0].childNodes[0].childNodes[0].childNodes[7].childNodes[0]
+          ) {
+            contens =
+              post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[7]
+                .childNodes[0];
+          }
+        } catch (e) {
+          if (
             document.querySelector('[aria-posinset="1"]').childNodes[0].childNodes[0].childNodes[0]
-              .childNodes[0].childNodes[0].childNodes[7].childNodes[0];
-        } else {
-          contens =
-            document.querySelector('[aria-posinset="1"]').childNodes[0].childNodes[0].childNodes[0]
-              .childNodes[0].childNodes[0].childNodes[1].childNodes[0];
+              .childNodes[0].childNodes[0].childNodes[7]
+          ) {
+            contens =
+              document.querySelector('[aria-posinset="1"]').childNodes[0].childNodes[0]
+                .childNodes[0].childNodes[0].childNodes[0].childNodes[7].childNodes[0];
+          } else {
+            contens =
+              document.querySelector('[aria-posinset="1"]').childNodes[0].childNodes[0]
+                .childNodes[0].childNodes[0].childNodes[0].childNodes[1].childNodes[0];
+          }
         }
       }
     }
-
+    // if(contens = ''){
+    //   post.forEach((e)=>{
+    //     if(e.childNodes.length >13){
+    //         contens = e.childNodes[7].childNodes[0]
+    //     }
+    // })
+    // }
     try {
       // contens.childNodes[1].childNodes[0].childNodes[1].childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes.forEach(
       //   (ele) => {
