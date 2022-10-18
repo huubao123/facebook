@@ -322,7 +322,7 @@ module.exports = async function main(req) {
         process +=
           (Math.round(Math.round((result.length * 80) / 100) / result.length) / result.length) *
           100;
-        console.log('Processing ' + (parseInt(process.toFixed(2)) / result.length) * 100);
+        console.log('Processing ' + parseInt(process.toFixed(2)));
         await req.progress(parseInt(process.toFixed(2)));
         try {
           // fs.writeFile('item.txt', JSON.stringify(result, null, 2), (err) => {
@@ -546,7 +546,7 @@ module.exports = async function main(req) {
               '/Listpost/' + name.replace(/[#:.,$]/g, '') + '/' + url.split('/')[6]
             );
 
-            set(postListRefss, {
+            await set(postListRefss, {
               user: results.user,
               videos: results.videos,
               contentList: results.contentList,
@@ -593,7 +593,7 @@ module.exports = async function main(req) {
               '/' +
               result[i].post_link.split('/')[6]
           );
-          set(postListRef, {
+          await set(postListRef, {
             post_link: result[i].post_link,
             error: 'error' + e,
           });
@@ -601,7 +601,7 @@ module.exports = async function main(req) {
             database,
             '/Listpost/' + name.replace(/[#:.,$]/g, '') + '/' + url.split('/')[6]
           );
-          set(postListRefss, {
+          await set(postListRefss, {
             post_link: url,
             error: 'error' + e,
           });
@@ -610,7 +610,7 @@ module.exports = async function main(req) {
             '/craw_list/' + name.replace(/[#:.,$]/g, '') + '/' + craw_id
           );
           const newPostRef = push(postListRefs);
-          set(newPostRef, {
+          await set(newPostRef, {
             id: i,
             post_link: result[i].post_link,
             statusbar: 'error' + e,
