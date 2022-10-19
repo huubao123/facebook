@@ -285,7 +285,7 @@ module.exports = async function main(req) {
       await page.goto('https://www.facebook.com', {
         waitUntil: 'load',
       });
-      await page.type('#email', 'huubao034@gmail.com');
+      await page.type('#email', 'huubao3999@gmail.com');
       await page.type('#pass', 'huubao123');
       await page.keyboard.press('Enter');
 
