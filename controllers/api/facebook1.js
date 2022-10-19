@@ -148,7 +148,7 @@ module.exports = async function main(req) {
       defaultViewport: null,
       args: ['--start-maximized'],
       product: 'chrome',
-      devtools: true,
+      devtools: false,
       executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
       //executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
     });

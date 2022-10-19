@@ -41,8 +41,9 @@ async function autoScrollpost(page) {
       let totalHeight = 0;
       let distance = 500;
       let n = 0;
-
+      let time = 0;
       let timer = setInterval(async () => {
+        time += 1;
         let scrool = new Array();
         let scrollHeight = document.body.scrollHeight;
         // window.scrollBy(0, distance);
@@ -60,7 +61,10 @@ async function autoScrollpost(page) {
           clearInterval(timer);
           resolve();
         }
-
+        if (time == 120) {
+          clearInterval(timer);
+          resolve();
+        }
         let isbottom = document.body.scrollHeight;
         let istop = parseInt(document.documentElement.scrollTop + window.innerHeight) + 1;
         if (isbottom === istop) {
