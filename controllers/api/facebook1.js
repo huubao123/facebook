@@ -471,14 +471,6 @@ module.exports = async function main(req) {
       console.log('lỗi error');
       const app = initializeApp.initializeApp(firebaseConfig);
       const database = getDatabase(app);
-      const postListRef = ref(
-        database,
-        'post_type/' + post_type + '/' + name.replace(/[#:.,$]/g, '') + '/' + url.split('/')[6]
-      );
-      await set(postListRef, {
-        post_link: url,
-        error: 'error' + e,
-      });
       const postListRefss = ref(
         database,
         '/Listpost/' + name.replace(/[#:.,$]/g, '') + '/' + url.split('/')[6]
