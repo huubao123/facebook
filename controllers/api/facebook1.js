@@ -78,7 +78,7 @@ async function autoScrollpost(page) {
           clearInterval(timer);
           resolve();
         }
-      }, 1000);
+      }, 2000);
     });
   });
   return;
@@ -169,7 +169,7 @@ module.exports = async function main(req) {
       await page.goto('https://www.facebook.com', {
         waitUntil: 'load',
       });
-      await page.type('#email', 'huub3999@gmail.com');
+      await page.type('#email', 'huubao034@gmail.com');
       await page.type('#pass', 'huubao123');
       await page.keyboard.press('Enter');
 
@@ -204,6 +204,13 @@ module.exports = async function main(req) {
       });
       // await page.waitForSelector('*');
       // await new Promise((r) => setTimeout(r, 4000));
+      try {
+        await page.evaluate(async () => {
+          document.querySelectorAll('[aria-label="Viết bình luận"]').forEach((e) => {
+            e.scrollIntoView();
+          });
+        });
+      } catch (err) {}
       await page.evaluate(async () => {
         let div = document.querySelectorAll('[role = "button"]');
         for (let i = 0; i < div.length; i++) {
@@ -223,6 +230,7 @@ module.exports = async function main(req) {
           }
         }
       });
+
       await autoScrollpost(page);
       await getdata(page, cmt_length).then(async function (result) {
         fs.writeFile('item1.txt', JSON.stringify(result, null, 2), (err) => {
@@ -485,7 +493,6 @@ module.exports = async function main(req) {
       );
       const newPostRef = push(postListRefs);
       await set(newPostRef, {
-        id: i,
         post_link: url,
         statusbar: 'error' + e,
       });
