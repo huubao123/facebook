@@ -206,9 +206,7 @@ module.exports = async function main(req) {
       // await new Promise((r) => setTimeout(r, 4000));
       try {
         await page.evaluate(async () => {
-          document.querySelectorAll('[aria-label="Viết bình luận"]').forEach((e) => {
-            e.scrollIntoView();
-          });
+          document.querySelector('[aria-label="Viết bình luận"]').scrollIntoView();
         });
       } catch (err) {}
       await page.evaluate(async () => {

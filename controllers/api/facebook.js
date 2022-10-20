@@ -262,9 +262,9 @@ module.exports = async function main(req) {
       //product: 'chrome',
       devtools: false,
       //executablePath : 'C:/Program Files/Mozilla Firefox/firefox.exe'
-      //executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
+      executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
       //executablePath: '"C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe"',
-      executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+      //executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
     });
     const page = await browser.newPage();
     await page.setDefaultNavigationTimeout(0);
@@ -321,7 +321,7 @@ module.exports = async function main(req) {
     // });
 
     await getlink(page, conten_length, like, comment, share).then(async function (result) {
-      if (result.ismain || result.iscate || result.iscomment || result.iscontent || result.isuser) {
+      if (!result.ismain || !result.iscate || !result.iscomment || !result.iscontent || !result.isuser) {
         const error = ref(databases, 'Error/' + name.replace(/[#:.,$]/g, ''));
         await set(error, {
           name: result.linkPost,
@@ -351,6 +351,13 @@ module.exports = async function main(req) {
           await page.goto(result[i].post_link, {
             waitUntil: 'load',
           });
+          try {
+            await page.evaluate(async () => {
+              document.querySelector('[aria-label="Viết bình luận"]').forEach((e) => {
+                e.scrollIntoView();
+              });
+            });
+          } catch (err) {}
           await page.evaluate(async () => {
             let div = document.querySelectorAll('[role = "button"]');
             for (let i = 0; i < div.length; i++) {
@@ -661,7 +668,7 @@ module.exports = async function main(req) {
       //   });
       // });
     });
-    //await browser.close();
+    await browser.close();
   } catch (err) {
     console.log('lỗi server', err);
   }
