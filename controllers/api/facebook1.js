@@ -448,7 +448,7 @@ module.exports = async function main(req) {
             : [],
         };
         data_post = {};
-        await bigquery(basic_fields, custom_fields);
+        //await bigquery(basic_fields, custom_fields);
         await set(postListRefss, {
           basic_fields: basic_fields,
           custom_fields: custom_fields,

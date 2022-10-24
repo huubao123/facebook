@@ -284,7 +284,7 @@ module.exports = async function main(req) {
       await page.goto('https://www.facebook.com', {
         waitUntil: 'load',
       });
-      await page.type('#email', 'huubao3999@gmail.com');
+      await page.type('#email', 'huubao4000@gmail.com');
       await page.type('#pass', 'huubao123');
       await page.keyboard.press('Enter');
 
@@ -337,13 +337,20 @@ module.exports = async function main(req) {
           //   console.log('The file has been saved!');
           // });
           await page.goto(result[i].post_link, {
-            waitUntil: 'load',
+            waitUntil: 'networkidle2',
           });
           try {
             await page.evaluate(async () => {
-              document.querySelector('[aria-label="Viết bình luận"]').forEach((e) => {
-                e.scrollIntoView();
-              });
+              let div = document.querySelectorAll('[role = "button"]');
+              for (let i = 0; i < div.length; i++) {
+                if (
+                  div[i].innerText.indexOf('liên quan nhất') !== -1 ||
+                  div[i].innerText.indexOf('Gần đây nhất') !== -1 ||
+                  div[i].innerText.indexOf('Tất cả bình luận') !== -1
+                ) {
+                  await div[i].scrollIntoView();
+                }
+              }
             });
           } catch (err) {}
           await page.evaluate(async () => {
