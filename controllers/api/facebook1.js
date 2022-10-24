@@ -1,7 +1,7 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 const crypto = require('crypto');
-const bigquery = require('./bigquery');
+//const bigquery = require('./bigquery');
 
 const initializeApp = require('firebase/app');
 
@@ -245,7 +245,10 @@ module.exports = async function main(req) {
           !result.iscontent ||
           !result.isuser
         ) {
-          const error = ref(databases, 'Error/' + name.replace(/[#:.,$]/g, ''));
+          const error = ref(
+            databases,
+            'Error/' + name.replace(/[#:.,$]/g, '') + result.linkPost.split('/')[6]
+          );
           await set(error, {
             name: result.linkPost,
             ismain: result.ismain,

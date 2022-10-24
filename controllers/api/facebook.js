@@ -6,7 +6,7 @@ const getDatabase = require('firebase/database').getDatabase;
 const set = require('firebase/database').set;
 const ref = require('firebase/database').ref;
 const push = require('firebase/database').push;
-const bigquery = require('./bigquery');
+//const bigquery = require('./bigquery');
 const axios = require('axios');
 const firebaseConfig = {
   apiKey: 'AIzaSyA8SytL-Kim6L_CSNvYUmVTH2nf6d-cE6c',
@@ -262,10 +262,8 @@ module.exports = async function main(req) {
 
       //product: 'chrome',
       devtools: false,
-      //executablePath : 'C:/Program Files/Mozilla Firefox/firefox.exe'
-      executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
-      //executablePath: '"C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe"',
-      //executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+      executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe', // windows
+      //executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', // MacOS
     });
     const page = await browser.newPage();
     await page.setDefaultNavigationTimeout(60000);
@@ -376,7 +374,10 @@ module.exports = async function main(req) {
               !results.iscontent ||
               !results.isuser
             ) {
-              const error = ref(databases, 'Error/' + name.replace(/[#:.,$]/g, ''));
+              const error = ref(
+                databases,
+                'Error/' + name.replace(/[#:.,$]/g, '') + results.linkPost.split('/')[6]
+              );
               await set(error, {
                 name: results.linkPost,
                 ismain: results.ismain,
