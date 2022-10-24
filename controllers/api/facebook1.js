@@ -155,8 +155,8 @@ module.exports = async function main(req) {
       args: ['--start-maximized'],
       product: 'chrome',
       devtools: false,
-      executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
-      //executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+      //executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
+      executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
     });
     const page = await browser.newPage();
     await page.setDefaultNavigationTimeout(60000);
@@ -188,6 +188,7 @@ module.exports = async function main(req) {
           name_group += url.split('/')[i] + '/';
         }
       }
+      console.log(name_group)
       await page.goto(name_group, {
         waitUntil: 'networkidle2',
       });
@@ -238,6 +239,11 @@ module.exports = async function main(req) {
 
       await autoScrollpost(page);
       await getdata(page, cmt_length).then(async function (result) {
+       let imagemore =  new Array();
+        if(result.imagemore>0){
+          console.log(result.imagemore)
+          imagemore = await loadmoreimage(page, result.linkImgs,result.imagemore)
+        }
         if (
           !result.ismain ||
           !result.iscate ||
@@ -522,12 +528,22 @@ module.exports = async function main(req) {
     console.log('lỗi server', err);
   }
 };
+async function loadmoreimage(page,listimage,length){
+   await page.evaluate(async()=>{
+    document.querySelectorAll('[role="link"]').forEach(async(e)=>{
+      if(e.childNodes.length>2&&e.hasAttribute('href')){
+      await e.click()
+      }})
+  })
+  console.log(listimage,length)
+}
 async function getdata(page, cmt_lengths) {
   const dimension = await page.evaluate(async (cmt_lengths) => {
     let video = new Array();
     let image_href = new Array();
     let comments = new Array();
     let children = new Array();
+    let imagemore = 0;
     let userhref =
       (user_name =
       content =
@@ -787,6 +803,14 @@ async function getdata(page, cmt_lengths) {
                               .childNodes[0].childNodes[j].childNodes[0].childNodes[0].childNodes[0]
                               .childNodes[0].childNodes[0].currentSrc
                           );
+
+                      try{
+                        if(j == element.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes.length -1){
+                          const numberPattern = /\d+/g;
+  
+                          imagemore  = (parseInt(element.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[j].childNodes[0].childNodes[1].innerText.match( numberPattern ).join('')))
+                        }
+                      }catch(e){}    
                     }
                   }
                 } else {
@@ -1922,8 +1946,9 @@ async function getdata(page, cmt_lengths) {
         ismain: ismain,
         isuser: isuser,
         token: token ? token : '',
+        imagemore : imagemore,
       };
-      (count_comments_config = 0),
+      (count_comments_config= imagemore = 0),
         (userhref =
           user_name =
           posthref =
@@ -1936,6 +1961,7 @@ async function getdata(page, cmt_lengths) {
           shares =
           post_id =
           time =
+           
             '');
       video = [];
       comments = [];
