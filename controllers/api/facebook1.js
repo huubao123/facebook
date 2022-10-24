@@ -557,59 +557,75 @@ async function getdata(page, cmt_lengths) {
     let token = require('DTSGInitialData').token;
     let count_like_cmt = (count_like_cmtchild = count_like_cmtchild2 = 0);
     //
+    // document.querySelectorAll('div').forEach((e) => {
+    //   if (e.hasAttribute('aria-describedby')) {
+    //     post = e[0];
+    //   }
+    // });
+    let ismain = true;
+    let isuser = true;
+    let iscontent = true;
+    let iscomment = true;
+    let iscate = true;
     let contens = '';
-    let post = document.querySelectorAll('[role="main"]')[2];
-    if (!post) {
-      let post1 =
-        document.querySelectorAll('[role="article"]')[0].childNodes[0].childNodes[0].childNodes[0]
-          .childNodes[0].childNodes[0];
-      if (post1.childNodes.length > 5) {
-        contens = post1.childNodes[7].childNodes[0];
-      } else {
-        contens = post1.childNodes[1].childNodes[0];
-      }
-    } else {
-      try {
-        if (
-          post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-            .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-            .childNodes[0].childNodes[0].childNodes[0].childNodes[1].childNodes[0].childNodes[0]
-            .childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-        ) {
-          contens =
-            post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-              .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-              .childNodes[0].childNodes[0].childNodes[0].childNodes[1].childNodes[0];
+    try {
+      let post = document.querySelectorAll('[role="main"]')[2];
+      if (!post) {
+        let post1 =
+          document.querySelectorAll('[role="article"]')[0].childNodes[0].childNodes[0].childNodes[0]
+            .childNodes[0].childNodes[0];
+        if (post1.childNodes.length > 5) {
+          contens = post1.childNodes[7].childNodes[0];
+        } else {
+          contens = post1.childNodes[1].childNodes[0];
         }
-      } catch (e) {
+      } else {
         try {
           if (
             post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
               .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-              .childNodes[0].childNodes[0].childNodes[0].childNodes[7].childNodes[0]
+              .childNodes[0].childNodes[0].childNodes[0].childNodes[1].childNodes[0].childNodes[0]
+              .childNodes[0].childNodes[0].childNodes[0].childNodes[0]
           ) {
             contens =
               post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
                 .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[7]
+                .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[1]
                 .childNodes[0];
           }
         } catch (e) {
-          if (
-            document.querySelector('[aria-posinset="1"]').childNodes[0].childNodes[0].childNodes[0]
-              .childNodes[0].childNodes[0].childNodes[7]
-          ) {
-            contens =
+          try {
+            if (
+              post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[7].childNodes[0]
+            ) {
+              contens =
+                post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                  .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                  .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                  .childNodes[7].childNodes[0];
+            }
+          } catch (e) {
+            if (
               document.querySelector('[aria-posinset="1"]').childNodes[0].childNodes[0]
-                .childNodes[0].childNodes[0].childNodes[0].childNodes[7].childNodes[0];
-          } else {
-            contens =
-              document.querySelector('[aria-posinset="1"]').childNodes[0].childNodes[0]
-                .childNodes[0].childNodes[0].childNodes[0].childNodes[1].childNodes[0];
+                .childNodes[0].childNodes[0].childNodes[0].childNodes[7]
+            ) {
+              contens =
+                document.querySelector('[aria-posinset="1"]').childNodes[0].childNodes[0]
+                  .childNodes[0].childNodes[0].childNodes[0].childNodes[7].childNodes[0];
+            } else {
+              contens =
+                document.querySelector('[aria-posinset="1"]').childNodes[0].childNodes[0]
+                  .childNodes[0].childNodes[0].childNodes[0].childNodes[1].childNodes[0];
+            }
           }
         }
       }
+    } catch (e) {
+      ismain = false;
     }
+
     // if(contens = ''){
     //   post.forEach((e)=>{
     //     if(e.childNodes.length >13){
@@ -654,6 +670,7 @@ async function getdata(page, cmt_lengths) {
         });
       } catch (e) {
         console.log('error user ');
+        isuser = false;
       }
       try {
         contens.childNodes[2].childNodes.forEach((element, index) => {
@@ -819,6 +836,7 @@ async function getdata(page, cmt_lengths) {
         });
       } catch (e) {
         console.log('error content ');
+        iscontent = false;
       }
 
       let divlikecomshare = contens;
@@ -861,6 +879,7 @@ async function getdata(page, cmt_lengths) {
         }
       } catch (e) {
         console.log('error: categori ');
+        iscate = false;
       }
 
       divcommment.forEach((element) => {
@@ -1789,6 +1808,7 @@ async function getdata(page, cmt_lengths) {
               children = [];
             } catch (error) {
               console.log('error cmt');
+              iscomment = false;
               console.log(error);
             }
           });
@@ -1896,7 +1916,11 @@ async function getdata(page, cmt_lengths) {
         user_id: user_id ? user_id : '',
         count_comments_config: count_comments_config,
         countShare: shares ? shares : '',
-
+        iscate: iscate,
+        iscomment: iscomment,
+        iscontent: iscontent,
+        ismain: ismain,
+        isuser: isuser,
         token: token ? token : '',
       };
       (count_comments_config = 0),
