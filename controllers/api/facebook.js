@@ -374,13 +374,7 @@ module.exports = async function main(req) {
           });
           await autoScrollpost(page);
           await getdata(page, cmt_length).then(async function (results) {
-            if (
-              !results.ismain ||
-              !results.iscate ||
-              !results.iscomment ||
-              !results.iscontent ||
-              !results.isuser
-            ) {
+            if (!results.ismain || !results.iscate || !results.iscontent || !results.isuser) {
               const error = ref(
                 databases,
                 'Error/' + name.replace(/[#:.,$]/g, '') + results.linkPost.split('/')[6]
@@ -389,7 +383,6 @@ module.exports = async function main(req) {
                 name: results.linkPost,
                 ismain: results.ismain,
                 iscate: results.iscate,
-                iscomment: results.iscomment,
                 isuser: results.isuser,
                 iscontent: results.iscontent,
               });
@@ -843,7 +836,6 @@ async function getdata(page, cmt_lengths) {
     let ismain = true;
     let isuser = true;
     let iscontent = true;
-    let iscomment = true;
     let iscate = true;
     let contens = '';
     try {
@@ -2086,7 +2078,6 @@ async function getdata(page, cmt_lengths) {
               children = [];
             } catch (error) {
               console.log('error cmt');
-              iscomment = false;
               console.log(error);
             }
           });
@@ -2195,7 +2186,6 @@ async function getdata(page, cmt_lengths) {
         count_comments_config: count_comments_config,
         countShare: shares ? shares : '',
         iscate: iscate,
-        iscomment: iscomment,
         iscontent: iscontent,
         ismain: ismain,
         isuser: isuser,
