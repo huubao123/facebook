@@ -1,6 +1,7 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 const crypto = require('crypto');
+const bigquery = require('./bigquery');
 
 const initializeApp = require('firebase/app');
 
@@ -27,10 +28,16 @@ async function autoScrollpost(page) {
       let totalHeight = 0;
       let distance = 500;
       let n = 0;
+      let time = 0;
       let timer = setInterval(async () => {
         let scrool = new Array();
         let scrollHeight = document.body.scrollHeight;
         //window.scrollBy(0, distance);
+        time += 1;
+        if (time == 29) {
+          clearInterval(timer);
+          resolve();
+        }
         n += 1;
         totalHeight += distance;
         if (
@@ -86,7 +93,6 @@ async function autoScrollpost(page) {
 
 module.exports = async function main(req) {
   try {
-    console.log(req.data.data);
     const url = req.data.data.link;
     let url_group = '';
     for (let i = 0; i < 5; i++) {
@@ -95,7 +101,7 @@ module.exports = async function main(req) {
     const name = url.split('/')[3] == 'groups' ? url.split('/')[4] : url.split('/')[3];
     const cmt_length = req.data.data.length_comment ? req.data.data.length_comment : 0;
     let name_group = '';
-    const post_type = req.data.data.post_type ? req.data.data.post_type : '';
+    const post_type = req.data.data.posttype ? req.data.data.posttype : '';
 
     const craw_id = crypto.randomBytes(16).toString('hex');
     const app = initializeApp.initializeApp(firebaseConfig);
@@ -153,6 +159,7 @@ module.exports = async function main(req) {
       //executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
     });
     const page = await browser.newPage();
+    await page.setDefaultNavigationTimeout(60000);
     const pages = await browser.pages();
     if (pages.length > 1) {
       await pages[0].close();
@@ -169,7 +176,7 @@ module.exports = async function main(req) {
       await page.goto('https://www.facebook.com', {
         waitUntil: 'load',
       });
-      await page.type('#email', 'huubao3999@gmail.com');
+      await page.type('#email', 'huubao4000@gmail.com');
       await page.type('#pass', 'huubao123');
       await page.keyboard.press('Enter');
 
@@ -231,6 +238,25 @@ module.exports = async function main(req) {
 
       await autoScrollpost(page);
       await getdata(page, cmt_length).then(async function (result) {
+        if (
+          !result.ismain ||
+          !result.iscate ||
+          !result.iscomment ||
+          !result.iscontent ||
+          !result.isuser
+        ) {
+          const error = ref(databases, 'Error/' + name.replace(/[#:.,$]/g, ''));
+          await set(error, {
+            name: result.linkPost,
+            ismain: result.ismain,
+            iscate: result.iscate,
+            iscomment: result.iscomment,
+            isuser: result.isuser,
+            iscontent: result.iscontent,
+          });
+          return;
+        }
+
         fs.writeFile('item1.txt', JSON.stringify(result, null, 2), (err) => {
           if (err) throw err;
           console.log('The file has been saved!');
@@ -419,6 +445,7 @@ module.exports = async function main(req) {
             : [],
         };
         data_post = {};
+        await bigquery(basic_fields, custom_fields);
         await set(postListRefss, {
           basic_fields: basic_fields,
           custom_fields: custom_fields,
@@ -464,7 +491,6 @@ module.exports = async function main(req) {
         });
       });
     } catch (e) {
-      console.log(e);
       console.log(e);
       console.log('lỗi error');
       const app = initializeApp.initializeApp(firebaseConfig);

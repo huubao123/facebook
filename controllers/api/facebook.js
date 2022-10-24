@@ -6,6 +6,7 @@ const getDatabase = require('firebase/database').getDatabase;
 const set = require('firebase/database').set;
 const ref = require('firebase/database').ref;
 const push = require('firebase/database').push;
+const bigquery = require('./bigquery');
 const axios = require('axios');
 const firebaseConfig = {
   apiKey: 'AIzaSyA8SytL-Kim6L_CSNvYUmVTH2nf6d-cE6c',
@@ -61,7 +62,7 @@ async function autoScrollpost(page) {
           clearInterval(timer);
           resolve();
         }
-        if (time == 120) {
+        if (time == 29) {
           clearInterval(timer);
           resolve();
         }
@@ -103,7 +104,7 @@ async function autoScrollpost(page) {
           clearInterval(timer);
           resolve();
         }
-      }, 1000);
+      }, 2000);
     });
   });
   return;
@@ -267,7 +268,7 @@ module.exports = async function main(req) {
       //executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
     });
     const page = await browser.newPage();
-    await page.setDefaultNavigationTimeout(0);
+    await page.setDefaultNavigationTimeout(60000);
     const pages = await browser.pages();
     if (pages.length > 1) {
       await pages[0].close();
@@ -321,17 +322,6 @@ module.exports = async function main(req) {
     // });
 
     await getlink(page, conten_length, like, comment, share).then(async function (result) {
-      if (!result.ismain || !result.iscate || !result.iscomment || !result.iscontent || !result.isuser) {
-        const error = ref(databases, 'Error/' + name.replace(/[#:.,$]/g, ''));
-        await set(error, {
-          name: result.linkPost,
-          ismain: result.ismain,
-          iscate: result.iscate,
-          iscomment: result.iscomment,
-          isuser: result.isuser,
-          iscontent: result.iscontent,
-        });
-      }
       fs.writeFile('item.txt', JSON.stringify(result, null, 2), (err) => {
         if (err) throw err;
         console.log('The file has been saved!');
@@ -379,6 +369,24 @@ module.exports = async function main(req) {
           });
           await autoScrollpost(page);
           await getdata(page, cmt_length).then(async function (results) {
+            if (
+              !results.ismain ||
+              !results.iscate ||
+              !results.iscomment ||
+              !results.iscontent ||
+              !results.isuser
+            ) {
+              const error = ref(databases, 'Error/' + name.replace(/[#:.,$]/g, ''));
+              await set(error, {
+                name: results.linkPost,
+                ismain: results.ismain,
+                iscate: results.iscate,
+                iscomment: results.iscomment,
+                isuser: results.isuser,
+                iscontent: results.iscontent,
+              });
+              return;
+            }
             const app = initializeApp.initializeApp(firebaseConfig);
             const database = getDatabase(app);
             const postListRef = ref(
@@ -562,7 +570,8 @@ module.exports = async function main(req) {
                   }))
                 : [],
             };
-            data_post = {};
+            //await bigquery(basic_fields, custom_fields);
+
             await set(postListRef, {
               basic_fields: basic_fields,
               custom_fields: custom_fields,
