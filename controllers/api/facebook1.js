@@ -155,8 +155,8 @@ module.exports = async function main(req) {
       args: ['--start-maximized'],
       product: 'chrome',
       devtools: false,
-      //executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
-      executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+      executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
+      //executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
     });
     const page = await browser.newPage();
     await page.setDefaultNavigationTimeout(60000);
@@ -188,7 +188,7 @@ module.exports = async function main(req) {
           name_group += url.split('/')[i] + '/';
         }
       }
-      console.log(name_group)
+      console.log(name_group);
       await page.goto(name_group, {
         waitUntil: 'networkidle2',
       });
@@ -214,7 +214,16 @@ module.exports = async function main(req) {
       // await new Promise((r) => setTimeout(r, 4000));
       try {
         await page.evaluate(async () => {
-          document.querySelector('[aria-label="Viết bình luận"]').scrollIntoView();
+          let div = document.querySelectorAll('[role = "button"]');
+          for (let i = 0; i < div.length; i++) {
+            if (
+              div[i].innerText.indexOf('liên quan nhất') !== -1 ||
+              div[i].innerText.indexOf('Gần đây nhất') !== -1 ||
+              div[i].innerText.indexOf('Tất cả bình luận') !== -1
+            ) {
+              await div[i].scrollIntoView();
+            }
+          }
         });
       } catch (err) {}
       await page.evaluate(async () => {
@@ -238,11 +247,10 @@ module.exports = async function main(req) {
       });
 
       await autoScrollpost(page);
-      await getdata(page, cmt_length).then(async function (result) {
-       let imagemore =  new Array();
-        if(result.imagemore>0){
-          console.log(result.imagemore)
-          imagemore = await loadmoreimage(page, result.linkImgs,result.imagemore)
+      await getdata(page, cmt_length).then(async function (results) {
+        let result = '';
+        if (results.imagemore > 0) {
+          result = await loadmoreimage(page, results, results.imagemore);
         }
         if (
           !result.ismain ||
@@ -321,6 +329,7 @@ module.exports = async function main(req) {
           }
         }
         if (result.videos.length > 2) {
+          console.log(result.videos);
           arrVid = await Promise.all(
             result.videos.map(async (video) => {
               let result = await fetch(video);
@@ -528,14 +537,95 @@ module.exports = async function main(req) {
     console.log('lỗi server', err);
   }
 };
-async function loadmoreimage(page,listimage,length){
-   await page.evaluate(async()=>{
-    document.querySelectorAll('[role="link"]').forEach(async(e)=>{
-      if(e.childNodes.length>2&&e.hasAttribute('href')){
-      await e.click()
-      }})
-  })
-  console.log(listimage,length)
+async function loadmoreimage(page, result, length) {
+  await page.evaluate(async () => {
+    let contens = '';
+    try {
+      let post = document.querySelectorAll('[role="main"]')[2];
+      if (!post) {
+        let post1 =
+          document.querySelectorAll('[role="article"]')[0].childNodes[0].childNodes[0].childNodes[0]
+            .childNodes[0].childNodes[0];
+        if (post1.childNodes.length > 5) {
+          contens = post1.childNodes[7].childNodes[0];
+        } else {
+          contens = post1.childNodes[1].childNodes[0];
+        }
+      } else {
+        try {
+          if (
+            post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+              .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+              .childNodes[0].childNodes[0].childNodes[0].childNodes[1].childNodes[0].childNodes[0]
+              .childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+          ) {
+            contens =
+              post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[1]
+                .childNodes[0];
+          }
+        } catch (e) {
+          try {
+            if (
+              post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[7].childNodes[0]
+            ) {
+              contens =
+                post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                  .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                  .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                  .childNodes[7].childNodes[0];
+            }
+          } catch (e) {
+            if (
+              document.querySelector('[aria-posinset="1"]').childNodes[0].childNodes[0]
+                .childNodes[0].childNodes[0].childNodes[0].childNodes[7]
+            ) {
+              contens =
+                document.querySelector('[aria-posinset="1"]').childNodes[0].childNodes[0]
+                  .childNodes[0].childNodes[0].childNodes[0].childNodes[7].childNodes[0];
+            } else {
+              contens =
+                document.querySelector('[aria-posinset="1"]').childNodes[0].childNodes[0]
+                  .childNodes[0].childNodes[0].childNodes[0].childNodes[1].childNodes[0];
+            }
+          }
+        }
+      }
+    } catch (e) {
+      ismain = false;
+    }
+    contens.querySelectorAll('[role="link"]').forEach(async (e) => {
+      if (e.childNodes.length > 2 && e.hasAttribute('href')) {
+        await e.click();
+      }
+    });
+  });
+  const getimage = await page.evaluate(
+    async (result, length) => {
+      for (let i = 0; i < length - 1; i++) {
+        await new Promise((r) => setTimeout(r, 1000));
+        await document
+          .querySelectorAll('[data-name="media-viewer-nav-container"]')[0]
+          .querySelectorAll('[data-visualcompletion="ignore-dynamic"]')[1]
+          .childNodes[0].click();
+        await new Promise((r) => setTimeout(r, 1000));
+        if (document.querySelectorAll('[data-visualcompletion="media-vc-image"]')[0])
+          await result.linkImgs.push(
+            document.querySelectorAll('[data-visualcompletion="media-vc-image"]')[0]
+              ? document.querySelectorAll('[data-visualcompletion="media-vc-image"]')[0].currentSrc
+              : ''
+          );
+      }
+      await result.linkImgs.filter((item) => item);
+      return result;
+    },
+    result,
+    length
+  );
+  return getimage;
 }
 async function getdata(page, cmt_lengths) {
   const dimension = await page.evaluate(async (cmt_lengths) => {
@@ -804,13 +894,24 @@ async function getdata(page, cmt_lengths) {
                               .childNodes[0].childNodes[0].currentSrc
                           );
 
-                      try{
-                        if(j == element.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes.length -1){
+                      try {
+                        if (
+                          j ==
+                          element.childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                            .childNodes[0].childNodes.length -
+                            1
+                        ) {
                           const numberPattern = /\d+/g;
-  
-                          imagemore  = (parseInt(element.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[j].childNodes[0].childNodes[1].innerText.match( numberPattern ).join('')))
+
+                          imagemore = parseInt(
+                            element.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[
+                              j
+                            ].childNodes[0].childNodes[1].innerText
+                              .match(numberPattern)
+                              .join('')
+                          );
                         }
-                      }catch(e){}    
+                      } catch (e) {}
                     }
                   }
                 } else {
@@ -1946,9 +2047,9 @@ async function getdata(page, cmt_lengths) {
         ismain: ismain,
         isuser: isuser,
         token: token ? token : '',
-        imagemore : imagemore,
+        imagemore: imagemore,
       };
-      (count_comments_config= imagemore = 0),
+      (count_comments_config = imagemore = 0),
         (userhref =
           user_name =
           posthref =
@@ -1961,7 +2062,6 @@ async function getdata(page, cmt_lengths) {
           shares =
           post_id =
           time =
-           
             '');
       video = [];
       comments = [];

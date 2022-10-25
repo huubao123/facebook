@@ -262,8 +262,8 @@ module.exports = async function main(req) {
 
       //product: 'chrome',
       devtools: false,
-      //executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe', // windows
-      executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', // MacOS
+      executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe', // windows
+      //executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', // MacOS
     });
     const page = await browser.newPage();
     await page.setDefaultNavigationTimeout(60000);
@@ -374,8 +374,8 @@ module.exports = async function main(req) {
           });
           await autoScrollpost(page);
           await getdata(page, cmt_length).then(async function (results) {
-            if(results.imagemore>0){
-              console.log(results.imagemore)
+            if (results.imagemore > 0) {
+              console.log(results.imagemore);
             }
             if (!results.ismain || !results.iscate || !results.iscontent || !results.isuser) {
               const error = ref(
@@ -1063,13 +1063,24 @@ async function getdata(page, cmt_lengths) {
                               .childNodes[0].childNodes[0].currentSrc
                           );
 
-                      try{
-                        if(j == element.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes.length -1){
+                      try {
+                        if (
+                          j ==
+                          element.childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                            .childNodes[0].childNodes.length -
+                            1
+                        ) {
                           const numberPattern = /\d+/g;
-  
-                          imagemore  = (parseInt(element.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[j].childNodes[0].childNodes[1].innerText.match( numberPattern ).join('')))
+
+                          imagemore = parseInt(
+                            element.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[
+                              j
+                            ].childNodes[0].childNodes[1].innerText
+                              .match(numberPattern)
+                              .join('')
+                          );
                         }
-                      }catch(e){}    
+                      } catch (e) {}
                     }
                   }
                 } else {
@@ -2205,9 +2216,9 @@ async function getdata(page, cmt_lengths) {
         ismain: ismain,
         isuser: isuser,
         token: token ? token : '',
-        imagemore : imagemore,
+        imagemore: imagemore,
       };
-      (count_comments_config= imagemore = 0),
+      (count_comments_config = imagemore = 0),
         (userhref =
           user_name =
           posthref =
@@ -2220,7 +2231,6 @@ async function getdata(page, cmt_lengths) {
           shares =
           post_id =
           time =
-           
             '');
       video = [];
       comments = [];
