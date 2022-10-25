@@ -378,10 +378,13 @@ module.exports = async function main(req) {
           });
           await autoScrollpost(page);
           await getdata(page, cmt_length).then(async function (data) {
-            let results = data;
+            let results = '';
             console.log(data);
-            if (data.imagemore > 0) {
+            if (parseInt(data.imagemore) > 0) {
               results = await loadmoremedia(page, data);
+              console.log(results);
+            } else {
+              results = data;
             }
 
             if (!results.ismain || !results.iscate || !results.iscontent || !results.isuser) {
