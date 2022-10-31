@@ -13,7 +13,7 @@ const app = express();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
+app.set('view engine', 'pug');
 app.use(cors());
 app.use(logger('dev'));
 app.use(express.json());
@@ -28,7 +28,6 @@ function haltOnTimedout(req, res, next) {
 }
 
 const Queue = require('bull');
-const QueueMQ = require('bullmq').Queue;
 const { createBullBoard } = require('@bull-board/api');
 const { BullAdapter } = require('@bull-board/api/bullAdapter');
 const { BullMQAdapter } = require('@bull-board/api/bullMQAdapter');
@@ -42,8 +41,6 @@ const page = new Queue('page', {
 }); // if you have a special connection to redis.
 const page1 = new Queue('page1', { redis: { port: 6379, host: '127.0.0.1' } });
 const group1 = new Queue('group1', { redis: { port: 6379, host: '127.0.0.1' } });
-
-const queueMQ = new QueueMQ('queueMQName');
 
 const serverAdapter = new ExpressAdapter();
 serverAdapter.setBasePath('/admin/queues');
