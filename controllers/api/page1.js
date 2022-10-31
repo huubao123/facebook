@@ -3,7 +3,7 @@ const fs = require('fs');
 const crypto = require('crypto');
 //const bigquery = require('./bigquery');
 const loadmoremedia = require('../../middlewares/loadmore_media');
-const getdata = require('../../middlewares/getdata');
+const getdata = require('../../middlewares/getdata_post_page');
 
 const initializeApp = require('firebase/app');
 
@@ -32,16 +32,16 @@ async function autoScrollpost(page) {
       let n = 0;
       let time = 0;
       let timer = setInterval(async () => {
+        time += 1;
         let scrool = new Array();
         let scrollHeight = document.body.scrollHeight;
-        //window.scrollBy(0, distance);
-        time += 1;
-        if (time == 29) {
-          clearInterval(timer);
-          resolve();
-        }
-        n += 1;
-        totalHeight += distance;
+        // window.scrollBy(0, distance);
+        //totalHeight += distance;
+        //n += 1;
+        // if (n == 10) {
+        //   clearInterval(timer);
+        //   resolve();
+        // }
         if (
           window.performance.memory.jsHeapSizeLimit -
             window.performance.memory.jsHeapSizeLimit / 10 <
@@ -50,17 +50,26 @@ async function autoScrollpost(page) {
           clearInterval(timer);
           resolve();
         }
-        // if (n == 10) {
-        //   clearInterval(timer);
-        //   resolve();
-        // }
+        if (time == 29) {
+          clearInterval(timer);
+          resolve();
+        }
         let isbottom = document.body.scrollHeight;
         let istop = parseInt(document.documentElement.scrollTop + window.innerHeight) + 1;
         if (isbottom === istop) {
           clearInterval(timer);
           resolve();
         }
-        let div = document.querySelectorAll('[role = "button"]');
+        let feed = document.querySelectorAll('[role="article"]')
+          ? document.querySelectorAll('[role="article"]')[0]
+          : document.querySelectorAll('[role="article"]')[0];
+        let div = feed.querySelectorAll('[role = "button"]');
+        // if (n > 1) {
+        //   for (let i = 0; i < div.length; i++) {
+        //     scrool.push(div[i].innerText);
+        //   }
+        // }
+
         for (let i = 0; i < div.length; i++) {
           if (div[i].innerText.indexOf('Ẩn') !== -1) {
             div[i].style.display = 'none';
@@ -78,11 +87,10 @@ async function autoScrollpost(page) {
         }
         checkcom = scrool.indexOf('đã hết') > -1;
         if (!checkcom) {
-          console.log(n);
           clearInterval(timer);
           resolve();
         }
-        // console.log(scrool);
+
         if (totalHeight >= scrollHeight) {
           clearInterval(timer);
           resolve();
@@ -108,17 +116,17 @@ module.exports = async function main(req) {
     const craw_id = crypto.randomBytes(16).toString('hex');
     const app = initializeApp.initializeApp(firebaseConfig);
     const database = getDatabase(app);
-    const postListRefs = ref(
-      database,
-      '/craw_list_length/' + name.replace(/[#:.,$]/g, '') + '/' + craw_id
-    );
-    await set(postListRefs, {
-      craw_id: craw_id,
-      length: 1,
-      url: url,
-      cmt_length: cmt_length,
-      create_at: Date.now(),
-    });
+    // const postListRefs = ref(
+    //   database,
+    //   '/craw_list_length/' + name.replace(/[#:.,$]/g, '') + '/' + craw_id
+    // );
+    // await set(postListRefs, {
+    //   craw_id: craw_id,
+    //   length: 1,
+    //   url: url,
+    //   cmt_length: cmt_length,
+    //   create_at: Date.now(),
+    // });
     if (!cmt_length) {
       cmt_length = -1;
     }
@@ -156,7 +164,7 @@ module.exports = async function main(req) {
       defaultViewport: null,
       args: ['--start-maximized'],
       product: 'chrome',
-      devtools: false,
+      devtools: true,
       executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
       //executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
     });
@@ -185,28 +193,25 @@ module.exports = async function main(req) {
       //await new Promise((r) => setTimeout(r, 4000));
       await page.waitForSelector('div', { hidden: true });
 
-      if (url.indexOf('posts') !== -1) {
-        for (let i = 0; i < 5; i++) {
-          name_group += url.split('/')[i] + '/';
-        }
+      for (let i = 0; i < 4; i++) {
+        name_group += url.split('/')[i] + '/';
       }
+
       await page.goto(name_group, {
         waitUntil: 'networkidle2',
       });
-      await page.waitForFunction('document.querySelector("h1")');
+      //await page.waitForFunction('document.querySelector("h2")');
     } catch (e) {}
-
-    let result = await page.evaluate(() => {
-      return document.querySelector('h1').textContent;
-    });
-    const apps = initializeApp.initializeApp(firebaseConfig);
-    const databases = getDatabase(apps);
-    const postListRefss = ref(databases, 'Group/' + name.replace(/[#:.,$]/g, ''));
-    await set(postListRefss, {
-      name: result,
-      url: url_group,
-      create_at: Date.now(),
-    });
+    await page.waitForSelector('h2', { visible: true });
+    // let result = await page.evaluate(() => {
+    //   return document.querySelector('h1').textContent;2
+    // });
+    // const postListRefss = ref(databases, 'Group/' + name.replace(/[#:.,$]/g, ''));
+    // await set(postListRefss, {
+    //   name: result,
+    //   url: url_group,
+    //   create_at: Date.now(),
+    // });
     try {
       await page.goto(url, {
         waitUntil: 'networkidle2',
@@ -218,11 +223,12 @@ module.exports = async function main(req) {
           let div = document.querySelectorAll('[role = "button"]');
           for (let i = 0; i < div.length; i++) {
             if (
-              div[i].innerText.indexOf('liên quan nhất') !== -1 ||
-              div[i].innerText.indexOf('Gần đây nhất') !== -1 ||
+              div[i].innerText.indexOf('Phù hợp nhất') !== -1 ||
+              div[i].innerText.indexOf('Mới nhất') !== -1 ||
               div[i].innerText.indexOf('Tất cả bình luận') !== -1
             ) {
               await div[i].scrollIntoView();
+              break;
             }
           }
         });
@@ -231,10 +237,11 @@ module.exports = async function main(req) {
         let div = document.querySelectorAll('[role = "button"]');
         for (let i = 0; i < div.length; i++) {
           if (
-            div[i].innerText.indexOf('liên quan nhất') !== -1 ||
-            div[i].innerText.indexOf('Gần đây nhất') !== -1
+            div[i].innerText.indexOf('Phù hợp nhất') !== -1 ||
+            div[i].innerText.indexOf('Mới nhất') !== -1
           ) {
             await div[i].click();
+            break;
           }
         }
       });
@@ -243,11 +250,13 @@ module.exports = async function main(req) {
         for (let i = 0; i < div.length; i++) {
           if (div[i].innerText.indexOf('Tất cả bình luận') !== -1) {
             await div[i].click();
+            break;
           }
         }
       });
-
+      console.log('scrollIntoView1');
       await autoScrollpost(page);
+      console.log('scrollIntoView');
       await getdata(page, cmt_length).then(async function (data) {
         let result = data;
         if (data.imagemore > 0) {
@@ -263,7 +272,6 @@ module.exports = async function main(req) {
             name: result.linkPost,
             ismain: result.ismain,
             iscate: result.iscate,
-            iscomment: result.iscomment,
             isuser: result.isuser,
             iscontent: result.iscontent,
           });
@@ -276,7 +284,7 @@ module.exports = async function main(req) {
         });
         const postListRef = ref(
           database,
-          '/Listpost/' + name.replace(/[#:.,$]/g, '') + '/' + url.split('/')[6]
+          '/Listpost/' + name.replace(/[#:.,$]/g, '') + '/' + result.idPost
         );
 
         set(postListRef, {
@@ -287,7 +295,7 @@ module.exports = async function main(req) {
           countLike: result.countLike,
           countShare: result.countShare,
           user_id: result.user_id,
-          idPost: url.split('/')[6],
+          idPost: result.idPost,
           linkPost: url,
           linkImgs: result.linkImgs,
           commentList: result.commentList,
@@ -299,7 +307,7 @@ module.exports = async function main(req) {
 
         const postListRefss = ref(
           database,
-          'post_type/' + post_type + '/' + name.replace(/[#:.,$]/g, '') + '/' + url.split('/')[6]
+          'post_type/' + post_type + '/' + name.replace(/[#:.,$]/g, '') + '/' + result.idPost
         );
         let titles = '';
         let short_descriptions = '';
@@ -477,7 +485,7 @@ module.exports = async function main(req) {
         });
         const postListRefsss = ref(
           database,
-          '/Listpost/' + name.replace(/[#:.,$]/g, '') + '/' + url.split('/')[6]
+          '/Listpost/' + name.replace(/[#:.,$]/g, '') + '/' + result.idPost
         );
 
         await set(postListRefsss, {
@@ -488,7 +496,7 @@ module.exports = async function main(req) {
           countLike: result.countLike,
           countShare: result.countShare,
           user_id: result.user_id,
-          idPost: url.split('/')[6],
+          idPost: result.idPost,
           linkPost: url,
           linkImgs: result.linkImgs,
           commentList: result.commentList,
@@ -539,7 +547,7 @@ module.exports = async function main(req) {
       });
     }
 
-    await browser.close();
+    // await browser.close();
   } catch (err) {
     console.log('lỗi server', err);
   }

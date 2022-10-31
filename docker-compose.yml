@@ -1,0 +1,28 @@
+version: '3.9'
+
+services:
+  main:
+    build:
+      context: .
+      target: development
+    ports:
+      - ${PORT}:${PORT}
+    volumes:
+      - ./src:/usr/src/app/src
+      - /app/node_modules
+    env_file:
+      - .env
+    command: npm run dev
+    depends_on:
+      - redis
+    networks:
+      - facebooks
+  redis:
+    image: redis
+    networks:
+      - facebooks
+
+volumes:
+  mongo-data:
+networks:
+  - facebooks

@@ -1,16 +1,15 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
-var cors = require('cors');
+const createError = require('http-errors');
+const express = require('express');
+const path = require('path');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
+const cors = require('cors');
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
-var timeout = require('connect-timeout'); //express v4
+const indexRouter = require('./routes/index');
+const timeout = require('connect-timeout'); //express v4
 const monitoro = require('monitoro');
 
-var app = express();
+const app = express();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -35,23 +34,51 @@ const { BullAdapter } = require('@bull-board/api/bullAdapter');
 const { BullMQAdapter } = require('@bull-board/api/bullMQAdapter');
 
 const { ExpressAdapter } = require('@bull-board/express');
-const someQueue = new Queue('facebook', {
+const group = new Queue('group', {
   redis: { port: 6379, host: '127.0.0.1' },
 }); // if you have a special connection to redis.
-const someOtherQueue = new Queue('facebook1', { redis: { port: 6379, host: '127.0.0.1' } });
+const page = new Queue('page', {
+  redis: { port: 6379, host: '127.0.0.1' },
+}); // if you have a special connection to redis.
+const page1 = new Queue('page1', { redis: { port: 6379, host: '127.0.0.1' } });
+const group1 = new Queue('group1', { redis: { port: 6379, host: '127.0.0.1' } });
+
 const queueMQ = new QueueMQ('queueMQName');
 
 const serverAdapter = new ExpressAdapter();
 serverAdapter.setBasePath('/admin/queues');
 
 const { addQueue, removeQueue, setQueues, replaceQueues } = createBullBoard({
-  queues: [new BullAdapter(someQueue), new BullAdapter(someOtherQueue), new BullMQAdapter(queueMQ)],
+  queues: [new BullAdapter(group), new BullAdapter(group1), new BullMQAdapter(page), new BullMQAdapter(page1)],
   serverAdapter: serverAdapter,
 });
+const redis = require('redis');
+let redisClient = redis.createClient({
+  legacyMode: true,
+  socket: {
+    port: 6379,
+    host: '127.0.0.1',
+  },
+});
+
+redisClient.connect(console.log('redis ok')).catch(console.error);
+
 queueConfigArray = [
   {
-    name: 'facebook',
-    url: 'localhost://127.0.0.1:6379',
+    name: 'group',
+    url: '127.0.0.1://127.0.0.1:6379',
+  },
+  {
+    name: 'group1',
+    url: '127.0.0.1://127.0.0.1:6379',
+  },
+  {
+    name: 'page',
+    url: '127.0.0.1://127.0.0.1:6379',
+  },
+  {
+    name: 'page1',
+    url: '127.0.0.1://127.0.0.1:6379',
   },
 ];
 app.locals.MonitoroQueues = queueConfigArray;

@@ -3,15 +3,21 @@ var router = express.Router();
 // var passport = require('passport');
 const bodyParser = require('body-parser');
 router.use(bodyParser.urlencoded({ extended: true }));
-var facebook = require('../controllers/api/facebook');
-var facebook1 = require('../controllers/api/facebook1.js');
+var group = require('../controllers/api/group');
+var page1 = require('../controllers/api/page1');
+var page = require('../controllers/api/page');
+
+var group1 = require('../controllers/api/group1');
 const video = require('../controllers/sitemap');
 const fs = require('fs');
 const Queue = require('bull');
 const crypto = require('crypto');
 
-const queue = new Queue('facebook', { redis: { port: 6379, host: '127.0.0.1' } });
-const queue1 = new Queue('facebook1', { redis: { port: 6379, host: '127.0.0.1' } });
+const queue = new Queue('group', { redis: { port: 6379, host: '127.0.0.1' } });
+const pagequeue = new Queue('page', { redis: { port: 6379, host: '127.0.0.1' } });
+const page1queue = new Queue('page1', { redis: { port: 6379, host: '127.0.0.1' } });
+
+const queue1 = new Queue('group1', { redis: { port: 6379, host: '127.0.0.1' } });
 
 // main().catch(console.error);
 // var q = kue.createQueue({
@@ -94,7 +100,7 @@ router.get('/post_link', async function (req, res, next) {
   });
 });
 
-router.post('/post1', async (req, res) => {
+router.post('/group1', async (req, res) => {
   const jobId = crypto.randomBytes(10).toString('hex');
   const currentTime = new Date().getTime();
   const processAt = new Date(req.body.datetime).getTime();
@@ -103,7 +109,7 @@ router.post('/post1', async (req, res) => {
   res.json({ data: 'success', statusbar: 'ok', jobId: jobId });
 });
 router.post('/add', video);
-router.post('/post', async function (req, res, next) {
+router.post('/group', async function (req, res, next) {
   const jobId = crypto.randomBytes(10).toString('hex');
   const currentTime = new Date().getTime();
   const processAt = new Date(req.body.datetime).getTime();
@@ -114,7 +120,7 @@ router.post('/post', async function (req, res, next) {
   await queue.add({ data: req.body }, { delay: delay, jobId: jobId });
 });
 queue.process(async (job, done) => {
-  await facebook(job);
+  await group(job);
   // if (job.data.url.indexOf('posts') > -1) {
   //   await facebook1(job);
   // }
@@ -122,36 +128,47 @@ queue.process(async (job, done) => {
   done();
 });
 queue1.process(async (job, done) => {
- // await new Promise((r) => setTimeout(r, 4000));
+  // await new Promise((r) => setTimeout(r, 4000));
   // console.log(job.data);
-  await facebook1(job);
+  await group1(job);
   done();
 });
-router.get('/post1', async function (req, res, next) {
-  const url = req.body.url;
-  url_id = url.split('/');
-  if (url_id[3] == 'groups') {
-    id = url_id[6];
-  } else {
-    id = url_id[5];
-  }
-  if (!url) {
-    res.json('url is required');
-  }
-  const dbRef = ref(getDatabase());
-  get(child(dbRef, '/postList1/' + id))
-    .then((snapshot) => {
-      if (snapshot.exists()) {
-        res.json(snapshot.val());
-      } else {
-        res.send('No data available');
-      }
-    })
-    .catch((error) => {
-      console.error(error);
-    });
-});
+router.post('/page', async function (req, res, next) {
+  const jobId = crypto.randomBytes(10).toString('hex');
+  const currentTime = new Date().getTime();
+  const processAt = new Date(req.body.datetime).getTime();
+  const delay = processAt - currentTime;
 
+  res.json({ data: 'success', statusbar: 'ok', jobId: jobId });
+
+  await pagequeue.add({ data: req.body }, { delay: delay, jobId: jobId });
+});
+pagequeue.process(async (job, done) => {
+  await page(job);
+  // if (job.data.url.indexOf('posts') > -1) {
+  //   await facebook1(job);
+  // }
+  job.progress(100);
+  done();
+});
+router.post('/page1', async function (req, res, next) {
+  const jobId = crypto.randomBytes(10).toString('hex');
+  const currentTime = new Date().getTime();
+  const processAt = new Date(req.body.datetime).getTime();
+  const delay = processAt - currentTime;
+
+  res.json({ data: 'success', statusbar: 'ok', jobId: jobId });
+
+  await page1queue.add({ data: req.body }, { delay: delay, jobId: jobId });
+});
+page1queue.process(async (job, done) => {
+  await page1(job);
+  // if (job.data.url.indexOf('posts') > -1) {
+  //   await facebook1(job);
+  // }
+  job.progress(100);
+  done();
+});
 router.get('/post', async function (req, res, next) {
   const url = req.body.url;
   if (!url) {

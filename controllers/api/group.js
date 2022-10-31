@@ -7,7 +7,7 @@ const set = require('firebase/database').set;
 const ref = require('firebase/database').ref;
 const push = require('firebase/database').push;
 const loadmoremedia = require('../../middlewares/loadmore_media');
-const getdata = require('../../middlewares/getdata');
+const getdata = require('../../middlewares/getdata_post_group');
 require('dotenv').config();
 
 //const bigquery = require('./bigquery');
@@ -25,7 +25,7 @@ const firebaseConfig = {
 // TODO: Replace the following with your app's Firebase project configuration
 // See: https://firebase.google.com/docs/web/learn-more#config-object
 const genSlug = (text) => {
-  str = str
+  text = text
     .toLowerCase()
     .replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g, 'a')
     .replace(/è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ/g, 'e')
@@ -37,7 +37,7 @@ const genSlug = (text) => {
     .replace(/\s+/g, '-')
     .replace(/[^A-Za-z0-9_-]/g, '')
     .replace(/-+/g, '-');
-  return str;
+  return text;
 };
 
 async function autoScrollpost(page) {
@@ -59,8 +59,7 @@ async function autoScrollpost(page) {
         //   resolve();
         // }
         if (
-          window.performance.memory.jsHeapSizeLimit -
-            window.performance.memory.jsHeapSizeLimit / 10 <
+          window.performance.memory.jsHeapSizeLimit - window.performance.memory.jsHeapSizeLimit / 10 <
           window.performance.memory.totalJSHeapSize
         ) {
           clearInterval(timer);
@@ -155,14 +154,12 @@ async function autoScroll(page, lengthss, like, comment, share) {
         let distance = 500;
         let timer = setInterval(async () => {
           console.log(lengthss, like, comment, share);
-          let length_post = 0;
           let scrollHeight = document.body.scrollHeight;
           window.scrollBy(0, distance);
           totalHeight += distance;
 
           if (
-            window.performance.memory.jsHeapSizeLimit -
-              window.performance.memory.jsHeapSizeLimit / 10 <
+            window.performance.memory.jsHeapSizeLimit - window.performance.memory.jsHeapSizeLimit / 10 <
             window.performance.memory.totalJSHeapSize
           ) {
             clearInterval(timer);
@@ -177,7 +174,6 @@ async function autoScroll(page, lengthss, like, comment, share) {
             resolve();
           }
 
-          console.log(length_post);
           if (post_length - 5 >= lengthss) {
             clearInterval(timer);
             resolve();
@@ -215,10 +211,7 @@ module.exports = async function main(req) {
     const craw_id = crypto.randomBytes(16).toString('hex');
     const app = initializeApp.initializeApp(firebaseConfig);
     const database = getDatabase(app);
-    const postListRefs = ref(
-      database,
-      '/craw_list_length/' + name.replace(/[#:.,$]/g, '') + '/' + craw_id
-    );
+    const postListRefs = ref(database, '/craw_list_length/' + name.replace(/[#:.,$]/g, '') + '/' + craw_id);
     await set(postListRefs, {
       craw_id: craw_id,
       length: lengths,
@@ -229,6 +222,45 @@ module.exports = async function main(req) {
       content_length: conten_length,
       url: url,
       create_at: Date.now(),
+    });
+    const browser2 = await puppeteer.launch({
+      ignoreHTTPSErrors: true,
+      ignoreDefaultArgs: ['--disable-extensions'],
+      args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--disable-extensions',
+        '--aggressive-cache-discard',
+        '--disable-cache',
+        '--disable-application-cache',
+        '--disable-offline-load-stale-cache',
+        '--disable-gpu-shader-disk-cache',
+        '--media-cache-size=0',
+        '--disk-cache-size=0',
+
+        '--disable-component-extensions-with-background-pages',
+        '--disable-default-apps',
+        '--mute-audio',
+        '--no-default-browser-check',
+        '--autoplay-policy=user-gesture-required',
+        '--disable-background-timer-throttling',
+        '--disable-backgrounding-occluded-windows',
+        '--disable-notifications',
+        '--disable-background-networking',
+        '--disable-breakpad',
+        '--disable-component-update',
+        '--disable-domain-reliability',
+        '--disable-sync',
+      ],
+      headless: false,
+      defaultViewport: null,
+      args: ['--start-maximized'],
+
+      //product: 'chrome',
+      devtools: false,
+      executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe', // windows
+      //executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', // MacOS
     });
     const browser = await puppeteer.launch({
       ignoreHTTPSErrors: true,
@@ -288,7 +320,14 @@ module.exports = async function main(req) {
       await page.goto('https://www.facebook.com', {
         waitUntil: 'load',
       });
-      await page.type('#email', process.env.user_name);
+      let ramdom = Math.floor(Math.random() * 2);
+      let username = '';
+      if (ramdom == 1) {
+        username = process.env.user_name_scrool1;
+      } else {
+        username = process.env.user_name_scrool2;
+      }
+      await page.type('#email', username);
       await page.type('#pass', 'huubao123');
       await page.keyboard.press('Enter');
 
@@ -328,23 +367,52 @@ module.exports = async function main(req) {
         if (err) throw err;
         console.log('The file has been saved!');
       });
-      let process = 0;
+      let proces = 0;
+      await browser.close();
+      const page1 = await browser2.newPage();
+      await page1.setDefaultNavigationTimeout(60000);
+      const pages = await browser2.pages();
+      if (pages.length > 1) {
+        await pages[0].close();
+      }
+      await page1.goto('https://www.facebook.com', {
+        waitUntil: 'load',
+      });
+      let ramdom = Math.floor(Math.random() * 2);
+      let username = '';
+      if (ramdom == 1) {
+        username = process.env.username_get_data1;
+      } else {
+        username = process.env.username_get_data2;
+      }
+      await page1.type('#email', username);
+      await page1.type('#pass', 'huubao123');
+      await page1.keyboard.press('Enter');
+      await page1.waitForSelector('div', { hidden: true });
       for (let i = 0; i < result.length; i++) {
-        process +=
-          (Math.round(Math.round((result.length * 80) / 100) / result.length) / result.length) *
-          100;
-        console.log('Processing ' + parseInt(process.toFixed(2)));
-        await req.progress(parseInt(process.toFixed(2)));
+        try {
+          //await new Promise((r) => setTimeout(r, 4000));
+          // await page1.goto(url, {
+          //   waitUntil: 'load',
+          // });
+          //aaa
+          //await page1.waitForFunction('document.querySelector("h1")');
+        } catch (e) {
+          console.log(e);
+        }
+        proces += (Math.round(Math.round((result.length * 80) / 100) / result.length) / result.length) * 100;
+        console.log('Processing ' + parseInt(proces.toFixed(2)));
+        await req.progress(parseInt(proces.toFixed(2)));
         try {
           // fs.writeFile('item.txt', JSON.stringify(result, null, 2), (err) => {
           //   if (err) throw err;s
           //   console.log('The file has been saved!');
           // });
-          await page.goto(result[i].post_link, {
+          await page1.goto(result[i].post_link, {
             waitUntil: 'networkidle2',
           });
           try {
-            await page.evaluate(async () => {
+            await page1.evaluate(async () => {
               let div = document.querySelectorAll('[role = "button"]');
               for (let i = 0; i < div.length; i++) {
                 if (
@@ -357,7 +425,7 @@ module.exports = async function main(req) {
               }
             });
           } catch (err) {}
-          await page.evaluate(async () => {
+          await page1.evaluate(async () => {
             let div = document.querySelectorAll('[role = "button"]');
             for (let i = 0; i < div.length; i++) {
               if (
@@ -368,7 +436,7 @@ module.exports = async function main(req) {
               }
             }
           });
-          await page.evaluate(async () => {
+          await page1.evaluate(async () => {
             let div = document.querySelectorAll('[role="menuitem"]');
             for (let i = 0; i < div.length; i++) {
               if (div[i].innerText.indexOf('Tất cả bình luận') !== -1) {
@@ -376,13 +444,11 @@ module.exports = async function main(req) {
               }
             }
           });
-          await autoScrollpost(page);
-          await getdata(page, cmt_length).then(async function (data) {
+          await autoScrollpost(page1);
+          await getdata(page1, cmt_length).then(async function (data) {
             let results = '';
-            console.log(data);
             if (parseInt(data.imagemore) > 0) {
-              results = await loadmoremedia(page, data);
-              console.log(results);
+              results = await loadmoremedia(page1, data);
             } else {
               results = data;
             }
@@ -405,12 +471,7 @@ module.exports = async function main(req) {
             const database = getDatabase(app);
             const postListRef = ref(
               database,
-              'post_type/' +
-                post_type +
-                '/' +
-                name.replace(/[#:.,$]/g, '') +
-                '/' +
-                result[i].post_link.split('/')[6]
+              'post_type/' + post_type + '/' + name.replace(/[#:.,$]/g, '') + '/' + result[i].post_link.split('/')[6]
             );
             let titles = '';
             let short_descriptions = '';
@@ -418,9 +479,7 @@ module.exports = async function main(req) {
             let arrImage = null;
             let flagimage = true;
             let flagvideo = true;
-            let short_description = results.contentList
-              ? results.contentList.replaceAll(/(<([^>]+)>)/gi, '')
-              : '';
+            let short_description = results.contentList ? results.contentList.replaceAll(/(<([^>]+)>)/gi, '') : '';
             for (let i = 0; i < 100; i++) {
               let lengths = short_description.split(' ').length;
               short_descriptions += short_description.split(' ')[i] + ' ';
@@ -532,31 +591,17 @@ module.exports = async function main(req) {
               user_name: results.user ? results.user : 'undefined',
               count_like: results.countLike
                 ? results.countLike.toString().split(' ')[0].indexOf(',') > -1
-                  ? parseInt(
-                      results.countLike.toString().split(' ')[0].replace('K', '00').replace(',', '')
-                    )
+                  ? parseInt(results.countLike.toString().split(' ')[0].replace('K', '00').replace(',', ''))
                   : parseInt(results.countLike.toString().split(' ')[0].replace('K', '000'))
                 : 0,
               count_comment: results.countComment
                 ? results.countComment.toString().split(' ')[0].indexOf(',') > -1
-                  ? parseInt(
-                      results.countComment
-                        .toString()
-                        .split(' ')[0]
-                        .replace('K', '00')
-                        .replace(',', '')
-                    )
+                  ? parseInt(results.countComment.toString().split(' ')[0].replace('K', '00').replace(',', ''))
                   : parseInt(results.countComment.toString().split(' ')[0].replace('K', '000'))
                 : 0,
               count_share: results.countShare
                 ? results.countShare.toString().split(' ')[0].indexOf(',') > -1
-                  ? parseInt(
-                      results.countShare
-                        .toString()
-                        .split(' ')[0]
-                        .replace('K', '00')
-                        .replace(',', '')
-                    )
+                  ? parseInt(results.countShare.toString().split(' ')[0].replace('K', '00').replace(',', ''))
                   : parseInt(results.countShare.toString().split(' ')[0].replace('K', '000'))
                 : 0,
               featured_image: results.linkImgs ? results.linkImgs : '',
@@ -565,13 +610,7 @@ module.exports = async function main(req) {
                     content: item.contentComment,
                     count_like: item.countLike
                       ? item.countLike.toString().split(' ')[0].indexOf(',') > -1
-                        ? parseInt(
-                            item.countLike
-                              .toString()
-                              .split(' ')[0]
-                              .replace('K', '00')
-                              .replace(',', '')
-                          )
+                        ? parseInt(item.countLike.toString().split(' ')[0].replace('K', '00').replace(',', ''))
                         : parseInt(item.countLike.toString().split(' ')[0].replace('K', '000'))
                       : 0,
                     user_id: item.userIDComment,
@@ -582,16 +621,8 @@ module.exports = async function main(req) {
                           content: child.contentComment,
                           count_like: child.countLike
                             ? child.countLike.toString().split(' ')[0].indexOf(',') > -1
-                              ? parseInt(
-                                  child.countLike
-                                    .toString()
-                                    .split(' ')[0]
-                                    .replace('K', '00')
-                                    .replace(',', '')
-                                )
-                              : parseInt(
-                                  child.countLike.toString().split(' ')[0].replace('K', '000')
-                                )
+                              ? parseInt(child.countLike.toString().split(' ')[0].replace('K', '00').replace(',', ''))
+                              : parseInt(child.countLike.toString().split(' ')[0].replace('K', '000'))
                             : 0,
                           user_id: child.userIDComment,
                           user_name: child.usernameComment,
@@ -607,69 +638,68 @@ module.exports = async function main(req) {
               basic_fields: basic_fields,
               custom_fields: custom_fields,
             });
-            const postListRefss = ref(
-              database,
-              '/Listpost/' + name.replace(/[#:.,$]/g, '') + '/' + url.split('/')[6]
-            );
+            // const postListRefss = ref(
+            //   database,
+            //   '/Listpost/' + name.replace(/[#:.,$]/g, '') + '/' + url.split('/')[6]
+            // );
 
-            await set(postListRefss, {
-              user: results.user,
-              videos: results.videos,
-              contentList: results.contentList,
-              countComment: results.countComment,
-              countLike: results.countLike,
-              countShare: results.countShare,
-              user_id: results.user_id,
-              idPost: result[i].post_link.split('/')[6],
-              linkPost: result[i].post_link,
-              linkImgs: results.linkImgs,
-              commentList: results.commentList,
-              token: results.token,
-              count_comments_config: results.count_comments_config,
-              statusbar: 'active',
-              create_at: Date.now(),
-            });
-            const postListRefs = ref(
-              database,
-              '/craw_list/' + name.replace(/[#:.,$]/g, '') + '/' + craw_id
-            );
-            const newPostRef = push(postListRefs);
-            await set(newPostRef, {
-              id: i,
-              post_link: result[i].post_link,
-              statusbar: 'active',
-              countComment: results.countComment,
-              countLike: results.countLike,
-              countShare: results.countShare,
-              count_comments_config: results.count_comments_config,
-              create_at: Date.now(),
-            });
+            // await set(postListRefss, {
+            //   user: results.user,
+            //   videos: results.videos,
+            //   contentList: results.contentList,
+            //   countComment: results.countComment,
+            //   countLike: results.countLike,
+            //   countShare: results.countShare,
+            //   user_id: results.user_id,
+            //   idPost: result[i].post_link.split('/')[6],
+            //   linkPost: result[i].post_link,
+            //   linkImgs: results.linkImgs,
+            //   commentList: results.commentList,
+            //   token: results.token,
+            //   count_comments_config: results.count_comments_config,
+            //   statusbar: 'active',
+            //   create_at: Date.now(),
+            // });
+            // const postListRefs = ref(
+            //   database,
+            //   '/craw_list/' + name.replace(/[#:.,$]/g, '') + '/' + craw_id
+            // );
+            // const newPostRef = push(postListRefs);
+            // await set(newPostRef, {
+            //   id: i,
+            //   post_link: result[i].post_link,
+            //   statusbar: 'active',
+            //   countComment: results.countComment,
+            //   countLike: results.countLike,
+            //   countShare: results.countShare,
+            //   count_comments_config: results.count_comments_config,
+            //   create_at: Date.now(),
+            // });
           });
         } catch (e) {
           console.log(e);
           console.log('lỗi error');
+
           const app = initializeApp.initializeApp(firebaseConfig);
           const database = getDatabase(app);
-          const postListRefss = ref(
-            database,
-            '/Listpost/' + name.replace(/[#:.,$]/g, '') + '/' + url.split('/')[6]
-          );
+          const postListRefss = ref(database, '/Listpost/' + name.replace(/[#:.,$]/g, '') + '/' + url.split('/')[6]);
           await set(postListRefss, {
             post_link: url,
             error: 'error' + e,
           });
-          const postListRefs = ref(
-            database,
-            '/craw_list/' + name.replace(/[#:.,$]/g, '') + '/' + craw_id
-          );
-          const newPostRef = push(postListRefs);
-          await set(newPostRef, {
-            id: i,
-            post_link: result[i].post_link,
-            statusbar: 'error' + e,
-          });
+          // const postListRefs = ref(
+          //   database,
+          //   '/craw_list/' + name.replace(/[#:.,$]/g, '') + '/' + craw_id
+          // );
+          // const newPostRef = push(postListRefs);
+          // await set(newPostRef, {
+          //   id: i,
+          //   post_link: result[i].post_link,
+          //   statusbar: 'error' + e,
+          // });
         }
       }
+      await browser2.close();
       // fs.writeFile('item2.txt', JSON.stringify(linkPost, null, 2), (err) => {
       //   if (err) throw err;
       //   console.log('The file1 has been saved!');
@@ -725,30 +755,26 @@ async function getlink(page, conten_length, like, comment, share) {
           let count_like = (count_comment = count_share = count_content = 0);
           let content = '';
           let lengths =
-            post[i].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-              .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[7] !== undefined
-              ? post[i].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                  .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[7]
-                  .childNodes[0].childNodes
-              : post[i].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                  .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[1]
-                  .childNodes[0].childNodes;
+            post[i].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+              .childNodes[0].childNodes[0].childNodes[7] !== undefined
+              ? post[i].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                  .childNodes[0].childNodes[0].childNodes[0].childNodes[7].childNodes[0].childNodes
+              : post[i].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                  .childNodes[0].childNodes[0].childNodes[0].childNodes[1].childNodes[0].childNodes;
           lengths[2].childNodes.forEach((element, index) => {
             if (element.className == '') {
               element.childNodes[0].childNodes.forEach(function (node) {
                 if (node.nodeName == 'SPAN') {
                   for (let c = 0; c < node.childNodes.length; c++) {
-                    content += node.childNodes[c].innerHTML
+                    content += node.childNodes[c].innerText
                       .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
-                      .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
-                      .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
+                      .replace(/^(\+\d{1,2}\s?)?1?\-?\.?\s?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/, '');
                   }
                 } else {
                   for (let c = 0; c < node.childNodes[0].childNodes[0].childNodes.length; c++) {
-                    content += node.childNodes[0].childNodes[0].childNodes[c].innerHTML
+                    content += node.childNodes[0].childNodes[0].childNodes[c].innerText
                       .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
-                      .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
-                      .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
+                      .replace(/^(\+\d{1,2}\s?)?1?\-?\.?\s?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/, '');
                   }
                 }
               });
@@ -761,34 +787,24 @@ async function getlink(page, conten_length, like, comment, share) {
           }
           div = div_commment_yes.querySelectorAll('a[role="link"]');
           let likecomshares =
-            div_commment_yes.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-              .childNodes;
+            div_commment_yes.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes;
           likecomshares.forEach((element, index) => {
             if (index == 0) {
               count_like = element.childNodes
                 ? element.childNodes[1].textContent.split(' ')[0].indexOf(',') > -1
-                  ? element.childNodes[1].textContent
-                      .split(' ')[0]
-                      .replace('K', '00')
-                      .replace(',', '')
+                  ? element.childNodes[1].textContent.split(' ')[0].replace('K', '00').replace(',', '')
                   : element.childNodes[1].textContent.split(' ')[0].replace('K', '000')
                 : 0;
             }
             if (index == 1) {
               count_comment = element.childNodes[1]
                 ? element.childNodes[1].textContent.split(' ')[0].indexOf(',') > -1
-                  ? element.childNodes[1].textContent
-                      .split(' ')[0]
-                      .replace('K', '00')
-                      .replace(',', '')
+                  ? element.childNodes[1].textContent.split(' ')[0].replace('K', '00').replace(',', '')
                   : element.childNodes[1].textContent.split(' ')[0].replace('K', '000')
                 : 0;
               count_share = element.childNodes[2]
                 ? element.childNodes[2].textContent.split(' ')[0].indexOf(',') > -1
-                  ? element.childNodes[2].textContent
-                      .split(' ')[0]
-                      .replace('K', '00')
-                      .replace(',', '')
+                  ? element.childNodes[2].textContent.split(' ')[0].replace('K', '00').replace(',', '')
                   : element.childNodes[2].textContent.split(' ')[0].replace('K', '000')
                 : 0;
             }
