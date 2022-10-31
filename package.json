@@ -30,13 +30,11 @@
     "fbdl-core": "^0.0.1",
     "firebase": "^9.12.1",
     "http-errors": "~1.6.3",
-    "jade": "^0.29.0",
     "monitoro": "^0.1.6",
     "morgan": "~1.9.1",
     "nodemon": "^2.0.20",
     "pug": "^3.0.2",
     "puppeteer": "^16.2.0",
-    "redis": "^4.3.1",
-    "site-audit-seo": "^5.1.5"
+    "redis": "^4.3.1"
   }
 }
