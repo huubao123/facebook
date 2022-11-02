@@ -8,6 +8,9 @@ const ref = require('firebase/database').ref;
 const push = require('firebase/database').push;
 const loadmoremedia = require('../../middlewares/loadmore_media');
 const getdata = require('../../middlewares/getdata_post_group');
+const autoScroll_post = require('../../middlewares/autoscrollpost');
+const createMedia = require('../../middlewares/media');
+const genSlug = require('../../middlewares/genslug');
 require('dotenv').config();
 
 //const bigquery = require('./bigquery');
@@ -24,127 +27,6 @@ const firebaseConfig = {
 };
 // TODO: Replace the following with your app's Firebase project configuration
 // See: https://firebase.google.com/docs/web/learn-more#config-object
-const genSlug = (text) => {
-  text = text
-    .toLowerCase()
-    .replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g, 'a')
-    .replace(/è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ/g, 'e')
-    .replace(/ì|í|ị|ỉ|ĩ/g, 'i')
-    .replace(/ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ/g, 'o')
-    .replace(/ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ/g, 'u')
-    .replace(/ỳ|ý|ỵ|ỷ|ỹ/g, 'y')
-    .replace(/đ/g, 'd')
-    .replace(/\s+/g, '-')
-    .replace(/[^A-Za-z0-9_-]/g, '')
-    .replace(/-+/g, '-');
-  return text;
-};
-
-async function autoScrollpost(page) {
-  const getdata = await page.evaluate(async () => {
-    const data = await new Promise((resolve, reject) => {
-      let totalHeight = 0;
-      let distance = 500;
-      let n = 0;
-      let time = 0;
-      let timer = setInterval(async () => {
-        time += 1;
-        let scrool = new Array();
-        let scrollHeight = document.body.scrollHeight;
-        // window.scrollBy(0, distance);
-        //totalHeight += distance;
-        //n += 1;
-        // if (n == 10) {
-        //   clearInterval(timer);
-        //   resolve();
-        // }
-        if (
-          window.performance.memory.jsHeapSizeLimit - window.performance.memory.jsHeapSizeLimit / 10 <
-          window.performance.memory.totalJSHeapSize
-        ) {
-          clearInterval(timer);
-          resolve();
-        }
-        if (time == 29) {
-          clearInterval(timer);
-          resolve();
-        }
-        let isbottom = document.body.scrollHeight;
-        let istop = parseInt(document.documentElement.scrollTop + window.innerHeight) + 1;
-        if (isbottom === istop) {
-          clearInterval(timer);
-          resolve();
-        }
-        let div = document.querySelectorAll('[role = "button"]');
-        // if (n > 1) {
-        //   for (let i = 0; i < div.length; i++) {
-        //     scrool.push(div[i].innerText);
-        //   }
-        // }
-
-        for (let i = 0; i < div.length; i++) {
-          if (div[i].innerText.indexOf('Ẩn') !== -1) {
-            div[i].style.display = 'none';
-          } else if (
-            div[i].innerText.indexOf('Xem thêm') !== -1 ||
-            div[i].innerText.indexOf('phản hồi') !== -1 ||
-            div[i].innerText.indexOf('câu trả lời') !== -1 ||
-            div[i].innerText.indexOf('bình luận trước') !== -1
-          ) {
-            await div[i].click();
-            scrool.push('đã hết');
-          } else {
-            scrool.push(div[i].innerText);
-          }
-        }
-        checkcom = scrool.indexOf('đã hết') > -1;
-        if (!checkcom) {
-          clearInterval(timer);
-          resolve();
-        }
-
-        if (totalHeight >= scrollHeight) {
-          clearInterval(timer);
-          resolve();
-        }
-      }, 2000);
-    });
-  });
-  return;
-}
-const createMedia = async (data) => {
-  let response = null;
-  let form = new FormData();
-  console.log(data);
-  if (length > 0) {
-    map((item, index) => {
-      form.append(`media[${index}][title]`, item.title);
-      form.append(`media[${index}][alt]`, item.alt);
-      form.append(`media[${index}][file]`, item.file);
-    });
-  }
-
-  await axios({
-    url: 'https://mgs-api-v2.internal.mangoads.com.vn/api/v1/media',
-    method: 'post',
-    data: form,
-    headers: {
-      'content-type': 'application/json',
-      'X-Requested-With': 'XMLHttpRequest',
-      'X-Requested-Store': 'default',
-      accept: 'application/json',
-      Authorization: 'iU9ld6uNhHIKvCIFURWqLyV0kfEGC7OD',
-    },
-  })
-    .then(function (res) {
-      response = res;
-    })
-    .catch(function (response) {
-      //handle error
-      response = null;
-    });
-  return response;
-};
 
 async function autoScroll(page, lengthss, like, comment, share) {
   const getdata = await page.evaluate(
@@ -154,6 +36,7 @@ async function autoScroll(page, lengthss, like, comment, share) {
         let distance = 500;
         let timer = setInterval(async () => {
           console.log(lengthss, like, comment, share);
+          console.log(post_length);
           let scrollHeight = document.body.scrollHeight;
           window.scrollBy(0, distance);
           totalHeight += distance;
@@ -363,9 +246,31 @@ module.exports = async function main(req) {
     // });
 
     await getlink(page, conten_length, like, comment, share).then(async function (result) {
-      fs.writeFile('item.txt', JSON.stringify(result, null, 2), (err) => {
-        if (err) throw err;
-        console.log('The file has been saved!');
+      const craw_link_jobId = ref(database, 'ListLink_jobId/' + req.data.jobId + '/');
+      await set(craw_link_jobId, {
+        name: result,
+        craw_id: req.data.jobId,
+        url: req.data.data.link,
+        lengths: req.data.data.count == '' ? 0 : req.data.data.count,
+        cmt_length: req.data.data.length_comment == '' ? 0 : req.data.data.length_comment,
+        conten_length: req.data.data.length_content == '' ? 0 : req.data.data.length_content,
+        like: req.data.data.like ? req.data.data.like : 0,
+        comment: req.data.data.comment ? req.data.data.comment : 0,
+        share: req.data.data.share ? req.data.data.share : 0,
+        post_type: req.data.data.posttype ? req.data.data.posttype : '',
+      });
+      const craw_link_crawid = ref(database, 'ListLink_crawid/' + craw_id + '/');
+      await set(craw_link_crawid, {
+        name: result,
+        craw_id: req.data.jobId,
+        url: req.data.data.link,
+        lengths: req.data.data.count == '' ? 0 : req.data.data.count,
+        cmt_length: req.data.data.length_comment == '' ? 0 : req.data.data.length_comment,
+        conten_length: req.data.data.length_content == '' ? 0 : req.data.data.length_content,
+        like: req.data.data.like ? req.data.data.like : 0,
+        comment: req.data.data.comment ? req.data.data.comment : 0,
+        share: req.data.data.share ? req.data.data.share : 0,
+        post_type: req.data.data.posttype ? req.data.data.posttype : '',
       });
       let proces = 0;
       await browser.close();
@@ -404,10 +309,6 @@ module.exports = async function main(req) {
         console.log('Processing ' + parseInt(proces.toFixed(2)));
         await req.progress(parseInt(proces.toFixed(2)));
         try {
-          // fs.writeFile('item.txt', JSON.stringify(result, null, 2), (err) => {
-          //   if (err) throw err;s
-          //   console.log('The file has been saved!');
-          // });
           await page1.goto(result[i].post_link, {
             waitUntil: 'networkidle2',
           });
@@ -444,7 +345,7 @@ module.exports = async function main(req) {
               }
             }
           });
-          await autoScrollpost(page1);
+          await autoScroll_post(page1);
           await getdata(page1, cmt_length).then(async function (data) {
             let results = '';
             if (parseInt(data.imagemore) > 0) {
@@ -467,8 +368,7 @@ module.exports = async function main(req) {
               });
               return;
             }
-            const app = initializeApp.initializeApp(firebaseConfig);
-            const database = getDatabase(app);
+
             const postListRef = ref(
               database,
               'post_type/' + post_type + '/' + name.replace(/[#:.,$]/g, '') + '/' + result[i].post_link.split('/')[6]
@@ -502,7 +402,7 @@ module.exports = async function main(req) {
             //       if (resultss.size / 1024 / 1024 > 1) {
             //         return null;
             //       }
-            //       let resultAddVid = await createMedia({
+            //    let resultAddVid = await createMedia({
             //         data: [
             //           {
             //             alt: result[i].post_link.split('/')[6]
@@ -577,6 +477,7 @@ module.exports = async function main(req) {
               type: post_type,
               attributes: [],
               status: 'publish',
+              is_active: 1,
               seo_tags: {
                 meta_title: 'New Post Facebook',
                 meta_description: 'New Post Facebook',
@@ -679,10 +580,10 @@ module.exports = async function main(req) {
         } catch (e) {
           console.log(e);
           console.log('lỗi error');
-
-          const app = initializeApp.initializeApp(firebaseConfig);
-          const database = getDatabase(app);
-          const postListRefss = ref(database, '/Listpost/' + name.replace(/[#:.,$]/g, '') + '/' + url.split('/')[6]);
+          const postListRefss = ref(
+            database,
+            '/Listpost_error/' + name.replace(/[#:.,$]/g, '') + '/' + url.split('/')[6]
+          );
           await set(postListRefss, {
             post_link: url,
             error: 'error' + e,
@@ -700,43 +601,6 @@ module.exports = async function main(req) {
         }
       }
       await browser2.close();
-      // fs.writeFile('item2.txt', JSON.stringify(linkPost, null, 2), (err) => {
-      //   if (err) throw err;
-      //   console.log('The file1 has been saved!');
-      // });
-      // await page.goto('https://mgs-admin-dev.mangoads.com.vn/sign-in-cover?returnUrl=%2F', {
-      //   waitUntil: 'load',
-      // });
-      // await page.type('[type="email"]', 'datpmwork+fleet@gmail.com', { delay: 100 });
-      // await page.type('[type="password"]', 'NzgxN2QxNTZhZDUyNDQyMjViYTM3ZDc0', { delay: 100 });
-      // await page.evaluate(async () => {
-      //   document.querySelector('[type="button"]').click();
-      // });
-      // await new Promise((r) => setTimeout(r, 4000));
-      // await page.goto('https://mgs-admin-dev.mangoads.com.vn/facebook/facebook10', {
-      //   waitUntil: 'load',
-      // });
-      // await page.evaluate(async () => {
-      //   document.querySelectorAll('textarea')[1].classList.add('my-class');
-      // });
-      // await new Promise((r) => setTimeout(r, 10000));
-      // fs.readFile('item2.txt', async (err, data) => {
-      //   data_parse = JSON.parse(data);
-
-      //   await page.evaluate(async (data_parse) => {
-      //     document.querySelectorAll('textarea')[0].innerHTML = JSON.stringify(data_parse);
-      //     document.querySelectorAll('textarea')[1].innerHTML = data_parse[0].token;
-      //   }, data_parse);
-      //   await page.type('textarea', ' ', { delay: 0 });
-      //   await page.type('.my-class', ' ', { delay: 0 });
-      //   await page.evaluate(async () => {
-      //     document.querySelectorAll('[type="button"]').forEach(async (button) => {
-      //       if (button.innerText == 'ADD') {
-      //         await button.click();
-      //       }
-      //     });
-      //   });
-      // });
     });
     //await browser.close();
   } catch (err) {

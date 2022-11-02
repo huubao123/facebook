@@ -4,7 +4,6 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const cors = require('cors');
-
 const indexRouter = require('./routes/index');
 const timeout = require('connect-timeout'); //express v4
 const monitoro = require('monitoro');
@@ -41,12 +40,19 @@ const page = new Queue('page', {
 }); // if you have a special connection to redis.
 const page1 = new Queue('page1', { redis: { port: 6379, host: '127.0.0.1' } });
 const group1 = new Queue('group1', { redis: { port: 6379, host: '127.0.0.1' } });
+const test = new Queue('test', { redis: { port: 6379, host: '127.0.0.1' } });
 
 const serverAdapter = new ExpressAdapter();
 serverAdapter.setBasePath('/admin/queues');
 
 const { addQueue, removeQueue, setQueues, replaceQueues } = createBullBoard({
-  queues: [new BullAdapter(group), new BullAdapter(group1), new BullMQAdapter(page), new BullMQAdapter(page1)],
+  queues: [
+    new BullAdapter(group),
+    new BullAdapter(group1),
+    new BullMQAdapter(page),
+    new BullMQAdapter(page1),
+    new BullMQAdapter(test),
+  ],
   serverAdapter: serverAdapter,
 });
 const redis = require('redis');

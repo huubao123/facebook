@@ -18,6 +18,7 @@ const pagequeue = new Queue('page', { redis: { port: 6379, host: '127.0.0.1' } }
 const page1queue = new Queue('page1', { redis: { port: 6379, host: '127.0.0.1' } });
 
 const queue1 = new Queue('group1', { redis: { port: 6379, host: '127.0.0.1' } });
+const test = new Queue('test', { redis: { port: 6379, host: '127.0.0.1' } });
 
 // main().catch(console.error);
 // var q = kue.createQueue({
@@ -67,8 +68,6 @@ const firebaseConfig = {
   appId: '1:207611940130:web:3cebdcc6c0a6f19e58297b',
   measurementId: 'G-3LDE9KDMV2',
 };
-const app = initializeApp.initializeApp(firebaseConfig);
-const database = getDatabase(app);
 
 router.get('/', async function (req, res, next) {
   res.json({ aaa: 'aaaa' });
@@ -105,7 +104,7 @@ router.post('/group1', async (req, res) => {
   const currentTime = new Date().getTime();
   const processAt = new Date(req.body.datetime).getTime();
   const delay = processAt - currentTime;
-  await queue1.add({ data: req.body }, { delay: delay, jobId: jobId });
+  await queue1.add({ data: req.body, jobId: jobId }, { delay: delay, jobId: jobId });
   res.json({ data: 'success', statusbar: 'ok', jobId: jobId });
 });
 router.post('/add', video);
@@ -117,14 +116,23 @@ router.post('/group', async function (req, res, next) {
 
   res.json({ data: 'success', statusbar: 'ok', jobId: jobId });
 
-  await queue.add({ data: req.body }, { delay: delay, jobId: jobId });
+  await queue.add({ data: req.body, jobId: jobId }, { delay: delay, jobId: jobId });
+});
+router.post('/test', async function (req, res, next) {
+  const jobId = crypto.randomBytes(10).toString('hex');
+
+  res.json({ data: 'success', statusbar: 'ok', jobId: jobId });
+
+  await test.add({ data: req.body, jobId: jobId }, { jobId: jobId });
+});
+test.process(async (job, done) => {
+  job.progress(100);
+  done();
 });
 queue.process(async (job, done) => {
+  // await new Promise((r) => setTimeout(r, 4000));
+  // console.log(job.data);
   await group(job);
-  // if (job.data.url.indexOf('posts') > -1) {
-  //   await facebook1(job);
-  // }
-  job.progress(100);
   done();
 });
 queue1.process(async (job, done) => {
@@ -141,7 +149,7 @@ router.post('/page', async function (req, res, next) {
 
   res.json({ data: 'success', statusbar: 'ok', jobId: jobId });
 
-  await pagequeue.add({ data: req.body }, { delay: delay, jobId: jobId });
+  await pagequeue.add({ data: req.body, jobId: jobId }, { delay: delay, jobId: jobId });
 });
 pagequeue.process(async (job, done) => {
   await page(job);
@@ -159,7 +167,7 @@ router.post('/page1', async function (req, res, next) {
 
   res.json({ data: 'success', statusbar: 'ok', jobId: jobId });
 
-  await page1queue.add({ data: req.body }, { delay: delay, jobId: jobId });
+  await page1queue.add({ data: req.body, jobId: jobId }, { delay: delay, jobId: jobId });
 });
 page1queue.process(async (job, done) => {
   await page1(job);

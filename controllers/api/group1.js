@@ -4,6 +4,9 @@ const crypto = require('crypto');
 //const bigquery = require('./bigquery');
 const loadmoremedia = require('../../middlewares/loadmore_media');
 const getdata = require('../../middlewares/getdata_post_group');
+const autoScroll_post = require('../../middlewares/autoscrollpost');
+const createMedia = require('../../middlewares/media');
+const genSlug = require('../../middlewares/genslug');
 
 const initializeApp = require('firebase/app');
 
@@ -24,73 +27,6 @@ const firebaseConfig = {
 
 // TODO: Replace the following with your app's Firebase project configuration
 // See: https://firebase.google.com/docs/web/learn-more#config-object
-async function autoScrollpost(page) {
-  const getdata = await page.evaluate(async () => {
-    const data = await new Promise((resolve, reject) => {
-      let totalHeight = 0;
-      let distance = 500;
-      let n = 0;
-      let time = 0;
-      let timer = setInterval(async () => {
-        let scrool = new Array();
-        let scrollHeight = document.body.scrollHeight;
-        //window.scrollBy(0, distance);
-        time += 1;
-        if (time == 29) {
-          clearInterval(timer);
-          resolve();
-        }
-        n += 1;
-        totalHeight += distance;
-        if (
-          window.performance.memory.jsHeapSizeLimit -
-            window.performance.memory.jsHeapSizeLimit / 10 <
-          window.performance.memory.totalJSHeapSize
-        ) {
-          clearInterval(timer);
-          resolve();
-        }
-        // if (n == 10) {
-        //   clearInterval(timer);
-        //   resolve();
-        // }
-        let isbottom = document.body.scrollHeight;
-        let istop = parseInt(document.documentElement.scrollTop + window.innerHeight) + 1;
-        if (isbottom === istop) {
-          clearInterval(timer);
-          resolve();
-        }
-        let div = document.querySelectorAll('[role = "button"]');
-        for (let i = 0; i < div.length; i++) {
-          if (div[i].innerText.indexOf('Ẩn') !== -1) {
-            div[i].style.display = 'none';
-          } else if (
-            div[i].innerText.indexOf('Xem thêm') !== -1 ||
-            div[i].innerText.indexOf('phản hồi') !== -1 ||
-            div[i].innerText.indexOf('câu trả lời') !== -1 ||
-            div[i].innerText.indexOf('bình luận trước') !== -1
-          ) {
-            await div[i].click();
-            scrool.push('đã hết');
-          } else {
-            scrool.push(div[i].innerText);
-          }
-        }
-        checkcom = scrool.indexOf('đã hết') > -1;
-        if (!checkcom) {
-          clearInterval(timer);
-          resolve();
-        }
-        // console.log(scrool);
-        if (totalHeight >= scrollHeight) {
-          clearInterval(timer);
-          resolve();
-        }
-      }, 2000);
-    });
-  });
-  return;
-}
 
 module.exports = async function main(req) {
   try {
@@ -107,10 +43,7 @@ module.exports = async function main(req) {
     const craw_id = crypto.randomBytes(16).toString('hex');
     const app = initializeApp.initializeApp(firebaseConfig);
     const database = getDatabase(app);
-    const postListRefs = ref(
-      database,
-      '/craw_list_length/' + name.replace(/[#:.,$]/g, '') + '/' + craw_id
-    );
+    const postListRefs = ref(database, '/craw_list_length/' + name.replace(/[#:.,$]/g, '') + '/' + craw_id);
     await set(postListRefs, {
       craw_id: craw_id,
       length: 1,
@@ -198,8 +131,6 @@ module.exports = async function main(req) {
     let result = await page.evaluate(() => {
       return document.querySelector('h1').textContent;
     });
-    const apps = initializeApp.initializeApp(firebaseConfig);
-    const databases = getDatabase(apps);
     const postListRefss = ref(databases, 'Group/' + name.replace(/[#:.,$]/g, ''));
     await set(postListRefss, {
       name: result,
@@ -229,10 +160,7 @@ module.exports = async function main(req) {
       await page.evaluate(async () => {
         let div = document.querySelectorAll('[role = "button"]');
         for (let i = 0; i < div.length; i++) {
-          if (
-            div[i].innerText.indexOf('liên quan nhất') !== -1 ||
-            div[i].innerText.indexOf('Gần đây nhất') !== -1
-          ) {
+          if (div[i].innerText.indexOf('liên quan nhất') !== -1 || div[i].innerText.indexOf('Gần đây nhất') !== -1) {
             await div[i].click();
           }
         }
@@ -246,17 +174,14 @@ module.exports = async function main(req) {
         }
       });
 
-      await autoScrollpost(page);
+      await autoScroll_post(page);
       await getdata(page, cmt_length).then(async function (data) {
         let result = data;
         if (data.imagemore > 0) {
           result = await loadmoremedia(page, data);
         }
         if (!result.ismain || !result.iscate || !result.iscontent || !result.isuser) {
-          const error = ref(
-            databases,
-            'Error/' + name.replace(/[#:.,$]/g, '') + '/' + result.linkPost.split('/')[6]
-          );
+          const error = ref(databases, 'Error/' + name.replace(/[#:.,$]/g, '') + '/' + result.linkPost.split('/')[6]);
           await set(error, {
             name: result.linkPost,
             ismain: result.ismain,
@@ -268,14 +193,7 @@ module.exports = async function main(req) {
           return;
         }
 
-        fs.writeFile('item1.txt', JSON.stringify(result, null, 2), (err) => {
-          if (err) throw err;
-          console.log('The file has been saved!');
-        });
-        const postListRef = ref(
-          database,
-          '/Listpost/' + name.replace(/[#:.,$]/g, '') + '/' + url.split('/')[6]
-        );
+        const postListRef = ref(database, '/Listpost/' + name.replace(/[#:.,$]/g, '') + '/' + url.split('/')[6]);
 
         set(postListRef, {
           user: result.user,
@@ -305,9 +223,7 @@ module.exports = async function main(req) {
         let arrImage = null;
         let flagimage = true;
         let flagvideo = true;
-        let short_description = result.contentList
-          ? result.contentList.replaceAll(/(<([^>]+)>)/gi, '')
-          : '';
+        let short_description = result.contentList ? result.contentList.replaceAll(/(<([^>]+)>)/gi, '') : '';
         for (let i = 0; i < 100; i++) {
           let lengths = short_description.split(' ').length;
           short_descriptions += short_description.split(' ')[i] + ' ';
@@ -392,6 +308,7 @@ module.exports = async function main(req) {
           session_tags: {
             tags: [],
           },
+          is_active: 1,
           categorialue: [],
           key: '',
           name: '',
@@ -412,23 +329,17 @@ module.exports = async function main(req) {
           user_name: result.user ? result.user : 'undefined',
           count_like: result.countLike
             ? result.countLike.toString().split(' ')[0].indexOf(',') > -1
-              ? parseInt(
-                  result.countLike.toString().split(' ')[0].replace('K', '00').replace(',', '')
-                )
+              ? parseInt(result.countLike.toString().split(' ')[0].replace('K', '00').replace(',', ''))
               : parseInt(result.countLike.toString().split(' ')[0].replace('K', '000'))
             : 0,
           count_comment: result.countComment
             ? result.countComment.toString().split(' ')[0].indexOf(',') > -1
-              ? parseInt(
-                  result.countComment.toString().split(' ')[0].replace('K', '00').replace(',', '')
-                )
+              ? parseInt(result.countComment.toString().split(' ')[0].replace('K', '00').replace(',', ''))
               : parseInt(result.countComment.toString().split(' ')[0].replace('K', '000'))
             : 0,
           count_share: result.countShare
             ? result.countShare.toString().split(' ')[0].indexOf(',') > -1
-              ? parseInt(
-                  result.countShare.toString().split(' ')[0].replace('K', '00').replace(',', '')
-                )
+              ? parseInt(result.countShare.toString().split(' ')[0].replace('K', '00').replace(',', ''))
               : parseInt(result.countShare.toString().split(' ')[0].replace('K', '000'))
             : 0,
           featured_image: result.linkImgs ? result.linkImgs : '',
@@ -437,9 +348,7 @@ module.exports = async function main(req) {
                 content: item.contentComment,
                 count_like: item.countLike
                   ? item.countLike.toString().split(' ')[0].indexOf(',') > -1
-                    ? parseInt(
-                        item.countLike.toString().split(' ')[0].replace('K', '00').replace(',', '')
-                      )
+                    ? parseInt(item.countLike.toString().split(' ')[0].replace('K', '00').replace(',', ''))
                     : parseInt(item.countLike.toString().split(' ')[0].replace('K', '000'))
                   : 0,
                 user_id: item.userIDComment,
@@ -450,13 +359,7 @@ module.exports = async function main(req) {
                       content: child.contentComment,
                       count_like: child.countLike
                         ? child.countLike.toString().split(' ')[0].indexOf(',') > -1
-                          ? parseInt(
-                              child.countLike
-                                .toString()
-                                .split(' ')[0]
-                                .replace('K', '00')
-                                .replace(',', '')
-                            )
+                          ? parseInt(child.countLike.toString().split(' ')[0].replace('K', '00').replace(',', ''))
                           : parseInt(child.countLike.toString().split(' ')[0].replace('K', '000'))
                         : 0,
                       user_id: child.userIDComment,
@@ -473,67 +376,14 @@ module.exports = async function main(req) {
           basic_fields: basic_fields,
           custom_fields: custom_fields,
         });
-        const postListRefsss = ref(
-          database,
-          '/Listpost/' + name.replace(/[#:.,$]/g, '') + '/' + url.split('/')[6]
-        );
-
-        await set(postListRefsss, {
-          user: result.user,
-          videos: result.videos,
-          contentList: result.contentList,
-          countComment: result.countComment,
-          countLike: result.countLike,
-          countShare: result.countShare,
-          user_id: result.user_id,
-          idPost: url.split('/')[6],
-          linkPost: url,
-          linkImgs: result.linkImgs,
-          commentList: result.commentList,
-          token: result.token,
-          count_comments_config: result.count_comments_config,
-          statusbar: 'active',
-          create_at: Date.now(),
-        });
-        const postListRefs = ref(
-          database,
-          '/craw_list/' + name.replace(/[#:.,$]/g, '') + '/' + craw_id
-        );
-        const newPostRef = push(postListRefs);
-
-        await set(newPostRef, {
-          id: 1,
-          post_link: url,
-          statusbar: 'active',
-          countComment: result.countComment,
-          countLike: result.countLike,
-          countShare: result.countShare,
-          count_comments_config: result.count_comments_config,
-          comments_config: cmt_length,
-          create_at: Date.now(),
-        });
       });
     } catch (e) {
       console.log(e);
       console.log('lỗi error');
-      const app = initializeApp.initializeApp(firebaseConfig);
-      const database = getDatabase(app);
-      const postListRefss = ref(
-        database,
-        '/Listpost/' + name.replace(/[#:.,$]/g, '') + '/' + url.split('/')[6]
-      );
+      const postListRefss = ref(database, '/Listpost/' + name.replace(/[#:.,$]/g, '') + '/' + url.split('/')[6]);
       await set(postListRefss, {
         post_link: url,
         error: 'error' + e,
-      });
-      const postListRefs = ref(
-        database,
-        '/craw_list/' + name.replace(/[#:.,$]/g, '') + '/' + craw_id
-      );
-      const newPostRef = push(postListRefs);
-      await set(newPostRef, {
-        post_link: url,
-        statusbar: 'error' + e,
       });
     }
 
