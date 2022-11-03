@@ -49,7 +49,7 @@ module.exports = async function main(req) {
 
     Posttype.findOne({ name: post_type }, async function (err, posttype) {
       if (posttype) {
-        group_id = posttype._id;
+        Posttype_id = posttype._id;
       } else {
         let Posttypes = new Posttype({
           name: post_type,
