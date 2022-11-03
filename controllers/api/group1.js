@@ -7,6 +7,10 @@ const getdata = require('../../middlewares/getdata_post_group');
 const autoScroll_post = require('../../middlewares/autoscrollpost');
 const createMedia = require('../../middlewares/media');
 const genSlug = require('../../middlewares/genslug');
+const Post = require('../../models/post');
+const Post_detail = require('../../models/post_detail');
+const Group = require('../../models/group');
+const Posttype = require('../../models/posttype');
 
 const initializeApp = require('firebase/app');
 
@@ -39,18 +43,33 @@ module.exports = async function main(req) {
     const cmt_length = req.data.data.length_comment ? req.data.data.length_comment : 0;
     let name_group = '';
     const post_type = req.data.data.posttype ? req.data.data.posttype : '';
-
+    let group_id = '';
+    let Posttype_id = '';
     const craw_id = crypto.randomBytes(16).toString('hex');
-    const app = initializeApp.initializeApp(firebaseConfig);
-    const database = getDatabase(app);
-    const postListRefs = ref(database, '/craw_list_length/' + name.replace(/[#:.,$]/g, '') + '/' + craw_id);
-    await set(postListRefs, {
-      craw_id: craw_id,
-      length: 1,
-      url: url,
-      cmt_length: cmt_length,
-      create_at: Date.now(),
+
+    Posttype.findOne({ url: url }, async function (err, posttype) {
+      if (posttype) {
+        group_id = posttype._id;
+      } else {
+        let Posttypes = new Posttype({
+          name: post_type,
+          create_at: new Date(),
+        });
+        await Posttypes.save();
+        Posttype_id = Posttypes._id;
+      }
     });
+
+    // const app = initializeApp.initializeApp(firebaseConfig);
+    // const database = getDatabase(app);
+    // const postListRefs = ref(database, '/craw_list_length/' + name.replace(/[#:.,$]/g, '') + '/' + craw_id);
+    // await set(postListRefs, {
+    //   craw_id: craw_id,
+    //   length: 1,
+    //   url: url,
+    //   cmt_length: cmt_length,
+    //   create_at: Date.now(),
+    // });
     if (!cmt_length) {
       cmt_length = -1;
     }
@@ -129,14 +148,29 @@ module.exports = async function main(req) {
     } catch (e) {}
 
     let result = await page.evaluate(() => {
-      return document.querySelector('h1').textContent;
+      return document.querySelectorAll('h1')[1]
+        ? document.querySelectorAll('h1')[1].textContent
+        : document.querySelectorAll('h1')[0].textContent;
     });
-    const postListRefss = ref(databases, 'Group/' + name.replace(/[#:.,$]/g, ''));
-    await set(postListRefss, {
-      name: result,
-      url: url_group,
-      create_at: Date.now(),
+    Group.findOne({ url: url }, async function (err, group) {
+      if (group) {
+        group_id = group._id;
+      } else {
+        let groups = new Group({
+          name: result,
+          url: url,
+          create_at: new Date(),
+        });
+        await groups.save();
+        group_id = groups._id;
+      }
     });
+    // const postListRefss = ref(databases, 'Group/' + name.replace(/[#:.,$]/g, ''));
+    // await set(postListRefss, {
+    //   name: result,
+    //   url: url_group,
+    //   create_at: Date.now(),
+    // });
     try {
       await page.goto(url, {
         waitUntil: 'networkidle2',
@@ -181,42 +215,42 @@ module.exports = async function main(req) {
           result = await loadmoremedia(page, data);
         }
         if (!result.ismain || !result.iscate || !result.iscontent || !result.isuser) {
-          const error = ref(databases, 'Error/' + name.replace(/[#:.,$]/g, '') + '/' + result.linkPost.split('/')[6]);
-          await set(error, {
-            name: result.linkPost,
-            ismain: result.ismain,
-            iscate: result.iscate,
-            iscomment: result.iscomment,
-            isuser: result.isuser,
-            iscontent: result.iscontent,
-          });
+          // const error = ref(databases, 'Error/' + name.replace(/[#:.,$]/g, '') + '/' + result.linkPost.split('/')[6]);
+          // await set(error, {
+          //   name: result.linkPost,
+          //   ismain: result.ismain,
+          //   iscate: result.iscate,
+          //   iscomment: result.iscomment,
+          //   isuser: result.isuser,
+          //   iscontent: result.iscontent,
+          // });
           return;
         }
 
-        const postListRef = ref(database, '/Listpost/' + name.replace(/[#:.,$]/g, '') + '/' + url.split('/')[6]);
+        // const postListRef = ref(database, '/Listpost/' + name.replace(/[#:.,$]/g, '') + '/' + url.split('/')[6]);
 
-        set(postListRef, {
-          user: result.user,
-          videos: result.videos,
-          contentList: result.contentList,
-          countComment: result.countComment,
-          countLike: result.countLike,
-          countShare: result.countShare,
-          user_id: result.user_id,
-          idPost: url.split('/')[6],
-          linkPost: url,
-          linkImgs: result.linkImgs,
-          commentList: result.commentList,
-          token: result.token,
-          count_comments_config: result.count_comments_config,
-          statusbar: 'active',
-          create_at: Date.now(),
-        });
+        // set(postListRef, {
+        //   user: result.user,
+        //   videos: result.videos,
+        //   contentList: result.contentList,
+        //   countComment: result.countComment,
+        //   countLike: result.countLike,
+        //   countShare: result.countShare,
+        //   user_id: result.user_id,
+        //   idPost: url.split('/')[6],
+        //   linkPost: url,
+        //   linkImgs: result.linkImgs,
+        //   commentList: result.commentList,
+        //   token: result.token,
+        //   count_comments_config: result.count_comments_config,
+        //   statusbar: 'active',
+        //   create_at: Date.now(),
+        // });
 
-        const postListRefss = ref(
-          database,
-          'post_type/' + post_type + '/' + name.replace(/[#:.,$]/g, '') + '/' + url.split('/')[6]
-        );
+        // const postListRefss = ref(
+        //   database,
+        //   'post_type/' + post_type + '/' + name.replace(/[#:.,$]/g, '') + '/' + url.split('/')[6]
+        // );
         let titles = '';
         let short_descriptions = '';
         let arrVid = null;
@@ -371,23 +405,108 @@ module.exports = async function main(req) {
             : [],
         };
         data_post = {};
+        try {
+          let post = new Post({
+            basic_fields: JSON.stringify(basic_fields, null, 2),
+            custom_fields: JSON.stringify(custom_fields, null, 2),
+            group_id: group_id,
+            posttype: Posttype_id,
+          });
+          let postdetail = new Post_detail({
+            group_id: group_id,
+            title: titles,
+            short_description: short_descriptions,
+            long_description: result.contentList
+              ? result.contentList.replaceAll('https://l.facebook.com/l.php?', '')
+              : '',
+            slug: '',
+            featured_image: result.linkImgs[0] ? result.linkImgs[0] : '',
+            session_tags: {
+              tags: [],
+            },
+            categorialue: [],
+            key: '',
+            name: '',
+            type: post_type,
+            attributes: [],
+            status: 'publish',
+            is_active: 1,
+            seo_tags: {
+              meta_title: 'New Post Facebook',
+              meta_description: 'New Post Facebook',
+            },
+            video: result.videos,
+            date: result.date ? result.date : '',
+            post_id: result.idPost ? result.idPost : '',
+            post_link: url,
+            user_id: result.user_id ? result.user_id : 'undefined',
+            user_name: result.user ? result.user : 'undefined',
+            count_like: result.countLike
+              ? result.countLike.toString().split(' ')[0].indexOf(',') > -1
+                ? parseInt(result.countLike.toString().split(' ')[0].replace('K', '00').replace(',', ''))
+                : parseInt(result.countLike.toString().split(' ')[0].replace('K', '000'))
+              : 0,
+            count_comment: result.countComment
+              ? result.countComment.toString().split(' ')[0].indexOf(',') > -1
+                ? parseInt(result.countComment.toString().split(' ')[0].replace('K', '00').replace(',', ''))
+                : parseInt(result.countComment.toString().split(' ')[0].replace('K', '000'))
+              : 0,
+            count_share: result.countShare
+              ? result.countShare.toString().split(' ')[0].indexOf(',') > -1
+                ? parseInt(result.countShare.toString().split(' ')[0].replace('K', '00').replace(',', ''))
+                : parseInt(result.countShare.toString().split(' ')[0].replace('K', '000'))
+              : 0,
+            featured_image: result.linkImgs ? result.linkImgs : '',
+            comments: result.commentList
+              ? result.commentList.map((item) => ({
+                  content: item.contentComment,
+                  count_like: item.countLike
+                    ? item.countLike.toString().split(' ')[0].indexOf(',') > -1
+                      ? parseInt(item.countLike.toString().split(' ')[0].replace('K', '00').replace(',', ''))
+                      : parseInt(item.countLike.toString().split(' ')[0].replace('K', '000'))
+                    : 0,
+                  user_id: item.userIDComment,
+                  user_name: item.usernameComment,
+                  imgComment: item.imageComment ? item.imageComment : '',
+                  children: item.children
+                    ? item.children.map((child) => ({
+                        content: child.contentComment,
+                        count_like: child.countLike
+                          ? child.countLike.toString().split(' ')[0].indexOf(',') > -1
+                            ? parseInt(child.countLike.toString().split(' ')[0].replace('K', '00').replace(',', ''))
+                            : parseInt(child.countLike.toString().split(' ')[0].replace('K', '000'))
+                          : 0,
+                        user_id: child.userIDComment,
+                        user_name: child.usernameComment,
+                        imageComment: child.imageComment ? child.imageComment : '',
+                      }))
+                    : [],
+                }))
+              : [],
+          });
+
+          await post.save();
+          await postdetail.save();
+        } catch (e) {
+          console.log(e);
+        }
         //await bigquery(basic_fields, custom_fields);
-        await set(postListRefss, {
-          basic_fields: basic_fields,
-          custom_fields: custom_fields,
-        });
+        // await set(postListRefss, {
+        //   basic_fields: basic_fields,
+        //   custom_fields: custom_fields,
+        // });
       });
     } catch (e) {
       console.log(e);
       console.log('lỗi error');
-      const postListRefss = ref(database, '/Listpost/' + name.replace(/[#:.,$]/g, '') + '/' + url.split('/')[6]);
-      await set(postListRefss, {
-        post_link: url,
-        error: 'error' + e,
-      });
+      // const postListRefss = ref(database, '/Listpost/' + name.replace(/[#:.,$]/g, '') + '/' + url.split('/')[6]);
+      // await set(postListRefss, {
+      //   post_link: url,
+      //   error: 'error' + e,
+      // });
     }
 
-    //await browser.close();
+    await browser.close();
   } catch (err) {
     console.log('lỗi server', err);
   }

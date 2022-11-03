@@ -6,7 +6,7 @@ router.use(bodyParser.urlencoded({ extended: true }));
 var group = require('../controllers/api/group');
 var page1 = require('../controllers/api/page1');
 var page = require('../controllers/api/page');
-
+const Post = require('.././models/post');
 var group1 = require('../controllers/api/group1');
 const video = require('../controllers/sitemap');
 const fs = require('fs');
@@ -119,11 +119,66 @@ router.post('/group', async function (req, res, next) {
   await queue.add({ data: req.body, jobId: jobId }, { delay: delay, jobId: jobId });
 });
 router.post('/test', async function (req, res, next) {
-  const jobId = crypto.randomBytes(10).toString('hex');
+  try {
+    let post = new Post({
+      title: 'data.title',
+      short_description: 'data.short_description',
+      long_description: 'data.long_description',
+      slug: 'genSlug(data.title)',
+      session_tags: ' { tags: data.tags }',
+      categories: 'data.categories' || null,
+      key: 'genSlug(data.title)',
+      name: 'data.title',
+      featured_image: 'imageList && imageList?.length !== 0 ? imageList[0].id : null',
+      type: 'data.type',
+      attributes: [],
+      status: 'publish',
+      seo_tags: {
+        meta_title: 'New Post Facebook',
+        meta_description: 'New Post Facebook',
+      },
+      video: 'arrVid' || null,
+      date: 'data.date',
+      post_id: 'data.post.id',
+      post_link: 'data.post.link',
+      user_id: 'data.user.id',
+      user_name: 'data.user.name',
+      count_like: 'data.like',
+      count_comment: 'data.comment',
+      count_share: 'data.share',
+      featured_image: 'imageList ? imageList.map((image) => ({ img: image.path })) : null',
+      comment: [
+        {
+          content: 'item.contentComment',
+          count_like: 'item.countLike',
+          user_id: 'item.userIDComment',
+          user_name: 'item.usernameComment',
+          imgComment: 'item.imageComment',
 
-  res.json({ data: 'success', statusbar: 'ok', jobId: jobId });
-
-  await test.add({ data: req.body, jobId: jobId }, { jobId: jobId });
+          children: [
+            {
+              content: 'child.contentComment',
+              count_like: 'child.countLike',
+              user_id: 'child.userIDComment',
+              user_name: 'child.usernameComment',
+              imageComment: 'child.imageComment',
+            },
+          ],
+        },
+        {
+          content: 'item.contentComment',
+          count_like: 'item.countLike',
+          user_id: 'item.userIDComment',
+          user_name: 'item.usernameComment',
+          imgComment: 'item.imageComment',
+        },
+      ],
+    });
+    await post.save();
+    res.json(post);
+  } catch (e) {
+    console.log(e);
+  }
 });
 test.process(async (job, done) => {
   job.progress(100);
