@@ -243,9 +243,9 @@ module.exports = async function main(req) {
       console.log(e);
     }
     const result = await page.evaluate(() => {
-      return document.querySelector('h1')[1]
-        ? document.querySelector('h1')[1].textContent
-        : document.querySelector('h1')[0].textContent;
+      return document.querySelectorAll('h1')[1]
+        ? document.querySelectorAll('h1')[1].textContent
+        : document.querySelectorAll('h1')[0].textContent;
     });
     Group.findOne({ url: url }, async function (err, group) {
       if (group) {
