@@ -98,7 +98,7 @@ module.exports = async function main(req) {
     let group_id = '';
     let Posttype_id = '';
 
-    Posttype.findOne({ url: url }, async function (err, posttype) {
+    Posttype.findOne({ name: post_type }, async function (err, posttype) {
       if (posttype) {
         group_id = posttype._id;
       } else {

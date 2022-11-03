@@ -47,7 +47,7 @@ module.exports = async function main(req) {
     let Posttype_id = '';
     const craw_id = crypto.randomBytes(16).toString('hex');
 
-    Posttype.findOne({ url: url }, async function (err, posttype) {
+    Posttype.findOne({ name: post_type }, async function (err, posttype) {
       if (posttype) {
         group_id = posttype._id;
       } else {
