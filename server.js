@@ -7,7 +7,7 @@ const cors = require('cors');
 const indexRouter = require('./routes/index');
 const timeout = require('connect-timeout'); //express v4
 const monitoro = require('monitoro');
-
+const postRouter = require('./routes/post');
 const app = express();
 
 // view engine setup
@@ -94,6 +94,7 @@ app.use((req, res, next) => {
 });
 
 app.use('/', indexRouter);
+app.use('/posts', postRouter);
 app.use('/admin/queues', serverAdapter.getRouter());
 app.use('/foo/bar', monitoro);
 

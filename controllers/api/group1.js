@@ -407,10 +407,11 @@ module.exports = async function main(req) {
         data_post = {};
         try {
           let post = new Post({
-            basic_fields: JSON.stringify(basic_fields, null, 2),
-            custom_fields: JSON.stringify(custom_fields, null, 2),
+            basic_fields: JSON.stringify(basic_fields),
+            custom_fields: JSON.stringify(custom_fields),
             group_id: group_id,
             posttype: Posttype_id,
+            create_at: new Date(),
           });
           let postdetail = new Post_detail({
             group_id: group_id,

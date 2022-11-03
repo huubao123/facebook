@@ -232,24 +232,24 @@ page1queue.process(async (job, done) => {
   job.progress(100);
   done();
 });
-router.get('/post', async function (req, res, next) {
-  const url = req.body.url;
-  if (!url) {
-    res.json('url is required');
-  }
-  const dbRef = ref(getDatabase());
-  get(child(dbRef, '/postList/' + url.split('/')[4].replace(/[#:.,$]/g, '')))
-    .then((snapshot) => {
-      if (snapshot.exists()) {
-        res.json(snapshot.val());
-      } else {
-        res.send('No data available');
-      }
-    })
-    .catch((error) => {
-      console.error(error);
-    });
-});
+// router.get('/post', async function (req, res, next) {
+//   const url = req.body.url;
+//   if (!url) {
+//     res.json('url is required');
+//   }
+//   const dbRef = ref(getDatabase());
+//   get(child(dbRef, '/postList/' + url.split('/')[4].replace(/[#:.,$]/g, '')))
+//     .then((snapshot) => {
+//       if (snapshot.exists()) {
+//         res.json(snapshot.val());
+//       } else {
+//         res.send('No data available');
+//       }
+//     })
+//     .catch((error) => {
+//       console.error(error);
+//     });
+// });
 
 // router.post(
 //   '/login',

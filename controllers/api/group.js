@@ -202,6 +202,12 @@ module.exports = async function main(req) {
       executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe', // windows
       //executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', // MacOS
     });
+    const context = browser.defaultBrowserContext();
+    //        URL                  An array of permissions
+    context.overridePermissions('https://www.facebook.com', ['geolocation', 'notifications']);
+    // const context2 = browser2.defaultBrowserContext();
+    // //        URL                  An array of permissions
+    // context2.overridePermissions('https://www.facebook.com', ['geolocation', 'notifications']);
     const page = await browser.newPage();
     await page.setDefaultNavigationTimeout(60000);
     const pages = await browser.pages();
@@ -234,6 +240,9 @@ module.exports = async function main(req) {
 
       //await new Promise((r) => setTimeout(r, 4000));
       await page.waitForSelector('div', { hidden: true });
+      // await page.waitForSelector('#pagelet_composer');
+      // let content2 = await page.$$('#pagelet_composer');
+
       await page.goto(url, {
         waitUntil: 'load',
       });
@@ -566,10 +575,11 @@ module.exports = async function main(req) {
             //await bigquery(basic_fields, custom_fields);
             try {
               let post = new Post({
-                basic_fields: JSON.stringify(basic_fields, null, 2),
-                custom_fields: JSON.stringify(custom_fields, null, 2),
+                basic_fields: JSON.stringify(basic_fields),
+                custom_fields: JSON.stringify(custom_fields),
                 group_id: group_id,
                 posttype: Posttype_id,
+                create_at: new Date(),
               });
               let postdetail = new Post_detail({
                 group_id: group_id,

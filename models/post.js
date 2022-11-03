@@ -4,6 +4,7 @@ const postSchema = mongoose.Schema({
   custom_fields: String,
   group_id: String,
   posttype: String,
+  create_at: Date,
 });
 
 const Post = mongoose.model('Post', postSchema);
