@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 // const connectionString = credentials.connectionString;
-const connectionString = 'mongodb://127.0.0.1:27017/facebook';
+const connectionString =
+  'mongodb://root:OWI3ODRhNzE2MzZkNjFlOWYxZTgwZmMz@206.189.81.38:28015/facebook?authSource=admin';
 if (!connectionString) {
   console.error('MongoDB connection string missing!');
   process.exit(1);

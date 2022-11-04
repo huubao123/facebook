@@ -97,7 +97,6 @@ module.exports = async function main(req) {
     const craw_id = crypto.randomBytes(16).toString('hex');
     let group_id = '';
     let Posttype_id = '';
-
     Posttype.findOne({ name: post_type }, async function (err, posttype) {
       if (posttype) {
         Posttype_id = posttype._id;
@@ -159,7 +158,7 @@ module.exports = async function main(req) {
       args: ['--start-maximized'],
 
       //product: 'chrome',
-      devtools: false,
+      devtools: true,
       executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe', // windows
       //executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', // MacOS
     });
@@ -198,7 +197,7 @@ module.exports = async function main(req) {
       args: ['--start-maximized'],
 
       //product: 'chrome',
-      devtools: false,
+      devtools: true,
       executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe', // windows
       //executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', // MacOS
     });
@@ -574,13 +573,34 @@ module.exports = async function main(req) {
             };
             //await bigquery(basic_fields, custom_fields);
             try {
-              let post = new Post({
-                basic_fields: JSON.stringify(basic_fields),
-                custom_fields: JSON.stringify(custom_fields),
-                group_id: group_id,
-                posttype: Posttype_id,
-                create_at: new Date(),
+              Post.findOne({ post_link: result[i].post_link, posttype: Posttype_id }, async function (err, post) {
+                if (err) {
+                  console.log(err);
+                } else {
+                  if (post === null) {
+                    let posts = new Post({
+                      basic_fields: JSON.stringify(basic_fields),
+                      custom_fields: JSON.stringify(custom_fields),
+                      post_link: result[i].post_link,
+                      group_id: group_id,
+                      posttype: Posttype_id,
+                      create_at: new Date(),
+                    });
+                    await posts.save();
+                  } else {
+                    await Post.findByIdAndUpdate(
+                      post._id,
+                      {
+                        basic_fields: JSON.stringify(basic_fields),
+                        custom_fields: JSON.stringify(custom_fields),
+                        create_at: new Date(),
+                      },
+                      { new: true }
+                    );
+                  }
+                }
               });
+
               let postdetail = new Post_detail({
                 group_id: group_id,
                 posttype: Posttype_id,
@@ -655,7 +675,6 @@ module.exports = async function main(req) {
                   : [],
               });
 
-              await post.save();
               await postdetail.save();
             } catch (e) {
               console.log(e);

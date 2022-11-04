@@ -107,7 +107,7 @@ module.exports = async function main(req) {
       defaultViewport: null,
       args: ['--start-maximized'],
       product: 'chrome',
-      devtools: false,
+      devtools: true,
       executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
       //executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
     });
@@ -406,12 +406,33 @@ module.exports = async function main(req) {
         };
         data_post = {};
         try {
-          let post = new Post({
-            basic_fields: JSON.stringify(basic_fields),
-            custom_fields: JSON.stringify(custom_fields),
-            group_id: group_id,
-            posttype: Posttype_id,
-            create_at: new Date(),
+          //let posttype = await Posttype.findOne({name: post_type});
+          Post.findOne({ post_link: url, posttype: Posttype_id }, async function (err, post) {
+            if (err) {
+              return;
+            } else {
+              if (post === null) {
+                let posts = new Post({
+                  basic_fields: JSON.stringify(basic_fields),
+                  custom_fields: JSON.stringify(custom_fields),
+                  post_link: url,
+                  group_id: group_id,
+                  posttype: Posttype_id,
+                  create_at: new Date(),
+                });
+                await posts.save();
+              } else {
+                await Post.findByIdAndUpdate(
+                  post._id,
+                  {
+                    basic_fields: JSON.stringify(basic_fields),
+                    custom_fields: JSON.stringify(custom_fields),
+                    create_at: new Date(),
+                  },
+                  { new: true }
+                );
+              }
+            }
           });
           let postdetail = new Post_detail({
             group_id: group_id,
@@ -486,7 +507,6 @@ module.exports = async function main(req) {
               : [],
           });
 
-          await post.save();
           await postdetail.save();
         } catch (e) {
           console.log(e);

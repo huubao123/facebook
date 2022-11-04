@@ -184,9 +184,6 @@ module.exports = async function main(req) {
       executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe', // windows
       //executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', // MacOS
     });
-    const context = browser.defaultBrowserContext();
-    //        URL                  An array of permissions
-    context.overridePermissions('https://www.facebook.com', ['geolocation', 'notifications']);
 
     const browser2 = await puppeteer.launch({
       ignoreHTTPSErrors: true,
