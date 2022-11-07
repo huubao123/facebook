@@ -20,11 +20,8 @@ class Postapi {
       .sort([['create_at', -1]])
       .skip(skip)
       .limit(limit);
-    let pages = (await Post.find({ posttype: posttype_id._id }).count()) / limit;
-    if (parseInt(pages).toFixed() < pages.toFixed()) {
-    }
     let posts = await Post.find({ posttype: posttype_id._id }).count();
-    await res.json({ data: post, count_pages: pages.toFixed(), count_posts: posts.toFixed() });
+    await res.json({ count_pages: parseInt(Math.ceil(posts / limit)), count_posts: parseInt(posts), data: post });
   }
   async getPost_id(req, res, next) {
     Post.findById(req.params.id, async function (err, post) {
