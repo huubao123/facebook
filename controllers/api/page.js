@@ -181,8 +181,7 @@ module.exports = async function main(req) {
 
       //product: 'chrome',
       devtools: true,
-      executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe', // windows
-      //executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', // MacOS
+      executablePath: process.env.executablePath,
     });
 
     const browser2 = await puppeteer.launch({
@@ -221,8 +220,7 @@ module.exports = async function main(req) {
 
       //product: 'chrome',
       devtools: true,
-      executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe', // windows
-      //executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', // MacOS
+      executablePath: process.env.executablePath,
     });
     const page = await browser.newPage();
     await page.setDefaultNavigationTimeout(60000);

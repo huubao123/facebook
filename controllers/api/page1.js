@@ -92,8 +92,7 @@ module.exports = async function main(req) {
       args: ['--start-maximized'],
       product: 'chrome',
       devtools: true,
-      executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
-      //executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
+      executablePath: process.env.executablePath,
     });
     const page = await browser.newPage();
     await page.setDefaultNavigationTimeout(60000);
