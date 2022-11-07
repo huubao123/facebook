@@ -17,7 +17,17 @@ module.exports = async function loadmoremedia(page, data) {
           if (
             post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
               .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-              .childNodes[0].childNodes[0].childNodes[0].childNodes[1].childNodes[0].childNodes[0]
+              .childNodes[0].childNodes[0].childNodes[1]
+          ) {
+            contens =
+            post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+            .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+            .childNodes[0].childNodes[0].childNodes[1].childNodes[0];
+          }
+         else if (
+            post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+              .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+              .childNodes[0].childNodes[0].childNodes[0].childNodes[1].childNodes[0].childNodes[1]
               .childNodes[0].childNodes[0].childNodes[0].childNodes[0]
           ) {
             contens =

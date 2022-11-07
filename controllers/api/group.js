@@ -158,9 +158,9 @@ module.exports = async function main(req) {
       args: ['--start-maximized'],
 
       //product: 'chrome',
-      devtools: true,
-      executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe', // windows
-      //executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', // MacOS
+      devtools: false,
+      //executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe', // windows
+      executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', // MacOS
     });
     const browser = await puppeteer.launch({
       ignoreHTTPSErrors: true,
@@ -198,8 +198,8 @@ module.exports = async function main(req) {
 
       //product: 'chrome',
       devtools: true,
-      executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe', // windows
-      //executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', // MacOS
+      //executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe', // windows
+      executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', // MacOS
     });
     const context = browser.defaultBrowserContext();
     //        URL                  An array of permissions
@@ -237,8 +237,8 @@ module.exports = async function main(req) {
       await page.type('#pass', 'huubao123');
       await page.keyboard.press('Enter');
 
-      //await new Promise((r) => setTimeout(r, 4000));
-      await page.waitForSelector('div', { hidden: true });
+      await new Promise((r) => setTimeout(r, 4000));
+      //await page.waitForSelector('div', { hidden: true });
       // await page.waitForSelector('#pagelet_composer');
       // let content2 = await page.$$('#pagelet_composer');
 
@@ -333,9 +333,15 @@ module.exports = async function main(req) {
       await page1.type('#email', username);
       await page1.type('#pass', 'huubao123');
       await page1.keyboard.press('Enter');
-      await page1.waitForSelector('div', { hidden: true });
+                await new Promise((r) => setTimeout(r, 4000));
+
+      //await page1.waitForSelector('div', { hidden: true });
       for (let i = 0; i < result.length; i++) {
         try {
+          fs.appendFile('error.txt', JSON.stringify(result[i].post_link, null, 2)+"\r\n", (err) => {
+            if (err) throw err;
+          });
+          console.log(result[i].post_link)
           //await new Promise((r) => setTimeout(r, 4000));
           // await page1.goto(url, {
           //   waitUntil: 'load',
@@ -750,6 +756,9 @@ module.exports = async function main(req) {
     //await browser.close();
   } catch (err) {
     console.log('lỗi server', err);
+    fs.appendFile('error.txt', JSON.stringify(err, null, 2)+"\r\n", (err) => {
+      if (err) throw err;
+    });
   }
 };
 

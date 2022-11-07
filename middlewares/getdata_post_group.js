@@ -61,7 +61,17 @@ module.exports = async function getdata(page, cmt_lengths) {
           if (
             post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
               .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-              .childNodes[0].childNodes[0].childNodes[0].childNodes[1].childNodes[0].childNodes[0]
+              .childNodes[0].childNodes[0].childNodes[1]
+          ) {
+            contens =
+            post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+            .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+            .childNodes[0].childNodes[0].childNodes[1].childNodes[0];
+          }
+         else if (
+            post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+              .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+              .childNodes[0].childNodes[0].childNodes[0].childNodes[1].childNodes[0].childNodes[1]
               .childNodes[0].childNodes[0].childNodes[0].childNodes[0]
           ) {
             contens =
@@ -101,8 +111,9 @@ module.exports = async function getdata(page, cmt_lengths) {
       }
     } catch (e) {
       ismain = false;
+      console.log("érroe main")
     }
-
+    console.log(contens)
     // if(contens = ''){
     //   post.forEach((e)=>{
     //     if(e.childNodes.length >13){
