@@ -22,7 +22,7 @@ class Postapi {
     let page = parseInt(req.query.page) || 1;
     let limit = parseInt(req.query.limit) || 100000000000000;
     let post_type = req.query.posttype;
-    let search = req.query?.search;
+    let search = req.query.search ? req.query.search : '';
     let skip = (page - 1) * limit;
     if (post_type == undefined) {
       res.json({ data: 'error', error: 'no posttype' });
