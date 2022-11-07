@@ -156,6 +156,10 @@ module.exports = async function main(req) {
         : document.querySelectorAll('h1')[0].textContent;
     });
     Group.findOne({ url: name_group }, async function (err, group) {
+      if (err) {
+        console.log(err);
+        return;
+      }
       if (group) {
         group_id = group._id;
       } else {
