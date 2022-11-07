@@ -41,7 +41,7 @@ class Postapi {
     post.forEach(async (element, index) => {
       delete element.post_link;
     });
-    let posts = await Post.find({ posttype: posttype_id._id }).count();
+    let posts = await Post.find({ posttype: posttype_id._id, post_link: { $regex: search } }).count();
     //await redisClient.set('bao', post);
 
     await res.json({
