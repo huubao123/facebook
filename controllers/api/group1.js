@@ -137,7 +137,11 @@ module.exports = async function main(req) {
 
       if (url.indexOf('posts') !== -1) {
         for (let i = 0; i < 5; i++) {
-          name_group += url.split('/')[i] + '/';
+          if (i === 4) {
+            name_group += url.split('/')[i];
+          } else {
+            name_group += url.split('/')[i] + '/';
+          }
         }
       }
       await page.goto(name_group, {
@@ -151,7 +155,7 @@ module.exports = async function main(req) {
         ? document.querySelectorAll('h1')[1].textContent
         : document.querySelectorAll('h1')[0].textContent;
     });
-    Group.findOne({ url: url }, async function (err, group) {
+    Group.findOne({ url: name_group }, async function (err, group) {
       if (group) {
         group_id = group._id;
       } else {

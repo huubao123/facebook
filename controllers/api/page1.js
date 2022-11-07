@@ -119,8 +119,12 @@ module.exports = async function main(req) {
       //await new Promise((r) => setTimeout(r, 4000));
       await page.waitForSelector('div', { hidden: true });
 
-      for (let i = 0; i < 4; i++) {
-        name_group += url.split('/')[i] + '/';
+      for (let i = 0; i < 5; i++) {
+        if (i === 4) {
+          name_group += url.split('/')[i];
+        } else {
+          name_group += url.split('/')[i] + '/';
+        }
       }
 
       await page.goto(name_group, {
