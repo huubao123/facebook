@@ -449,13 +449,17 @@ module.exports = async function main(req) {
                   if (err) return console.log(err);
                   if (keys) {
                     keys.map(async (key) => {
-                      if (key.indexOf('page') > -1 || key.indexOf('limit') > -1 || key.indexOf('search') > -1) {
+                      if (
+                        key.indexOf('page') > -1 ||
+                        key.indexOf('limit') > -1 ||
+                        key.indexOf('search') > -1 ||
+                        key.indexOf(`posts/${post._id}`) > -1
+                      ) {
                         redisClient.del(key);
                       }
                     });
                   }
                 });
-                redisClient.del(`posts/${post._id}`);
               }
             }
           });
