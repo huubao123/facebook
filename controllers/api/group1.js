@@ -11,7 +11,15 @@ const Post = require('../../models/post');
 const Post_detail = require('../../models/post_detail');
 const Group = require('../../models/group');
 const Posttype = require('../../models/posttype');
-
+let redis = require('redis');
+let redisClient = redis.createClient({
+  legacyMode: true,
+  socket: {
+    port: 6379,
+    host: '127.0.0.1',
+  },
+});
+redisClient.connect();
 const initializeApp = require('firebase/app');
 
 const getDatabase = require('firebase/database').getDatabase;
@@ -39,7 +47,6 @@ module.exports = async function main(req) {
     for (let i = 0; i < 5; i++) {
       url_group += url.split('/')[i];
     }
-    const name = url.split('/')[3] == 'groups' ? url.split('/')[4] : url.split('/')[3];
     const cmt_length = req.data.data.length_comment ? req.data.data.length_comment : 0;
     let name_group = '';
     const post_type = req.data.data.posttype ? req.data.data.posttype : '';
@@ -438,6 +445,17 @@ module.exports = async function main(req) {
                   },
                   { new: true }
                 );
+                redisClient.keys('*', async (err, keys) => {
+                  if (err) return console.log(err);
+                  if (keys) {
+                    keys.map(async (key) => {
+                      if (key.indexOf('page') > -1 || key.indexOf('limit') > -1 || key.indexOf('search') > -1) {
+                        redisClient.del(key);
+                      }
+                    });
+                  }
+                });
+                redisClient.del(`posts/${post._id}`);
               }
             }
           });

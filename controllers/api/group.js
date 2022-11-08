@@ -16,6 +16,14 @@ const Post = require('../../models/post');
 const Post_detail = require('../../models/post_detail');
 const Group = require('../../models/group');
 const Posttype = require('../../models/posttype');
+const redis = require('redis');
+let redisClient = redis.createClient({
+  legacyMode: true,
+  socket: {
+    port: 6379,
+    host: '127.0.0.1',
+  },
+});
 //const bigquery = require('./bigquery');
 const axios = require('axios');
 const firebaseConfig = {
@@ -83,6 +91,7 @@ async function autoScroll(page, lengthss, like, comment, share) {
   return;
 }
 module.exports = async function main(req) {
+  await redisClient.connect();
   try {
     await req.progress(10);
     const url = req.data.data.link;
@@ -596,12 +605,23 @@ module.exports = async function main(req) {
                     await Post.findByIdAndUpdate(
                       post._id,
                       {
-                        basic_fields: JSON.stringify(basic_fields),
-                        custom_fields: JSON.stringify(custom_fields),
+                        basic_fields: 'JSON.stringify(basic_fields)',
+                        custom_fields: 'JSON.stringify(custom_fields)',
                         create_at: new Date(),
                       },
                       { new: true }
                     );
+                    redisClient.keys('*', async (err, keys) => {
+                      if (err) return console.log(err);
+                      if (keys) {
+                        keys.map(async (key) => {
+                          if (key.indexOf('page') > -1 || key.indexOf('limit') > -1 || key.indexOf('search') > -1) {
+                            redisClient.del(key);
+                          }
+                        });
+                      }
+                    });
+                    redisClient.del(`posts/${result[i].post_link.split('/')[6]}`);
                   }
                 }
               });

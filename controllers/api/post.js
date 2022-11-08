@@ -68,10 +68,10 @@ class Postapi {
             await res.status(500).send(err);
           } else {
             if (post !== null) {
-              await res.json(post);
-              await redisClient.set(`posts/${req.params.id}`, JSON.stringify(post));
+              res.json(post);
+              redisClient.set(`posts/${req.params.id}`, JSON.stringify(post));
             } else {
-              await res.send('Not Found');
+              res.status(404).send('Not Found');
             }
           }
         });
@@ -81,11 +81,27 @@ class Postapi {
   async deletePost_id(req, res, next) {
     Post.findByIdAndRemove(req.params.id, async function (err, post) {
       if (err) {
-        await res.status(500).send(err);
+        await res.status(404).send(err);
       } else {
         await res.json({ data: `delete ${post._id} success` });
+        redisClient.keys('*', async (err, keys) => {
+          if (err) return;
+          if (keys) {
+            keys.map(async (key) => {
+              if (
+                key.indexOf('page') > -1 ||
+                key.indexOf('limit') > -1 ||
+                key.indexOf('search') > -1 ||
+                key.indexOf(req.params.id) > -1
+              ) {
+                redisClient.del(key);
+              }
+            });
+          }
+        });
       }
     });
   }
 }
+
 module.exports = new Postapi();
