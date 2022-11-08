@@ -16,7 +16,7 @@ class Postapi {
     let limit = parseInt(req.query.limit) || 100000000000000;
     let post_type = req.query.posttype;
     let search = req.query.search ? req.query.search : '';
-    redisClient.get(`posts?page=${page}&limit=${limit}&search${search}`, async (err, data) => {
+    redisClient.get(`posts?page=${page}&limit=${limit}&posttype=${post_type}&search${search}`, async (err, data) => {
       if (err) console.log(err);
       if (data != null) {
         let datas = JSON.parse(data);
@@ -51,7 +51,7 @@ class Postapi {
           data: post,
         };
 
-        await redisClient.set(`posts?page=${page}&limit=${limit}&search${search}`, JSON.stringify(data));
+        await redisClient.set(`posts?page=${page}&limit=${limit}&posttype=${post_type}&search${search}`, JSON.stringify(data));
         res.json({ count_pages: parseInt(Math.ceil(posts / limit)) || 1, count_posts: parseInt(posts), data: post });
       }
     });
@@ -83,7 +83,7 @@ class Postapi {
       if (err) {
         await res.status(404).send(err);
       } else {
-        await res.json({ data: `delete ${post._id} success` });
+        await res.json({ data: `delete ${req.params.id} success` });
         redisClient.keys('*', async (err, keys) => {
           if (err) return;
           if (keys) {
