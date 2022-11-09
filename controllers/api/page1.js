@@ -168,7 +168,7 @@ module.exports = async function main(req) {
         Posttype_id = posttype._id;
         let flag_page = true;
         for (let i = 0; i < posttype.groups.length; i++) {
-          if (posttype.groups[i] == page_id) {
+          if (posttype.pages[i] == page_id) {
             flag_page = true;
             break;
           } else {
@@ -197,7 +197,7 @@ module.exports = async function main(req) {
         waitUntil: 'networkidle2',
       });
       // await page.waitForSelector('*');
-      // await new Promise((r) => setTimeout(r, 4000));
+       await new Promise((r) => setTimeout(r, 4000));
       try {
         await page.evaluate(async () => {
           let div = document.querySelectorAll('[role = "button"]');
@@ -205,7 +205,11 @@ module.exports = async function main(req) {
             if (
               div[i].innerText.indexOf('Phù hợp nhất') !== -1 ||
               div[i].innerText.indexOf('Mới nhất') !== -1 ||
-              div[i].innerText.indexOf('Tất cả bình luận') !== -1
+              div[i].innerText.indexOf('Tất cả bình luận') !== -1 ||
+              div[i].innerText.indexOf('Tất cả bình luận') !== -1 ||
+              div[i].innerText.indexOf('Tất cả bình luận') !== -1 ||
+              div[i].innerText.indexOf('Tất cả bình luận') !== -1 
+              
             ) {
               await div[i].scrollIntoView();
               break;
@@ -216,7 +220,7 @@ module.exports = async function main(req) {
       await page.evaluate(async () => {
         let div = document.querySelectorAll('[role = "button"]');
         for (let i = 0; i < div.length; i++) {
-          if (div[i].innerText.indexOf('Phù hợp nhất') !== -1 || div[i].innerText.indexOf('Mới nhất') !== -1) {
+          if (div[i].innerText.indexOf('Phù hợp nhất') !== -1 || div[i].innerText.indexOf('Mới nhất') !== -1 || div[i].innerText.indexOf('Most relevant') !== -1 || div[i].innerText.indexOf('Newest') !== -1) {
             await div[i].click();
             break;
           }
@@ -225,9 +229,9 @@ module.exports = async function main(req) {
       await page.evaluate(async () => {
         let div = document.querySelectorAll('[role="menuitem"]');
         for (let i = 0; i < div.length; i++) {
-          if (div[i].innerText.indexOf('Tất cả bình luận') !== -1) {
+          if (div[i].innerText.indexOf('Tất cả bình luận') !== -1 || div[i].innerText.indexOf('All comments') !== -1) {
             await div[i].click();
-            break;
+            break;  
           }
         }
       });

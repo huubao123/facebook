@@ -379,7 +379,7 @@ module.exports = async function getdata(page, cmt_lengths) {
                     (elementsss, index) => {
                       if (elementsss.nodeName == 'SPAN' && index == 0) {
                         console.log(elementsss);
-                        user_cmt_href = elementsss.childNodes[0].href.split('&')[0].split('id=')[1];
+                        user_cmt_href = elementsss.childNodes[0].href;
                         user_name_cmt = elementsss.childNodes[0].innerText;
                         user_cmt_id = elementsss.childNodes[0].href.split('/')[3];
                       } else if (elementsss.nodeName == 'DIV') {
@@ -444,7 +444,7 @@ module.exports = async function getdata(page, cmt_lengths) {
                   }
                   diw_newcmt.childNodes[0].childNodes[0].childNodes[0].childNodes.forEach((cmt, index) => {
                     if (cmt.nodeName == 'SPAN' && index == 0) {
-                      user_cmt_href = cmt.childNodes[0].href.split('&')[0].split('id=')[1];
+                      user_cmt_href = cmt.childNodes[0].href;
                       user_name_cmt = cmt.childNodes[0].innerText;
                       user_cmt_id = cmt.childNodes[0].href.split('/')[3];
                     } else if (cmt.nodeName == 'DIV') {
@@ -493,7 +493,7 @@ module.exports = async function getdata(page, cmt_lengths) {
                     (child, index) => {
                       if (child.nodeName == 'SPAN' && index == 0) {
                         console.log(child);
-                        user_cmt_href = child.childNodes[0].href.split('&')[0].split('id=')[1];
+                        user_cmt_href = child.childNodes[0].href;
                         user_name_cmt = child.childNodes[0].innerText;
                         user_cmt_id = child.childNodes[0].href.split('/')[3];
                       } else if (child.nodeName == 'DIV') {
@@ -515,7 +515,7 @@ module.exports = async function getdata(page, cmt_lengths) {
                         }
                       } else if (child.nodeName == 'A') {
                         console.log('child', child);
-                        user_cmt_href = child.href.split('&')[0].split('id=')[1];
+                        user_cmt_href = child.href;
                         user_name_cmt = child.innerText;
                         user_cmt_id = child.href.split('/')[3];
                         cotent_cmt = 'Icon Facebook';
@@ -546,7 +546,7 @@ module.exports = async function getdata(page, cmt_lengths) {
                                     cotent_cmtchild += child.childNodes[0].childNodes[l].innerText
                                       .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
                                       .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
-                                      .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
+                                      .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, ''); 
                                     cotent_cmtchild_text += child.childNodes[0].childNodes[l].innerText
                                       .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
                                       .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
@@ -596,7 +596,7 @@ module.exports = async function getdata(page, cmt_lengths) {
                             // }
                             children.push({
                               usernameComment: user_name_cmtchild,
-                              userIDComment: user_cmtchild_id,
+                              userIDComment: user_cmtchild_id.split('&')[0].split('id=')[1],
                               contentComment: cotent_cmtchild,
                               imageComment: imgComment_cmt == '' ? null : imgComment_cmt,
                               countLike: count_like_cmtchild,
@@ -768,7 +768,7 @@ module.exports = async function getdata(page, cmt_lengths) {
 
                           children.push({
                             usernameComment: user_name_cmtchild,
-                            userIDComment: user_cmtchild_id,
+                            userIDComment: user_cmtchild_id.split('&')[0].split('id=')[1],
                             contentComment: cotent_cmtchild,
                             imageComment: imgComment_cmt == '' ? null : imgComment_cmt,
                             countLike: count_like_cmtchild,
@@ -937,7 +937,7 @@ module.exports = async function getdata(page, cmt_lengths) {
 
                                 children.push({
                                   usernameComment: user_name_cmtchild,
-                                  userIDComment: user_cmtchild_id,
+                                  userIDComment: user_cmtchild_id.split('&')[0].split('id=')[1],
                                   contentComment: cotent_cmtchild,
                                   imageComment: imgComment_cmt == '' ? null : imgComment_cmt,
                                   countLike: count_like_cmtchild2,
@@ -1036,7 +1036,7 @@ module.exports = async function getdata(page, cmt_lengths) {
                   divcommment.forEach((element, index) => {
                     if (element.nodeName == 'SPAN' && index == 0) {
                       console.log(element);
-                      user_cmt_href = element.childNodes[0].href.split('&')[0].split('id=')[1];
+                      user_cmt_href = element.childNodes[0].href;
                       user_name_cmt = element.childNodes[0].innerText;
                       user_cmt_id = element.childNodes[0].href.split('/')[3];
                     } else if (element.nodeName == 'DIV') {
@@ -1062,7 +1062,7 @@ module.exports = async function getdata(page, cmt_lengths) {
                   divcommment[0].childNodes[0].childNodes.forEach((element, index) => {
                     if (element.nodeName == 'SPAN' && index == 0) {
                       console.log(element);
-                      user_cmt_href = element.childNodes[0].href.split('&')[0].split('id=')[1];
+                      user_cmt_href = element.childNodes[0].href;
                       user_name_cmt = element.childNodes[0].innerText;
                       user_cmt_id = element.childNodes[0].href.split('/')[3];
                     } else if (element.nodeName == 'DIV') {
@@ -1089,7 +1089,7 @@ module.exports = async function getdata(page, cmt_lengths) {
               comments.push({
                 contentComment: cotent_cmt,
                 usernameComment: user_name_cmt,
-                userIDComment: user_cmt_id,
+                userIDComment: user_cmt_id.split('&')[0].split('id=')[1],
                 //user_cmt_href: user_cmt_href,
                 imageComment: imgComment == '' ? null : imgComment,
                 countLike: count_like_cmt,

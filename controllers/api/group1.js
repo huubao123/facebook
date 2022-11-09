@@ -53,7 +53,6 @@ module.exports = async function main(req) {
     let group_id = '';
     let Posttype_id = '';
     const craw_id = crypto.randomBytes(16).toString('hex');
-
     Posttype.findOne({ name: post_type }, async function (err, posttype) {
       if (posttype) {
         Posttype_id = posttype._id;
@@ -435,6 +434,20 @@ module.exports = async function main(req) {
                   create_at: new Date(),
                 });
                 await posts.save();
+                redisClient.keys('*', async (err, keys) => {
+                  if (err) return console.log(err);
+                  if (keys) {
+                    keys.map(async (key) => {
+                      if (
+                        key.indexOf('page') > -1 ||
+                        key.indexOf('limit') > -1 ||
+                        key.indexOf('search') > -1 
+                                                  ) {
+                        redisClient.del(key);
+                      }
+                    });
+                  }
+                });
               } else {
                 await Post.findByIdAndUpdate(
                   post._id,

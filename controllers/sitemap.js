@@ -17,7 +17,6 @@ const firebaseConfig = {
   measurementId: 'G-3LDE9KDMV2',
 };
 module.exports = function json(req, res) {
-  console.log(req.body.url);
   const craw_id = crypto.randomBytes(16).toString('hex');
   if (!req.body.config) {
     req.body.config = '';

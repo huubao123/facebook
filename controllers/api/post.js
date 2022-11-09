@@ -62,10 +62,9 @@ class Postapi {
   async getall(req, res, next) {
     let posts = await Post.find().lean();
     for (let i = 0; i < posts.length; i++) {
-      for (let j = i + 1; j < posts.length; j++) {
-        if (posts[j].post_link === posts[i].post_link) {
-          console.log(posts[j].post_link);
-        }
+      
+      if(posts[i].posttype != "6364ba6972a13f347c5f8dd4"){
+        console.log(posts[i])
       }
     }
     // delete element.basic_fields;
@@ -75,7 +74,7 @@ class Postapi {
     // delete element.__v;
     // delete element.posttype;
     // delete element.group_id;
-    // res.json(posts);
+     res.json(posts);
   }
   async getPost_id(req, res, next) {
     redisClient.get(`posts/${req.params.id}`, async (err, data) => {

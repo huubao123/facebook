@@ -563,6 +563,20 @@ module.exports = async function main(req) {
                       create_at: new Date(),
                     });
                     await posts.save();
+                    redisClient.keys('*', async (err, keys) => {
+                      if (err) return console.log(err);
+                      if (keys) {
+                        keys.map(async (key) => {
+                          if (
+                            key.indexOf('page') > -1 ||
+                            key.indexOf('limit') > -1 ||
+                            key.indexOf('search') > -1 
+                                                      ) {
+                            redisClient.del(key);
+                          }
+                        });
+                      }
+                    });
                   } else {
                     await Post.findByIdAndUpdate(
                       post._id,

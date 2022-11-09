@@ -33,6 +33,13 @@ module.exports = async function autoScrollpost(page) {
           clearInterval(timer);
           resolve();
         }
+        document.querySelectorAll('div').forEach((el) => {
+          el.childNodes.forEach((eel) => {
+            if (eel.nodeName == '#comment') {
+              eel.remove();
+            }
+          });
+        });
         let div = document.querySelectorAll('[role = "button"]');
         // if (n > 1) {
         //   for (let i = 0; i < div.length; i++) {
