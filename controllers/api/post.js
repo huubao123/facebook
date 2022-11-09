@@ -51,10 +51,31 @@ class Postapi {
           data: post,
         };
 
-        await redisClient.set(`posts?page=${page}&limit=${limit}&posttype=${post_type}&search${search}`, JSON.stringify(data));
+        await redisClient.set(
+          `posts?page=${page}&limit=${limit}&posttype=${post_type}&search${search}`,
+          JSON.stringify(data)
+        );
         res.json({ count_pages: parseInt(Math.ceil(posts / limit)) || 1, count_posts: parseInt(posts), data: post });
       }
     });
+  }
+  async getall(req, res, next) {
+    let posts = await Post.find().lean();
+    for (let i = 0; i < posts.length; i++) {
+      for (let j = i + 1; j < posts.length; j++) {
+        if (posts[j].post_link === posts[i].post_link) {
+          console.log(posts[j].post_link);
+        }
+      }
+    }
+    // delete element.basic_fields;
+    // delete element.custom_fields;
+    // delete element._id;
+    // delete element.create_at;
+    // delete element.__v;
+    // delete element.posttype;
+    // delete element.group_id;
+    // res.json(posts);
   }
   async getPost_id(req, res, next) {
     redisClient.get(`posts/${req.params.id}`, async (err, data) => {

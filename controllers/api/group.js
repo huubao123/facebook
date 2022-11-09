@@ -107,18 +107,7 @@ module.exports = async function main(req) {
     const craw_id = crypto.randomBytes(16).toString('hex');
     let group_id = '';
     let Posttype_id = '';
-    Posttype.findOne({ name: post_type }, async function (err, posttype) {
-      if (posttype) {
-        Posttype_id = posttype._id;
-      } else {
-        let Posttypes = new Posttype({
-          name: post_type,
-          create_at: new Date(),
-        });
-        await Posttypes.save();
-        Posttype_id = Posttypes._id;
-      }
-    });
+
     // const app = initializeApp.initializeApp(firebaseConfig);
     // const database = getDatabase(app);
     // const postListRefs = ref(database, '/craw_list_length/' + name.replace(/[#:.,$]/g, '') + '/' + craw_id);
@@ -264,63 +253,51 @@ module.exports = async function main(req) {
         ? document.querySelectorAll('h1')[1].textContent
         : document.querySelectorAll('h1')[0].textContent;
     });
-    Group.findOne({ url: url }, async function (err, group) {
-      if (group) {
-        group_id = group._id;
+    let group = await Group.findOne({ url: url });
+    if (group) {
+      group_id = group._id;
+    } else {
+      let groups = new Group({
+        name: result,
+        url: url,
+        create_at: new Date(),
+      });
+      await groups.save();
+      group_id = groups._id;
+    }
+    Posttype.findOne({ name: post_type }, async function (err, posttype) {
+      if (posttype) {
+        Posttype_id = posttype._id;
+        let flag_group = true;
+        for (let i = 0; i < posttype.groups.length; i++) {
+          if (posttype.groups[i] == group_id) {
+            flag_group = true;
+            break;
+          } else {
+            flag_group = false;
+          }
+        }
+        if (!flag_group) {
+          await Posttype.findByIdAndUpdate(
+            posttype._id,
+            { $push: { groups: group_id } },
+            { safe: true, upsert: true, new: true }
+          );
+        }
       } else {
-        let groups = new Group({
-          name: result,
-          url: url,
+        let Posttypes = new Posttype({
+          name: post_type,
           create_at: new Date(),
+          groups: group_id,
         });
-        await groups.save();
-        group_id = groups._id;
+        await Posttypes.save();
+        Posttype_id = Posttypes._id;
       }
     });
-    // const apps = initializeApp.initializeApp(firebaseConfig);
-    // const databases = getDatabase(apps);
-    // const postListRefss = ref(databases, 'Group/' + name.replace(/[#:.,$]/g, ''));
-    // await set(postListRefss, {
-    //   name: result,
-    //   url: url,
-    //   create_at: Date.now(),
-    // });
 
     await autoScroll(page, lengths, like, comment, share);
-    // await page.evaluate(() => {
-    //   document.querySelectorAll('a[role="link"][href="#"]').forEach(async (element) => {
-    //     await element.focus();
-    //     console.log('b');
-    //   });
-    // });
 
     await getlink(page, conten_length, like, comment, share).then(async function (result) {
-      //const craw_link_jobId = ref(database, 'ListLink_jobId/' + req.data.jobId + '/');
-      // await set(craw_link_jobId, {
-      //   name: result,
-      //   craw_id: req.data.jobId,
-      //   url: req.data.data.link,
-      //   lengths: req.data.data.count == '' ? 0 : req.data.data.count,
-      //   cmt_length: req.data.data.length_comment == '' ? 0 : req.data.data.length_comment,
-      //   conten_length: req.data.data.length_content == '' ? 0 : req.data.data.length_content,
-      //   like: req.data.data.like ? req.data.data.like : 0,
-      //   comment: req.data.data.comment ? req.data.data.comment : 0,
-      //   share: req.data.data.share ? req.data.data.share : 0,
-      //   post_type: req.data.data.posttype ? req.data.data.posttype : '',
-      // });
-      //const craw_link_crawid = ref(database, 'ListLink_crawid/' + craw_id + '/');
-      // await set(craw_link_crawid, {
-      //   name: result,
-      //   craw_id: req.data.jobId,
-      //   url: req.data.data.link,
-      //   lengths: req.data.data.count == '' ? 0 : req.data.data.count,
-      //   cmt_length: req.data.data.length_comment == '' ? 0 : req.data.data.length_comment,
-      //   conten_length: req.data.data.length_content == '' ? 0 : req.data.data.length_content,
-      //   like: req.data.data.like ? req.data.data.like : 0,
-      //   comment: req.data.data.comment ? req.data.data.comment : 0,
-      //   share: req.data.data.share ? req.data.data.share : 0,
-      //   post_type: req.data.data.posttype ? req.data.data.posttype : '',
-      // });
       let proces = 0;
       await browser.close();
       const page1 = await browser2.newPage();
@@ -408,24 +385,8 @@ module.exports = async function main(req) {
             }
 
             if (!results.ismain || !results.iscate || !results.iscontent || !results.isuser) {
-              // const error = ref(
-              //   databases,
-              //   'Error/' + name.replace(/[#:.,$]/g, '') + '/' + result[i].post_link.split('/')[6]
-              // );
-              // await set(error, {
-              //   name: result[i].post_link,
-              //   ismain: results.ismain,
-              //   iscate: results.iscate,
-              //   isuser: results.isuser,
-              //   iscontent: results.iscontent,
-              // });
               return;
             }
-
-            // const postListRef = ref(
-            //   database,
-            //   'post_type/' + post_type + '/' + name.replace(/[#:.,$]/g, '') + '/' + result[i].post_link.split('/')[6]
-            // );
             let titles = '';
             let short_descriptions = '';
             let arrVid = null;
@@ -630,154 +591,17 @@ module.exports = async function main(req) {
                   }
                 }
               });
-
-              let postdetail = new Post_detail({
-                group_id: group_id,
-                posttype: Posttype_id,
-                title: titles,
-                short_description: short_descriptions,
-                long_description: results.contentList
-                  ? results.contentList.replaceAll('https://l.facebook.com/l.php?', '')
-                  : '',
-                slug: '',
-                featured_image: results.linkImgs[0] ? results.linkImgs[0] : '',
-                session_tags: {
-                  tags: [],
-                },
-                categorialue: [],
-                key: '',
-                name: '',
-                type: post_type,
-                attributes: [],
-                status: 'publish',
-                is_active: 1,
-                seo_tags: {
-                  meta_title: 'New Post Facebook',
-                  meta_description: 'New Post Facebook',
-                },
-                video: results.videos,
-                date: results.date ? results.date : '',
-                post_id: results.idPost ? results.idPost : '',
-                post_link: result[i].post_link ? result[i].post_link : '',
-                user_id: results.user_id ? results.user_id : 'undefined',
-                user_name: results.user ? results.user : 'undefined',
-                count_like: results.countLike
-                  ? results.countLike.toString().split(' ')[0].indexOf(',') > -1
-                    ? parseInt(results.countLike.toString().split(' ')[0].replace('K', '00').replace(',', ''))
-                    : parseInt(results.countLike.toString().split(' ')[0].replace('K', '000'))
-                  : 0,
-                count_comment: results.countComment
-                  ? results.countComment.toString().split(' ')[0].indexOf(',') > -1
-                    ? parseInt(results.countComment.toString().split(' ')[0].replace('K', '00').replace(',', ''))
-                    : parseInt(results.countComment.toString().split(' ')[0].replace('K', '000'))
-                  : 0,
-                count_share: results.countShare
-                  ? results.countShare.toString().split(' ')[0].indexOf(',') > -1
-                    ? parseInt(results.countShare.toString().split(' ')[0].replace('K', '00').replace(',', ''))
-                    : parseInt(results.countShare.toString().split(' ')[0].replace('K', '000'))
-                  : 0,
-                featured_image: results.linkImgs ? results.linkImgs : '',
-                comments: results.commentList
-                  ? results.commentList.map((item) => ({
-                      content: item.contentComment,
-                      count_like: item.countLike
-                        ? item.countLike.toString().split(' ')[0].indexOf(',') > -1
-                          ? parseInt(item.countLike.toString().split(' ')[0].replace('K', '00').replace(',', ''))
-                          : parseInt(item.countLike.toString().split(' ')[0].replace('K', '000'))
-                        : 0,
-                      user_id: item.userIDComment,
-                      user_name: item.usernameComment,
-                      imgComment: item.imageComment ? item.imageComment : '',
-                      children: item.children
-                        ? item.children.map((child) => ({
-                            content: child.contentComment,
-                            count_like: child.countLike
-                              ? child.countLike.toString().split(' ')[0].indexOf(',') > -1
-                                ? parseInt(child.countLike.toString().split(' ')[0].replace('K', '00').replace(',', ''))
-                                : parseInt(child.countLike.toString().split(' ')[0].replace('K', '000'))
-                              : 0,
-                            user_id: child.userIDComment,
-                            user_name: child.usernameComment,
-                            imageComment: child.imageComment ? child.imageComment : '',
-                          }))
-                        : [],
-                    }))
-                  : [],
-              });
-
-              await postdetail.save();
             } catch (e) {
               console.log(e);
             }
-
-            // await set(postListRef, {
-            //   basic_fields: basic_fields,
-            //   custom_fields: custom_fields,
-            // });
-            // const postListRefss = ref(
-            //   database,
-            //   '/Listpost/' + name.replace(/[#:.,$]/g, '') + '/' + url.split('/')[6]
-            // );
-
-            // await set(postListRefss, {
-            //   user: results.user,
-            //   videos: results.videos,
-            //   contentList: results.contentList,
-            //   countComment: results.countComment,
-            //   countLike: results.countLike,
-            //   countShare: results.countShare,
-            //   user_id: results.user_id,
-            //   idPost: result[i].post_link.split('/')[6],
-            //   linkPost: result[i].post_link,
-            //   linkImgs: results.linkImgs,
-            //   commentList: results.commentList,
-            //   token: results.token,
-            //   count_comments_config: results.count_comments_config,
-            //   statusbar: 'active',
-            //   create_at: Date.now(),
-            // });
-            // const postListRefs = ref(
-            //   database,
-            //   '/craw_list/' + name.replace(/[#:.,$]/g, '') + '/' + craw_id
-            // );
-            // const newPostRef = push(postListRefs);
-            // await set(newPostRef, {
-            //   id: i,
-            //   post_link: result[i].post_link,
-            //   statusbar: 'active',
-            //   countComment: results.countComment,
-            //   countLike: results.countLike,
-            //   countShare: results.countShare,
-            //   count_comments_config: results.count_comments_config,
-            //   create_at: Date.now(),
-            // });
           });
         } catch (e) {
           console.log(e);
           console.log('lỗi error');
-          // const postListRefss = ref(
-          //   database,
-          //   '/Listpost_error/' + name.replace(/[#:.,$]/g, '') + '/' + url.split('/')[6]
-          // );
-          // await set(postListRefss, {
-          //   post_link: url,
-          //   error: 'error' + e,
-          // });
-          // const postListRefs = ref(
-          //   database,
-          //   '/craw_list/' + name.replace(/[#:.,$]/g, '') + '/' + craw_id
-          // );
-          // const newPostRef = push(postListRefs);
-          // await set(newPostRef, {
-          //   id: i,
-          //   post_link: result[i].post_link,
-          //   statusbar: 'error' + e,
-          // });
         }
       }
       await browser2.close();
     });
-    //await browser.close();
   } catch (err) {
     console.log('lỗi server', err);
     fs.appendFile('error.txt', JSON.stringify(err, null, 2) + '\r\n', (err) => {

@@ -1,7 +1,10 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 const crypto = require('crypto');
-//const bigquery = require('./bigquery');
+//const bigquery = require('./bigquery');#
+const Page = require('../.././models/page');
+const Post = require('../.././models/post');
+const Posttype = require('../.././models/posttype');
 const loadmoremedia = require('../../middlewares/loadmore_media');
 const getdata = require('../../middlewares/getdata_post_page');
 const autoScroll_post = require('../../middlewares/autoscrollpost');
@@ -9,7 +12,15 @@ const createMedia = require('../../middlewares/media');
 const genSlug = require('../../middlewares/genslug');
 
 const initializeApp = require('firebase/app');
-
+let redis = require('redis');
+let redisClient = redis.createClient({
+  legacyMode: true,
+  socket: {
+    port: 6379,
+    host: '127.0.0.1',
+  },
+});
+redisClient.connect();
 const getDatabase = require('firebase/database').getDatabase;
 const set = require('firebase/database').set;
 const ref = require('firebase/database').ref;
@@ -37,7 +48,7 @@ module.exports = async function main(req) {
     }
     const name = url.split('/')[3] == 'groups' ? url.split('/')[4] : url.split('/')[3];
     const cmt_length = req.data.data.length_comment ? req.data.data.length_comment : 0;
-    let name_group = '';
+    let name_page = '';
     const post_type = req.data.data.posttype ? req.data.data.posttype : '';
 
     const craw_id = crypto.randomBytes(16).toString('hex');
@@ -119,29 +130,68 @@ module.exports = async function main(req) {
       //await new Promise((r) => setTimeout(r, 4000));
       await page.waitForSelector('div', { hidden: true });
 
-      for (let i = 0; i < 5; i++) {
-        if (i === 4) {
-          name_group += url.split('/')[i];
+      for (let i = 0; i < 4; i++) {
+        if (i === 3) {
+          name_page += url.split('/')[i];
         } else {
-          name_group += url.split('/')[i] + '/';
+          name_page += url.split('/')[i] + '/';
         }
       }
 
-      await page.goto(name_group, {
+      await page.goto(name_page, {
         waitUntil: 'networkidle2',
       });
       //await page.waitForFunction('document.querySelector("h2")');
     } catch (e) {}
-    await page.waitForSelector('h2', { visible: true });
-    // let result = await page.evaluate(() => {
-    //   return document.querySelector('h1').textContent;2
-    // });
-    // const postListRefss = ref(databases, 'Group/' + name.replace(/[#:.,$]/g, ''));
-    // await set(postListRefss, {
-    //   name: result,
-    //   url: url_group,
-    //   create_at: Date.now(),
-    // });
+    await page.waitForSelector('h1', { visible: true });
+    let result = await page.evaluate(() => {
+      return document.querySelectorAll('h1')[1]
+        ? document.querySelectorAll('h1')[1].textContent
+        : document.querySelectorAll('h1')[0].textContent;
+    });
+    let page_id = '';
+    let Posttype_id = '';
+    let page_name = await Page.findOne({ url: name_page });
+    if (page_name) {
+      page_id = page_name._id;
+    } else {
+      let page_names = new Page({
+        name: result,
+        url: name_page,
+        create_at: new Date(),
+      });
+      await page_names.save();
+      page_id = page_names._id;
+    }
+    Posttype.findOne({ name: post_type }, async function (err, posttype) {
+      if (posttype) {
+        Posttype_id = posttype._id;
+        let flag_page = true;
+        for (let i = 0; i < posttype.groups.length; i++) {
+          if (posttype.groups[i] == page_id) {
+            flag_page = true;
+            break;
+          } else {
+            flag_page = false;
+          }
+        }
+        if (!flag_page) {
+          await Posttype.findByIdAndUpdate(
+            posttype._id,
+            { $push: { pages: page_id } },
+            { safe: true, upsert: true, new: true }
+          );
+        }
+      } else {
+        let Posttypes = new Posttype({
+          name: post_type,
+          create_at: new Date(),
+          pages: page_id,
+        });
+        await Posttypes.save();
+        Posttype_id = Posttypes._id;
+      }
+    });
     try {
       await page.goto(url, {
         waitUntil: 'networkidle2',
@@ -188,14 +238,6 @@ module.exports = async function main(req) {
           result = await loadmoremedia(page, data);
         }
         if (!result.ismain || !result.iscate || !result.iscontent || !result.isuser) {
-          const error = ref(databases, 'Error/' + name.replace(/[#:.,$]/g, '') + '/' + result.linkPost.split('/')[6]);
-          await set(error, {
-            name: result.linkPost,
-            ismain: result.ismain,
-            iscate: result.iscate,
-            isuser: result.isuser,
-            iscontent: result.iscontent,
-          });
           return;
         }
 
@@ -203,30 +245,7 @@ module.exports = async function main(req) {
           if (err) throw err;
           console.log('The file has been saved!');
         });
-        const postListRef = ref(database, '/Listpost/' + name.replace(/[#:.,$]/g, '') + '/' + result.idPost);
 
-        set(postListRef, {
-          user: result.user,
-          videos: result.videos,
-          contentList: result.contentList,
-          countComment: result.countComment,
-          countLike: result.countLike,
-          countShare: result.countShare,
-          user_id: result.user_id,
-          idPost: result.idPost,
-          linkPost: url,
-          linkImgs: result.linkImgs,
-          commentList: result.commentList,
-          token: result.token,
-          count_comments_config: result.count_comments_config,
-          statusbar: 'active',
-          create_at: Date.now(),
-        });
-
-        const postListRefss = ref(
-          database,
-          'post_type/' + post_type + '/' + name.replace(/[#:.,$]/g, '') + '/' + result.idPost
-        );
         let titles = '';
         let short_descriptions = '';
         let arrVid = null;
@@ -381,61 +400,58 @@ module.exports = async function main(req) {
             : [],
         };
         data_post = {};
+        try {
+          //let posttype = await Posttype.findOne({name: post_type});
+          Post.findOne({ post_link: url, posttype: Posttype_id }, async function (err, post) {
+            if (err) {
+              return;
+            } else {
+              if (post === null) {
+                let posts = new Post({
+                  basic_fields: JSON.stringify(basic_fields),
+                  custom_fields: JSON.stringify(custom_fields),
+                  post_link: url,
+                  group_page_id: page_id,
+                  posttype: Posttype_id,
+                  create_at: new Date(),
+                });
+                await posts.save();
+              } else {
+                await Post.findByIdAndUpdate(
+                  post._id,
+                  {
+                    basic_fields: JSON.stringify(basic_fields),
+                    custom_fields: JSON.stringify(custom_fields),
+                    create_at: new Date(),
+                  },
+                  { new: true }
+                );
+                redisClient.keys('*', async (err, keys) => {
+                  if (err) return console.log(err);
+                  if (keys) {
+                    keys.map(async (key) => {
+                      if (
+                        key.indexOf('page') > -1 ||
+                        key.indexOf('limit') > -1 ||
+                        key.indexOf('search') > -1 ||
+                        key.indexOf(`posts/${post._id}`) > -1
+                      ) {
+                        redisClient.del(key);
+                      }
+                    });
+                  }
+                });
+              }
+            }
+          });
+        } catch (e) {
+          console.log(e);
+        }
         //await bigquery(basic_fields, custom_fields);
-        await set(postListRefss, {
-          basic_fields: basic_fields,
-          custom_fields: custom_fields,
-        });
-        const postListRefsss = ref(database, '/Listpost/' + name.replace(/[#:.,$]/g, '') + '/' + result.idPost);
-
-        await set(postListRefsss, {
-          user: result.user,
-          videos: result.videos,
-          contentList: result.contentList,
-          countComment: result.countComment,
-          countLike: result.countLike,
-          countShare: result.countShare,
-          user_id: result.user_id,
-          idPost: result.idPost,
-          linkPost: url,
-          linkImgs: result.linkImgs,
-          commentList: result.commentList,
-          token: result.token,
-          count_comments_config: result.count_comments_config,
-          statusbar: 'active',
-          create_at: Date.now(),
-        });
-        const postListRefs = ref(database, '/craw_list/' + name.replace(/[#:.,$]/g, '') + '/' + craw_id);
-        const newPostRef = push(postListRefs);
-
-        await set(newPostRef, {
-          id: 1,
-          post_link: url,
-          statusbar: 'active',
-          countComment: result.countComment,
-          countLike: result.countLike,
-          countShare: result.countShare,
-          count_comments_config: result.count_comments_config,
-          comments_config: cmt_length,
-          create_at: Date.now(),
-        });
       });
     } catch (e) {
       console.log(e);
       console.log('lỗi error');
-      const app = initializeApp.initializeApp(firebaseConfig);
-      const database = getDatabase(app);
-      const postListRefss = ref(database, '/Listpost/' + name.replace(/[#:.,$]/g, '') + '/' + url.split('/')[6]);
-      await set(postListRefss, {
-        post_link: url,
-        error: 'error' + e,
-      });
-      const postListRefs = ref(database, '/craw_list/' + name.replace(/[#:.,$]/g, '') + '/' + craw_id);
-      const newPostRef = push(postListRefs);
-      await set(newPostRef, {
-        post_link: url,
-        statusbar: 'error' + e,
-      });
     }
 
     // await browser.close();

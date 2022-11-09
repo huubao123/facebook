@@ -3,7 +3,7 @@ const postSchema = mongoose.Schema({
   basic_fields: String,
   custom_fields: String,
   post_link: String,
-  group_id: String,
+  group_page_id: String,
   posttype: String,
   create_at: Date,
 });

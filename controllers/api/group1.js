@@ -162,21 +162,45 @@ module.exports = async function main(req) {
         ? document.querySelectorAll('h1')[1].textContent
         : document.querySelectorAll('h1')[0].textContent;
     });
-    Group.findOne({ url: name_group }, async function (err, group) {
-      if (err) {
-        console.log(err);
-        return;
-      }
-      if (group) {
-        group_id = group._id;
+    let group = await Group.findOne({ url: name_group });
+    if (group) {
+      group_id = group._id;
+    } else {
+      let groups = new Group({
+        name: result,
+        url: name_group,
+        create_at: new Date(),
+      });
+      await groups.save();
+      group_id = groups._id;
+    }
+    Posttype.findOne({ name: post_type }, async function (err, posttype) {
+      if (posttype) {
+        Posttype_id = posttype._id;
+        let flag_group = true;
+        for (let i = 0; i < posttype.groups.length; i++) {
+          if (posttype.groups[i] == group_id) {
+            flag_group = true;
+            break;
+          } else {
+            flag_group = false;
+          }
+        }
+        if (!flag_group) {
+          await Posttype.findByIdAndUpdate(
+            posttype._id,
+            { $push: { groups: group_id } },
+            { safe: true, upsert: true, new: true }
+          );
+        }
       } else {
-        let groups = new Group({
-          name: result,
-          url: url,
+        let Posttypes = new Posttype({
+          name: post_type,
           create_at: new Date(),
+          groups: group_id,
         });
-        await groups.save();
-        group_id = groups._id;
+        await Posttypes.save();
+        Posttype_id = Posttypes._id;
       }
     });
     // const postListRefss = ref(databases, 'Group/' + name.replace(/[#:.,$]/g, ''));
@@ -241,30 +265,6 @@ module.exports = async function main(req) {
           return;
         }
 
-        // const postListRef = ref(database, '/Listpost/' + name.replace(/[#:.,$]/g, '') + '/' + url.split('/')[6]);
-
-        // set(postListRef, {
-        //   user: result.user,
-        //   videos: result.videos,
-        //   contentList: result.contentList,
-        //   countComment: result.countComment,
-        //   countLike: result.countLike,
-        //   countShare: result.countShare,
-        //   user_id: result.user_id,
-        //   idPost: url.split('/')[6],
-        //   linkPost: url,
-        //   linkImgs: result.linkImgs,
-        //   commentList: result.commentList,
-        //   token: result.token,
-        //   count_comments_config: result.count_comments_config,
-        //   statusbar: 'active',
-        //   create_at: Date.now(),
-        // });
-
-        // const postListRefss = ref(
-        //   database,
-        //   'post_type/' + post_type + '/' + name.replace(/[#:.,$]/g, '') + '/' + url.split('/')[6]
-        // );
         let titles = '';
         let short_descriptions = '';
         let arrVid = null;
@@ -463,97 +463,13 @@ module.exports = async function main(req) {
               }
             }
           });
-          let postdetail = new Post_detail({
-            group_id: group_id,
-            title: titles,
-            short_description: short_descriptions,
-            long_description: result.contentList
-              ? result.contentList.replaceAll('https://l.facebook.com/l.php?', '')
-              : '',
-            slug: '',
-            featured_image: result.linkImgs[0] ? result.linkImgs[0] : '',
-            session_tags: {
-              tags: [],
-            },
-            categorialue: [],
-            key: '',
-            name: '',
-            type: post_type,
-            attributes: [],
-            status: 'publish',
-            is_active: 1,
-            seo_tags: {
-              meta_title: 'New Post Facebook',
-              meta_description: 'New Post Facebook',
-            },
-            video: result.videos,
-            date: result.date ? result.date : '',
-            post_id: result.idPost ? result.idPost : '',
-            post_link: url,
-            user_id: result.user_id ? result.user_id : 'undefined',
-            user_name: result.user ? result.user : 'undefined',
-            count_like: result.countLike
-              ? result.countLike.toString().split(' ')[0].indexOf(',') > -1
-                ? parseInt(result.countLike.toString().split(' ')[0].replace('K', '00').replace(',', ''))
-                : parseInt(result.countLike.toString().split(' ')[0].replace('K', '000'))
-              : 0,
-            count_comment: result.countComment
-              ? result.countComment.toString().split(' ')[0].indexOf(',') > -1
-                ? parseInt(result.countComment.toString().split(' ')[0].replace('K', '00').replace(',', ''))
-                : parseInt(result.countComment.toString().split(' ')[0].replace('K', '000'))
-              : 0,
-            count_share: result.countShare
-              ? result.countShare.toString().split(' ')[0].indexOf(',') > -1
-                ? parseInt(result.countShare.toString().split(' ')[0].replace('K', '00').replace(',', ''))
-                : parseInt(result.countShare.toString().split(' ')[0].replace('K', '000'))
-              : 0,
-            featured_image: result.linkImgs ? result.linkImgs : '',
-            comments: result.commentList
-              ? result.commentList.map((item) => ({
-                  content: item.contentComment,
-                  count_like: item.countLike
-                    ? item.countLike.toString().split(' ')[0].indexOf(',') > -1
-                      ? parseInt(item.countLike.toString().split(' ')[0].replace('K', '00').replace(',', ''))
-                      : parseInt(item.countLike.toString().split(' ')[0].replace('K', '000'))
-                    : 0,
-                  user_id: item.userIDComment,
-                  user_name: item.usernameComment,
-                  imgComment: item.imageComment ? item.imageComment : '',
-                  children: item.children
-                    ? item.children.map((child) => ({
-                        content: child.contentComment,
-                        count_like: child.countLike
-                          ? child.countLike.toString().split(' ')[0].indexOf(',') > -1
-                            ? parseInt(child.countLike.toString().split(' ')[0].replace('K', '00').replace(',', ''))
-                            : parseInt(child.countLike.toString().split(' ')[0].replace('K', '000'))
-                          : 0,
-                        user_id: child.userIDComment,
-                        user_name: child.usernameComment,
-                        imageComment: child.imageComment ? child.imageComment : '',
-                      }))
-                    : [],
-                }))
-              : [],
-          });
-
-          await postdetail.save();
         } catch (e) {
           console.log(e);
         }
-        //await bigquery(basic_fields, custom_fields);
-        // await set(postListRefss, {
-        //   basic_fields: basic_fields,
-        //   custom_fields: custom_fields,
-        // });
       });
     } catch (e) {
       console.log(e);
       console.log('lỗi error');
-      // const postListRefss = ref(database, '/Listpost/' + name.replace(/[#:.,$]/g, '') + '/' + url.split('/')[6]);
-      // await set(postListRefss, {
-      //   post_link: url,
-      //   error: 'error' + e,
-      // });
     }
 
     await browser.close();
