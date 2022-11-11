@@ -443,11 +443,23 @@ module.exports = async function getdata(page, cmt_lengths) {
                         : diw_newcmt.childNodes[0].childNodes[0].childNodes[1].textContent;
                   }
                   diw_newcmt.childNodes[0].childNodes[0].childNodes[0].childNodes.forEach((cmt, index) => {
-                    if (cmt.nodeName == 'SPAN' && index == 0) {
+                    if (cmt.nodeName == 'SPAN' && index == 1) {
+                      console.log('user1: ', cmt);
                       user_cmt_href = cmt.childNodes[0].href;
                       user_name_cmt = cmt.childNodes[0].innerText;
                       user_cmt_id = cmt.childNodes[0].href.split('/')[3];
-                    } else if (cmt.nodeName == 'DIV') {
+                    }
+                    if (cmt.nodeName == 'SPAN' && index == 0) {
+                      console.log('user1: ', cmt);
+                      user_cmt_href = cmt.childNodes[0].href;
+                      user_name_cmt = cmt.childNodes[0].innerText;
+                      user_cmt_id = cmt.childNodes[0].href.split('/')[3];
+                    } else if (cmt.nodeName == 'DIV' && index > 1) {
+                      if (cmt.childNodes.length > 3) {
+                        user_cmt_href = cmt.childNodes[1].childNodes[0].href;
+                        user_name_cmt = cmt.childNodes[1].childNodes[0].innerText;
+                        user_cmt_id = cmt.childNodes[1].childNodes[0].href.split('/')[3];
+                      }
                       for (let l = 0; l < cmt.childNodes[0].childNodes.length; l++) {
                         cotent_cmt += cmt.childNodes[0].childNodes[l].innerText
                           .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
@@ -491,12 +503,18 @@ module.exports = async function getdata(page, cmt_lengths) {
                   });
                   diw_newcmt.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes.forEach(
                     (child, index) => {
-                      if (child.nodeName == 'SPAN' && index == 0) {
-                        console.log(child);
+                      if (child.nodeName == 'SPAN' && index == 1) {
+                        console.log('user12 ', child);
                         user_cmt_href = child.childNodes[0].href;
                         user_name_cmt = child.childNodes[0].innerText;
                         user_cmt_id = child.childNodes[0].href.split('/')[3];
-                      } else if (child.nodeName == 'DIV') {
+                      }
+                      if (child.nodeName == 'SPAN' && index == 0) {
+                        console.log('user12 ', child);
+                        user_cmt_href = child.childNodes[0].href;
+                        user_name_cmt = child.childNodes[0].innerText;
+                        user_cmt_id = child.childNodes[0].href.split('/')[3];
+                      } else if (child.nodeName == 'DIV' && index > 0) {
                         for (let l = 0; l < child.childNodes[0].childNodes.length; l++) {
                           cotent_cmt += child.childNodes[0].childNodes[l].innerText
                             .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
@@ -536,17 +554,23 @@ module.exports = async function getdata(page, cmt_lengths) {
                               m
                             ].childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes.forEach(
                               (child, index) => {
+                                if (child.nodeName == 'SPAN' && index == 1) {
+                                  console.log(child);
+                                  user_cmtchild_href = child.childNodes[0].href;
+                                  user_name_cmtchild = child.childNodes[0].innerText;
+                                  user_cmtchild_id = child.childNodes[0].href.split('/')[3];
+                                }
                                 if (child.nodeName == 'SPAN' && index == 0) {
                                   console.log(child);
                                   user_cmtchild_href = child.childNodes[0].href;
                                   user_name_cmtchild = child.childNodes[0].innerText;
                                   user_cmtchild_id = child.childNodes[0].href.split('/')[3];
-                                } else if (child.nodeName == 'DIV') {
+                                } else if (child.nodeName == 'DIV' && index > 0) {
                                   for (let l = 0; l < child.childNodes[0].childNodes.length; l++) {
                                     cotent_cmtchild += child.childNodes[0].childNodes[l].innerText
                                       .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
                                       .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
-                                      .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, ''); 
+                                      .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
                                     cotent_cmtchild_text += child.childNodes[0].childNodes[l].innerText
                                       .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
                                       .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
@@ -623,6 +647,7 @@ module.exports = async function getdata(page, cmt_lengths) {
                       for (let m = 0; m < elementsss.childNodes.length; m++) {
                         console.log('child1', elementsss.childNodes[m].childNodes);
                         try {
+                          let children_div = '';
                           // thử comment_child1 mới có thêm 1 thẻ div
                           if (elementsss.childNodes[m].childNodes.length == 3) {
                             children_div = elementsss.childNodes[m].childNodes[1].childNodes[
@@ -646,6 +671,7 @@ module.exports = async function getdata(page, cmt_lengths) {
                                 ].childNodes[1].childNodes[1].childNodes[0].childNodes[0].childNodes[0].childNodes;
                           }
                           // cmtchild1 mới  cũ có hình ảnh
+                          console.log('children_div', children_div);
                           if (
                             children_div[0].parentNode.parentNode.parentNode.parentNode.parentNode.childNodes.length ==
                             3
@@ -714,12 +740,18 @@ module.exports = async function getdata(page, cmt_lengths) {
                           // lấy thông tin cmt
                           if (children_div.length > 1) {
                             children_div.forEach((child, index) => {
-                              if (child.nodeName == 'SPAN' && index == 0) {
-                                console.log(child);
+                              if (child.nodeName == 'SPAN' && index === 1) {
+                                console.log('userchild :', child);
                                 user_cmtchild_href = child.childNodes[0].href;
                                 user_name_cmtchild = child.childNodes[0].innerText;
                                 user_cmtchild_id = child.childNodes[0].href.split('/')[3];
-                              } else if (child.nodeName == 'DIV') {
+                              }
+                              if (child.nodeName == 'SPAN' && index === 0) {
+                                console.log('userchild :', child);
+                                user_cmtchild_href = child.childNodes[0].href;
+                                user_name_cmtchild = child.childNodes[0].innerText;
+                                user_cmtchild_id = child.childNodes[0].href.split('/')[3];
+                              } else if (child.nodeName == 'DIV' && index > 0) {
                                 for (let l = 0; l < child.childNodes[0].childNodes.length; l++) {
                                   cotent_cmtchild += child.childNodes[0].childNodes[l].innerText
                                     .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
@@ -740,12 +772,18 @@ module.exports = async function getdata(page, cmt_lengths) {
                             });
                           } else {
                             children_div[0].childNodes[0].childNodes.forEach((child, index) => {
-                              if (child.nodeName == 'SPAN' && index == 0) {
-                                console.log(child);
+                              if (child.nodeName == 'SPAN' && index == 1) {
+                                console.log('userchild2 :', child);
                                 user_cmtchild_href = child.childNodes[0].href;
                                 user_name_cmtchild = child.childNodes[0].innerText;
                                 user_cmtchild_id = child.childNodes[0].href.split('/')[3];
-                              } else if (child.nodeName == 'DIV') {
+                              }
+                              if (child.nodeName == 'SPAN' && index == 0) {
+                                console.log('userchild2 :', child);
+                                user_cmtchild_href = child.childNodes[0].href;
+                                user_name_cmtchild = child.childNodes[0].innerText;
+                                user_cmtchild_id = child.childNodes[0].href.split('/')[3];
+                              } else if (child.nodeName == 'DIV' && index > 0) {
                                 for (let l = 0; l < child.childNodes[0].childNodes.length; l++) {
                                   cotent_cmtchild += child.childNodes[0].childNodes[l].innerText
                                     .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
@@ -800,12 +838,18 @@ module.exports = async function getdata(page, cmt_lengths) {
                                     // lấy thông tin child2 cmt
                                     element.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes.forEach(
                                       (child, index) => {
-                                        if (child.nodeName == 'SPAN' && index == 0) {
-                                          console.log(child);
+                                        if (child.nodeName == 'SPAN' && index === 1) {
+                                          console.log('userchild3 :', child);
                                           user_cmtchild_href = child.childNodes[0].href;
                                           user_name_cmtchild = child.childNodes[0].innerText;
                                           user_cmtchild_id = child.childNodes[0].href.split('/')[3];
-                                        } else if (child.nodeName == 'DIV') {
+                                        }
+                                        if (child.nodeName == 'SPAN' && index === 0) {
+                                          console.log('userchild3 :', child);
+                                          user_cmtchild_href = child.childNodes[0].href;
+                                          user_name_cmtchild = child.childNodes[0].innerText;
+                                          user_cmtchild_id = child.childNodes[0].href.split('/')[3];
+                                        } else if (child.nodeName == 'DIV' && index > 0) {
                                           for (let l = 0; i < child.childNodes[0].childNodes.length; l++) {
                                             cotent_cmtchild += child.childNodes[0].childNodes[l].innerText
                                               .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
@@ -868,12 +912,18 @@ module.exports = async function getdata(page, cmt_lengths) {
                                       // lấy thông tin khi có hình
                                       children22[0].childNodes[0].childNodes[0].childNodes[0].childNodes.forEach(
                                         (child, index) => {
-                                          if (child.nodeName == 'SPAN' && index == 0) {
-                                            console.log(child);
+                                          if (child.nodeName == 'SPAN' && index == 1) {
+                                            console.log('userchild4 :', child);
                                             user_cmtchild_href = child.childNodes[0].href;
                                             user_name_cmtchild = child.childNodes[0].innerText;
                                             user_cmtchild_id = child.childNodes[0].href.split('/')[3];
-                                          } else if (child.nodeName == 'DIV') {
+                                          }
+                                          if (child.nodeName == 'SPAN' && index == 0) {
+                                            console.log('userchild4 :', child);
+                                            user_cmtchild_href = child.childNodes[0].href;
+                                            user_name_cmtchild = child.childNodes[0].innerText;
+                                            user_cmtchild_id = child.childNodes[0].href.split('/')[3];
+                                          } else if (child.nodeName == 'DIV' && index > 0) {
                                             for (let l = 0; l < child.childNodes[0].childNodes.length; l++) {
                                               cotent_cmtchild += child.childNodes[0].childNodes[l].innerText
                                                 .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
@@ -906,12 +956,18 @@ module.exports = async function getdata(page, cmt_lengths) {
                                       // lấy thông tin cmt child 2
                                       children22[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes.forEach(
                                         (child, index) => {
-                                          if (child.nodeName == 'SPAN' && index == 0) {
-                                            console.log(child);
+                                          if (child.nodeName == 'SPAN' && index == 1) {
+                                            console.log('userchild5 :', child);
                                             user_cmtchild_href = child.childNodes[0].href;
                                             user_name_cmtchild = child.childNodes[0].innerText;
                                             user_cmtchild_id = child.childNodes[0].href.split('/')[3];
-                                          } else if (child.nodeName == 'DIV') {
+                                          }
+                                          if (child.nodeName == 'SPAN' && index == 0) {
+                                            console.log('userchild5 :', child);
+                                            user_cmtchild_href = child.childNodes[0].href;
+                                            user_name_cmtchild = child.childNodes[0].innerText;
+                                            user_cmtchild_id = child.childNodes[0].href.split('/')[3];
+                                          } else if (child.nodeName == 'DIV' && index > 0) {
                                             for (var l = 0; l < child.childNodes[0].childNodes.length; l++) {
                                               cotent_cmtchild += child.childNodes[0].childNodes[l].innerText
                                                 .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
@@ -1035,7 +1091,7 @@ module.exports = async function getdata(page, cmt_lengths) {
                 if (divcommment.length > 1) {
                   divcommment.forEach((element, index) => {
                     if (element.nodeName == 'SPAN' && index == 0) {
-                      console.log(element);
+                      console.log('user6', element);
                       user_cmt_href = element.childNodes[0].href;
                       user_name_cmt = element.childNodes[0].innerText;
                       user_cmt_id = element.childNodes[0].href.split('/')[3];
@@ -1060,12 +1116,18 @@ module.exports = async function getdata(page, cmt_lengths) {
                   });
                 } else if (divcommment.length == 1) {
                   divcommment[0].childNodes[0].childNodes.forEach((element, index) => {
+                    if (element.nodeName == 'SPAN' && index == 1) {
+                      console.log(element);
+                      user_cmt_href = element.childNodes[0].href;
+                      user_name_cmt = element.childNodes[0].innerText;
+                      user_cmt_id = element.childNodes[0].href.split('/')[3];
+                    }
                     if (element.nodeName == 'SPAN' && index == 0) {
                       console.log(element);
                       user_cmt_href = element.childNodes[0].href;
                       user_name_cmt = element.childNodes[0].innerText;
                       user_cmt_id = element.childNodes[0].href.split('/')[3];
-                    } else if (element.nodeName == 'DIV') {
+                    } else if (element.nodeName == 'DIV' && index > 0) {
                       for (let l = 0; l < element.childNodes[0].childNodes.length; l++) {
                         cotent_cmt += element.childNodes[0].childNodes[l].innerText
                           .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')

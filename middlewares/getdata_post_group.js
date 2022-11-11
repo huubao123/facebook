@@ -483,6 +483,7 @@ module.exports = async function getdata(page, cmt_lengths) {
                   // đếm like comment
                   console.log('diw_newcmt', diw_newcmt);
                   if (diw_newcmt.childNodes[0].childNodes[0].childNodes[1]) {
+                    
                     count_like_cmt =
                       diw_newcmt.childNodes[0].childNodes[0].childNodes[1].textContent == ''
                         ? 1
@@ -490,6 +491,7 @@ module.exports = async function getdata(page, cmt_lengths) {
                   }
                   diw_newcmt.childNodes[0].childNodes[0].childNodes[0].childNodes.forEach(
                     (cmt, index) => {
+                      console.log('user1 :',cmt)
                       if (cmt.nodeName == 'SPAN' && index == 0) {
                         user_cmt_href = cmt.childNodes[0].childNodes[0].href;
                         user_name_cmt = cmt.childNodes[0].childNodes[0].innerText;
@@ -531,6 +533,7 @@ module.exports = async function getdata(page, cmt_lengths) {
 
                   elementss.childNodes[0].childNodes[1].childNodes[1].childNodes.forEach(
                     (elementsss, index) => {
+
                       if (elementsss.nodeName == 'DIV' && index == 1) {
                         //console.log('1', elementsss);
                         imgComment =
@@ -541,6 +544,7 @@ module.exports = async function getdata(page, cmt_lengths) {
                   );
                   diw_newcmt.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes.forEach(
                     (child, index) => {
+                      console.log("user2: ",child)
                       if (child.nodeName == 'SPAN' && index == 0) {
                         user_cmt_href = child.childNodes[0].childNodes[0].href;
                         user_name_cmt = child.childNodes[0].childNodes[0].innerText;
@@ -563,6 +567,7 @@ module.exports = async function getdata(page, cmt_lengths) {
                           cotent_cmt_text = '';
                         }
                       } else if (child.nodeName == 'A') {
+                        console.log("user3:",child)
                         user_cmt_href = child.href;
                         user_name_cmt = child.innerText;
                         user_cmt_id = child.href.split('/')[6];

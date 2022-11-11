@@ -178,7 +178,7 @@ module.exports = async function main(req) {
         Posttype_id = posttype._id;
         let flag_group = true;
         for (let i = 0; i < posttype.groups.length; i++) {
-          if (posttype.groups[i] == group_id) {
+          if (posttype.groups[i].toString() == group_id.toString()) {
             flag_group = true;
             break;
           } else {
@@ -438,11 +438,7 @@ module.exports = async function main(req) {
                   if (err) return console.log(err);
                   if (keys) {
                     keys.map(async (key) => {
-                      if (
-                        key.indexOf('page') > -1 ||
-                        key.indexOf('limit') > -1 ||
-                        key.indexOf('search') > -1 
-                                                  ) {
+                      if (key.indexOf('page') > -1 || key.indexOf('limit') > -1 || key.indexOf('search') > -1) {
                         redisClient.del(key);
                       }
                     });

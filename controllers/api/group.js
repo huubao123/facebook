@@ -270,13 +270,14 @@ module.exports = async function main(req) {
         Posttype_id = posttype._id;
         let flag_group = true;
         for (let i = 0; i < posttype.groups.length; i++) {
-          if (posttype.groups[i] == group_id) {
+          if (posttype.groups[i].toString() === group_id.toString()) {
             flag_group = true;
             break;
           } else {
             flag_group = false;
           }
         }
+        console.log(flag_group);
         if (!flag_group) {
           await Posttype.findByIdAndUpdate(
             posttype._id,
@@ -548,66 +549,62 @@ module.exports = async function main(req) {
                 : [],
             };
             //await bigquery(basic_fields, custom_fields);
-            try {
-              Post.findOne({ post_link: result[i].post_link, posttype: Posttype_id }, async function (err, post) {
-                if (err) {
-                  console.log(err);
-                } else {
-                  if (post === null) {
-                    let posts = new Post({
-                      basic_fields: JSON.stringify(basic_fields),
-                      custom_fields: JSON.stringify(custom_fields),
-                      post_link: result[i].post_link,
-                      group_id: group_id,
-                      posttype: Posttype_id,
-                      create_at: new Date(),
-                    });
-                    await posts.save();
-                    redisClient.keys('*', async (err, keys) => {
-                      if (err) return console.log(err);
-                      if (keys) {
-                        keys.map(async (key) => {
-                          if (
-                            key.indexOf('page') > -1 ||
-                            key.indexOf('limit') > -1 ||
-                            key.indexOf('search') > -1 
-                                                      ) {
-                            redisClient.del(key);
-                          }
-                        });
-                      }
-                    });
-                  } else {
-                    await Post.findByIdAndUpdate(
-                      post._id,
-                      {
-                        basic_fields: JSON.stringify(basic_fields),
-                        custom_fields: JSON.stringify(custom_fields),
-                        create_at: new Date(),
-                      },
-                      { new: true }
-                    );
-                    redisClient.keys('*', async (err, keys) => {
-                      if (err) return console.log(err);
-                      if (keys) {
-                        keys.map(async (key) => {
-                          if (
-                            key.indexOf('page') > -1 ||
-                            key.indexOf('limit') > -1 ||
-                            key.indexOf('search') > -1 ||
-                            key.indexOf(`posts/${post._id}`) > -1
-                          ) {
-                            redisClient.del(key);
-                          }
-                        });
-                      }
-                    });
-                  }
-                }
-              });
-            } catch (e) {
-              console.log(e);
-            }
+            // try {
+            //   Post.findOne({ post_link: result[i].post_link, posttype: Posttype_id }, async function (err, post) {
+            //     if (err) {
+            //       console.log(err);
+            //     } else {
+            //       if (post === null) {
+            //         let posts = new Post({
+            //           basic_fields: JSON.stringify(basic_fields),
+            //           custom_fields: JSON.stringify(custom_fields),
+            //           post_link: result[i].post_link,
+            //           group_id: group_id,
+            //           posttype: Posttype_id,
+            //           create_at: new Date(),
+            //         });
+            //         await posts.save();
+            //         redisClient.keys('*', async (err, keys) => {
+            //           if (err) return console.log(err);
+            //           if (keys) {
+            //             keys.map(async (key) => {
+            //               if (key.indexOf('page') > -1 || key.indexOf('limit') > -1 || key.indexOf('search') > -1) {
+            //                 redisClient.del(key);
+            //               }
+            //             });
+            //           }
+            //         });
+            //       } else {
+            //         await Post.findByIdAndUpdate(
+            //           post._id,
+            //           {
+            //             basic_fields: JSON.stringify(basic_fields),
+            //             custom_fields: JSON.stringify(custom_fields),
+            //             create_at: new Date(),
+            //           },
+            //           { new: true }
+            //         );
+            //         redisClient.keys('*', async (err, keys) => {
+            //           if (err) return console.log(err);
+            //           if (keys) {
+            //             keys.map(async (key) => {
+            //               if (
+            //                 key.indexOf('page') > -1 ||
+            //                 key.indexOf('limit') > -1 ||
+            //                 key.indexOf('search') > -1 ||
+            //                 key.indexOf(`posts/${post._id}`) > -1
+            //               ) {
+            //                 redisClient.del(key);
+            //               }
+            //             });
+            //           }
+            //         });
+            //       }
+            //     }
+            //   });
+            // } catch (e) {
+            //   console.log(e);
+            // }
           });
         } catch (e) {
           console.log(e);

@@ -105,6 +105,12 @@ module.exports = async function main(req) {
       devtools: true,
       executablePath: process.env.executablePath,
     });
+    const context = browser.defaultBrowserContext();
+    //        URL                  An array of permissions
+    context.overridePermissions('https://www.facebook.com', ['geolocation', 'notifications']);
+    const context2 = browser2.defaultBrowserContext();
+    //        URL                  An array of permissions
+    context2.overridePermissions('https://www.facebook.com', ['geolocation', 'notifications']);
     const page = await browser.newPage();
     await page.setDefaultNavigationTimeout(60000);
     const pages = await browser.pages();
@@ -143,7 +149,7 @@ module.exports = async function main(req) {
       });
       //await page.waitForFunction('document.querySelector("h2")');
     } catch (e) {}
-    await page.waitForSelector('h1', { visible: true });
+    await page.waitForFunction('document.querySelector("h1")');
     let result = await page.evaluate(() => {
       return document.querySelectorAll('h1')[1]
         ? document.querySelectorAll('h1')[1].textContent
@@ -168,7 +174,7 @@ module.exports = async function main(req) {
         Posttype_id = posttype._id;
         let flag_page = true;
         for (let i = 0; i < posttype.groups.length; i++) {
-          if (posttype.pages[i] == page_id) {
+          if (posttype.pages[i].toString() == page_id.toString()) {
             flag_page = true;
             break;
           } else {
@@ -197,7 +203,7 @@ module.exports = async function main(req) {
         waitUntil: 'networkidle2',
       });
       // await page.waitForSelector('*');
-       await new Promise((r) => setTimeout(r, 4000));
+      await new Promise((r) => setTimeout(r, 4000));
       try {
         await page.evaluate(async () => {
           let div = document.querySelectorAll('[role = "button"]');
@@ -206,10 +212,9 @@ module.exports = async function main(req) {
               div[i].innerText.indexOf('Phù hợp nhất') !== -1 ||
               div[i].innerText.indexOf('Mới nhất') !== -1 ||
               div[i].innerText.indexOf('Tất cả bình luận') !== -1 ||
-              div[i].innerText.indexOf('Tất cả bình luận') !== -1 ||
-              div[i].innerText.indexOf('Tất cả bình luận') !== -1 ||
-              div[i].innerText.indexOf('Tất cả bình luận') !== -1 
-              
+              div[i].innerText.indexOf('Most relevant') !== -1 ||
+              div[i].innerText.indexOf('All comments') !== -1 ||
+              div[i].innerText.indexOf('Newest') !== -1
             ) {
               await div[i].scrollIntoView();
               break;
@@ -220,7 +225,12 @@ module.exports = async function main(req) {
       await page.evaluate(async () => {
         let div = document.querySelectorAll('[role = "button"]');
         for (let i = 0; i < div.length; i++) {
-          if (div[i].innerText.indexOf('Phù hợp nhất') !== -1 || div[i].innerText.indexOf('Mới nhất') !== -1 || div[i].innerText.indexOf('Most relevant') !== -1 || div[i].innerText.indexOf('Newest') !== -1) {
+          if (
+            div[i].innerText.indexOf('Phù hợp nhất') !== -1 ||
+            div[i].innerText.indexOf('Mới nhất') !== -1 ||
+            div[i].innerText.indexOf('Most relevant') !== -1 ||
+            div[i].innerText.indexOf('Newest') !== -1
+          ) {
             await div[i].click();
             break;
           }
@@ -231,7 +241,7 @@ module.exports = async function main(req) {
         for (let i = 0; i < div.length; i++) {
           if (div[i].innerText.indexOf('Tất cả bình luận') !== -1 || div[i].innerText.indexOf('All comments') !== -1) {
             await div[i].click();
-            break;  
+            break;
           }
         }
       });
@@ -458,7 +468,7 @@ module.exports = async function main(req) {
       console.log('lỗi error');
     }
 
-    // await browser.close();
+    await browser.close();
   } catch (err) {
     console.log('lỗi server', err);
   }
