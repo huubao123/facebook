@@ -251,6 +251,10 @@ module.exports = async function main(req) {
         if (data.imagemore > 0) {
           result = await loadmoremedia(page, data);
         }
+        fs.writeFile('item1.txt', JSON.stringify(result, null, 2), (err) => {
+          if (err) throw err;
+          console.log('The file has been saved!');
+        });
         if (!result.ismain || !result.iscate || !result.iscontent || !result.isuser) {
           // const error = ref(databases, 'Error/' + name.replace(/[#:.,$]/g, '') + '/' + result.linkPost.split('/')[6]);
           // await set(error, {
@@ -481,7 +485,7 @@ module.exports = async function main(req) {
       console.log('lỗi error');
     }
 
-    await browser.close();
+    //await browser.close();
   } catch (err) {
     console.log('lỗi server', err);
   }

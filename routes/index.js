@@ -60,7 +60,7 @@ router.get('/groups/:id', async function (req, res, next) {
       if (post !== null) {
         res.json(post);
       } else {
-        res.send('Not Found');
+        res.status(404).send('Not Found');
       }
     }
   });
@@ -71,12 +71,16 @@ router.post('/post2', async (req, res, next) => {
 });
 
 router.post('/group1', async (req, res) => {
-  const jobId = crypto.randomBytes(10).toString('hex');
-  const currentTime = new Date().getTime();
-  const processAt = new Date(req.body.datetime).getTime();
-  const delay = processAt - currentTime;
-  await queue1.add({ data: req.body, jobId: jobId }, { delay: delay, jobId: jobId });
-  res.json({ data: 'success', statusbar: 'ok', jobId: jobId });
+  try {
+    const jobId = crypto.randomBytes(10).toString('hex');
+    const currentTime = new Date().getTime();
+    const processAt = new Date(req.body.datetime).getTime();
+    const delay = processAt - currentTime;
+    await queue1.add({ data: req.body, jobId: jobId }, { delay: delay, jobId: jobId });
+    res.json({ data: 'success', statusbar: 'ok', jobId: jobId });
+  } catch (err) {
+    res.status(500).send(err);
+  }
 });
 queue1.process(async (job, done) => {
   // await new Promise((r) => setTimeout(r, 4000));
@@ -86,14 +90,17 @@ queue1.process(async (job, done) => {
 });
 router.post('/add', video);
 router.post('/group', async function (req, res, next) {
-  const jobId = crypto.randomBytes(10).toString('hex');
-  const currentTime = new Date().getTime();
-  const processAt = new Date(req.body.datetime).getTime();
-  const delay = processAt - currentTime;
+  try {
+    const jobId = crypto.randomBytes(10).toString('hex');
+    const currentTime = new Date().getTime();
+    const processAt = new Date(req.body.datetime).getTime();
+    const delay = processAt - currentTime;
 
-  res.json({ data: 'success', statusbar: 'ok', jobId: jobId });
-
-  await queue.add({ data: req.body, jobId: jobId }, { delay: delay, jobId: jobId });
+    await queue.add({ data: req.body, jobId: jobId }, { delay: delay, jobId: jobId });
+    res.json({ data: 'success', statusbar: 'ok', jobId: jobId });
+  } catch (e) {
+    res.status(500).send(e);
+  }
 });
 queue.process(async (job, done) => {
   await group(job);
@@ -182,14 +189,17 @@ pagequeue.process(async (job, done) => {
   done();
 });
 router.post('/page1', async function (req, res, next) {
-  const jobId = crypto.randomBytes(10).toString('hex');
-  const currentTime = new Date().getTime();
-  const processAt = new Date(req.body.datetime).getTime();
-  const delay = processAt - currentTime;
+  try {
+    const jobId = crypto.randomBytes(10).toString('hex');
+    const currentTime = new Date().getTime();
+    const processAt = new Date(req.body.datetime).getTime();
+    const delay = processAt - currentTime;
 
-  res.json({ data: 'success', statusbar: 'ok', jobId: jobId });
-
-  await page1queue.add({ data: req.body, jobId: jobId }, { delay: delay, jobId: jobId });
+    await page1queue.add({ data: req.body, jobId: jobId }, { delay: delay, jobId: jobId });
+    res.json({ data: 'success', statusbar: 'ok', jobId: jobId });
+  } catch (err) {
+    res.status(500).send(e);
+  }
 });
 page1queue.process(async (job, done) => {
   await page1(job);
