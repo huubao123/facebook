@@ -13,6 +13,7 @@ const video = require('../controllers/sitemap');
 const fs = require('fs');
 const Queue = require('bull');
 const crypto = require('crypto');
+const ipadd = require('.././middlewares/request_ip_address');
 
 const queue = new Queue('group', { redis: { port: 6379, host: '127.0.0.1' } });
 const pagequeue = new Queue('page', { redis: { port: 6379, host: '127.0.0.1' } });
@@ -20,7 +21,6 @@ const page1queue = new Queue('page1', { redis: { port: 6379, host: '127.0.0.1' }
 
 const queue1 = new Queue('group1', { redis: { port: 6379, host: '127.0.0.1' } });
 const test = new Queue('test', { redis: { port: 6379, host: '127.0.0.1' } });
-
 // const initializeApp = require('firebase/app');
 
 // const getDatabase = require('firebase/database').getDatabase;
@@ -91,14 +91,18 @@ queue1.process(async (job, done) => {
 router.post('/add', video);
 router.post('/group', async function (req, res, next) {
   try {
+    const ip = ipadd.getRequestIpAddress(req);
     const jobId = crypto.randomBytes(10).toString('hex');
     const currentTime = new Date().getTime();
     const processAt = new Date(req.body.datetime).getTime();
     const delay = processAt - currentTime;
+    //console.log(req);
 
-    await queue.add({ data: req.body, jobId: jobId }, { delay: delay, jobId: jobId });
+    console.log(ip);
+    //await queue.add({ data: req.body, jobId: jobId }, { delay: delay, jobId: jobId });
     res.json({ data: 'success', statusbar: 'ok', jobId: jobId });
   } catch (e) {
+    console.log(e);
     res.status(500).send(e);
   }
 });

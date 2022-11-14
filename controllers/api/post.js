@@ -42,7 +42,12 @@ class Postapi {
           .limit(limit)
           .lean();
         post.forEach(async (element, index) => {
-          delete element.post_link;
+          delete element.basic_fields;
+          delete element.custom_fields;
+          delete element.page_group_id;
+          delete element.posttype;
+          delete element.create_at;
+          delete element.__v;
         });
         let posts = await Post.find({ posttype: posttype_id._id, post_link: { $regex: search } }).count();
         let data = {
@@ -60,13 +65,31 @@ class Postapi {
     });
   }
   async getall(req, res, next) {
-    let posts = await Post.find().lean();
-    for (let i = 0; i < posts.length; i++) {
-      
-      if(posts[i].posttype != "6364ba6972a13f347c5f8dd4"){
-        console.log(posts[i])
+    let page = 1;
+    let limit = 10000;
+    let post_type = req.query.posttype;
+    let skip = (page - 1) * limit;
+    let search = req.query.search ? req.query.search : '';
+    let post = await Post.find()
+      .sort([['create_at', -1]])
+      .skip(skip)
+      .limit(limit)
+      .lean();
+    post.forEach(async (element, index) => {
+      console.log(element._id);
+      if (element.basic_fields) {
+        let basic = JSON.parse(element.basic_fields);
+        await Post.findByIdAndUpdate(
+          element._id,
+          {
+            title: basic.title,
+          },
+          { safe: true, new: true }
+        );
       }
-    }
+    });
+    //console.log(post)
+    res.send(';');
     // delete element.basic_fields;
     // delete element.custom_fields;
     // delete element._id;
@@ -74,7 +97,6 @@ class Postapi {
     // delete element.__v;
     // delete element.posttype;
     // delete element.group_id;
-     res.json(posts);
   }
   async getPost_id(req, res, next) {
     redisClient.get(`posts/${req.params.id}`, async (err, data) => {

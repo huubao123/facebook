@@ -9,7 +9,7 @@ const timeout = require('connect-timeout'); //express v4
 const monitoro = require('monitoro');
 const postRouter = require('./routes/post');
 const app = express();
-
+const requestIp = require('request-ip');
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
@@ -75,7 +75,11 @@ queueConfigArray = [
   },
 ];
 app.locals.MonitoroQueues = queueConfigArray;
-
+app.use(requestIp.mw());
+const ipMiddleware = function (req, res, next) {
+  const clientIp = requestIp.getClientIp(req);
+  next();
+};
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,PATCH,DELETE');
@@ -83,7 +87,7 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use('/', indexRouter);
+app.use('/', ipMiddleware, indexRouter);
 app.use('/posts', postRouter);
 app.use('/admin/queues', serverAdapter.getRouter());
 app.use('/foo/bar', monitoro);

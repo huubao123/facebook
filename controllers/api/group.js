@@ -624,7 +624,7 @@ module.exports = async function main(req) {
 async function getlink(page, conten_length, like, comment, share) {
   const dimension = await page.evaluate(
     async (conten_length, like, comment, share) => {
-      post = document.querySelectorAll('[role="feed"]')[0].childNodes;
+      let post = document.querySelectorAll('[role="feed"]')[0].childNodes;
       let data = [];
       for (let i = 1; i < post.length; i++) {
         try {
