@@ -2,6 +2,8 @@ const { async } = require('@firebase/util');
 const Post = require('../../models/post');
 const Posttype = require('../../models/posttype');
 const redis = require('redis');
+var zlib = require('zlib');
+
 let redisClient = redis.createClient({
   legacyMode: true,
   socket: {
@@ -66,7 +68,7 @@ class Postapi {
   }
   async getall(req, res, next) {
     let page = 1;
-    let limit = 10000;
+    let limit = 100;
     let post_type = req.query.posttype;
     let skip = (page - 1) * limit;
     let search = req.query.search ? req.query.search : '';
@@ -75,21 +77,16 @@ class Postapi {
       .skip(skip)
       .limit(limit)
       .lean();
-    post.forEach(async (element, index) => {
-      console.log(element._id);
-      if (element.basic_fields) {
-        let basic = JSON.parse(element.basic_fields);
-        await Post.findByIdAndUpdate(
-          element._id,
-          {
-            title: basic.title,
-          },
-          { safe: true, new: true }
-        );
+    zlib.gzip(JSON.stringify(post), async function (err, posts) {
+      if (err) {
+        console.log(err);
+      } else {
+        var text = posts.toString('utf-8');
+        res.json(text);
       }
     });
     //console.log(post)
-    res.send(';');
+    // res.send(';');
     // delete element.basic_fields;
     // delete element.custom_fields;
     // delete element._id;
