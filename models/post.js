@@ -5,6 +5,7 @@ const postSchema = mongoose.Schema({
   post_link: String,
   group_page_id: String,
   posttype: String,
+  title: String,
   create_at: Date,
 });
 
