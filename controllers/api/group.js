@@ -12,11 +12,12 @@ const autoScroll_post = require('../../middlewares/autoscrollpost');
 const createMedia = require('../../middlewares/media');
 const genSlug = require('../../middlewares/genslug');
 require('dotenv').config();
+const downloadImage = require('../../middlewares/downloadimage');
 const Post = require('../../models/post');
 const Post_detail = require('../../models/post_detail');
 const Group = require('../../models/group');
 const Posttype = require('../../models/posttype');
-const Image = require('../../models/image');
+const Images = require('../../models/image');
 const redis = require('redis');
 let redisClient = redis.createClient({
   legacyMode: true,
@@ -109,20 +110,6 @@ module.exports = async function main(req) {
     let group_id = '';
     let Posttype_id = '';
 
-    // const app = initializeApp.initializeApp(firebaseConfig);
-    // const database = getDatabase(app);
-    // const postListRefs = ref(database, '/craw_list_length/' + name.replace(/[#:.,$]/g, '') + '/' + craw_id);
-    // await set(postListRefs, {
-    //   craw_id: craw_id,
-    //   length: lengths,
-    //   cmt_length: cmt_length,
-    //   like: like,
-    //   share: share,
-    //   comment: comment,
-    //   content_length: conten_length,
-    //   url: url,
-    //   create_at: Date.now(),
-    // });
     const browser2 = await puppeteer.launch({
       ignoreHTTPSErrors: true,
       ignoreDefaultArgs: ['--disable-extensions'],
@@ -203,9 +190,9 @@ module.exports = async function main(req) {
     const context = browser.defaultBrowserContext();
     //        URL                  An array of permissions
     context.overridePermissions('https://www.facebook.com', ['geolocation', 'notifications']);
-    // const context2 = browser2.defaultBrowserContext();
-    // //        URL                  An array of permissions
-    // context2.overridePermissions('https://www.facebook.com', ['geolocation', 'notifications']);
+    const context2 = browser2.defaultBrowserContext();
+    //        URL                  An array of permissions
+    context2.overridePermissions('https://www.facebook.com', ['geolocation', 'notifications']);
     const page = await browser.newPage();
     await page.setDefaultNavigationTimeout(60000);
     const pages = await browser.pages();
@@ -278,7 +265,6 @@ module.exports = async function main(req) {
             flag_group = false;
           }
         }
-        console.log(flag_group);
         if (!flag_group) {
           await Posttype.findByIdAndUpdate(
             posttype._id,
@@ -330,12 +316,6 @@ module.exports = async function main(req) {
             if (err) throw err;
           });
           console.log(result[i].post_link);
-          //await new Promise((r) => setTimeout(r, 4000));
-          // await page1.goto(url, {
-          //   waitUntil: 'load',
-          // });
-          //aaa
-          //await page1.waitForFunction('document.querySelector("h1")');
         } catch (e) {
           console.log(e);
         }
@@ -566,12 +546,16 @@ module.exports = async function main(req) {
                     });
                     await posts.save();
                     if (results.linkImgs.length > 0) {
-                      let image = new Image({
-                        link: results.linkImgs.map((linkImgs) => ({
-                          link: linkImgs,
-                          statusbar: active,
-                        })),
+                      let Image_id = new Array();
+                      for (let i = 0; i < results.linkImgs.length; i++) {
+                        let result_id_image = await downloadImage(results.linkImgs[i], post_type);
+                        Image_id.push(result_id_image);
+                      }
+                      let image = new Images({
+                        link_img: Image_id,
                         idPost: posts._id,
+                        link_post: result[i].post_link,
+                        update_at: new Date(),
                       });
                       await image.save();
                     }
@@ -595,6 +579,22 @@ module.exports = async function main(req) {
                       },
                       { new: true }
                     );
+                    if (results.linkImgs.length > 0) {
+                      let Image_id = new Array();
+                      for (let i = 0; i < results.linkImgs.length; i++) {
+                        let result_id_image = await downloadImage(results.linkImgs[i], post_type);
+                        Image_id.push(result_id_image);
+                      }
+                      await Images.findByIdAndUpdate(
+                        post._id,
+                        {
+                          link_img: Image_id,
+                          update_at: new Date(),
+                        },
+                        { new: true }
+                      );
+                    }
+
                     redisClient.keys('*', async (err, keys) => {
                       if (err) return console.log(err);
                       if (keys) {

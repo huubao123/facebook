@@ -2,7 +2,7 @@ const { async } = require('@firebase/util');
 const Post = require('../../models/post');
 const Posttype = require('../../models/posttype');
 const Image = require('../../models/image');
-
+const downloadImage = require('../../middlewares/downloadimage');
 const redis = require('redis');
 let redisClient = redis.createClient({
   legacyMode: true,
@@ -67,48 +67,51 @@ class Postapi {
     });
   }
   async getall(req, res, next) {
-    redisClient.keys('*', async (err, keys) => {
-      if (err) return;
-      if (keys) {
-        keys.map(async (key) => {
-          redisClient.del(key);
+    let page = 1;
+    let limit = 10;
+    let post_type = req.query.posttype;
+    let skip = (page - 1) * limit;
+    let search = req.query.search ? req.query.search : '';
+    let images = await Image.find()
+      .sort([['create_at', -1]])
+      .skip(skip)
+      .limit(limit)
+      .lean();
+    images.forEach(async (image, index) => {
+      try {
+        let imageid = new Array();
+        image.link_img.map(async (linkImgs) => {
+          if (linkImgs !== null) {
+            let result = await fetch(linkImgs.link);
+            result = await result.blob();
+            if (result.type.split('/')[0] == 'image') {
+              let resultimage = await downloadImage(linkImgs.link);
+              imageid.push(resultimage);
+            }
+          }
         });
+        console.log(imageid);
+        await Image.findByIdAndUpdate(
+          image._id,
+          {
+            link_img: imageid,
+          },
+          { new: true }
+        );
+      } catch (e) {
+        console.log(image._id);
       }
     });
-    // let page = 1;
-    // let limit = 1000;
-    // let post_type = req.query.posttype;
-    // let skip = (page - 1) * limit;
-    // let search = req.query.search ? req.query.search : '';
-    // let post = await Post.find()
-    //   .sort([['create_at', -1]])
-    //   .skip(skip)
-    //   .limit(limit)
-    //   .lean();
-    // post.forEach(async (posts, index) => {
-    //   let custom_fields = await JSON.parse(posts.custom_fields);
-    //   if (custom_fields.featured_image.length > 0) {
-    //     console.log(custom_fields.featured_image);
-    //     let image = new Image({
-    //       link_img: custom_fields.featured_image.map((linkImgs) => ({
-    //         link: linkImgs,
-    //         statusbar: 'active',
-    //       })),
-    //       link_post: custom_fields.post_link,
-    //       idPost: posts._id,
-    //     });
-    //     await image.save();
-    //   }
-    // });
-    // res.send(';');
-    // delete element.basic_fields;
-    // delete element.custom_fields;
-    // delete element._id;
-    // delete element.create_at;
-    // delete element.__v;
-    // delete element.posttype;
-    // delete element.group_id;
   }
+
+  // delete element.basic_fields;
+  // delete element.custom_fields;
+  // delete element._id;
+  // delete element.create_at;
+  // delete element.__v;
+  // delete element.posttype;
+  // delete element.group_id;
+
   async getPost_id(req, res, next) {
     redisClient.get(`posts/${req.params.id}`, async (err, data) => {
       if (err) console.log(err);

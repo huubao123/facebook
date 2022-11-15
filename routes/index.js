@@ -107,10 +107,7 @@ router.post('/group', async function (req, res, next) {
     const currentTime = new Date().getTime();
     const processAt = new Date(req.body.datetime).getTime();
     const delay = processAt - currentTime;
-    console.log(req.clientIp);
-
-    console.log(ip);
-    //await queue.add({ data: req.body, jobId: jobId }, { delay: delay, jobId: jobId });
+    await queue.add({ data: req.body, jobId: jobId }, { delay: delay, jobId: jobId });
     res.json({ data: 'success', statusbar: 'ok', jobId: jobId });
   } catch (e) {
     console.log(e);
