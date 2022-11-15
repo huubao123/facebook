@@ -1,5 +1,3 @@
-const { async } = require('@firebase/util');
-
 module.exports = async function getdata(page, cmt_lengths) {
   const dimension = await page.evaluate(async (cmt_lengths) => {
     let video = new Array();

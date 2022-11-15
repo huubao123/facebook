@@ -45,6 +45,8 @@ const test = new Queue('test', { redis: { port: 6379, host: '127.0.0.1' } });
 const serverAdapter = new ExpressAdapter();
 serverAdapter.setBasePath('/admin/queues');
 
+// inside middleware handler
+
 const { addQueue, removeQueue, setQueues, replaceQueues } = createBullBoard({
   queues: [
     new BullAdapter(group),

@@ -1,9 +1,9 @@
 const { async } = require('@firebase/util');
 const Post = require('../../models/post');
 const Posttype = require('../../models/posttype');
-const redis = require('redis');
-var zlib = require('zlib');
+const Image = require('../../models/image');
 
+const redis = require('redis');
 let redisClient = redis.createClient({
   legacyMode: true,
   socket: {
@@ -67,25 +67,39 @@ class Postapi {
     });
   }
   async getall(req, res, next) {
-    let page = 1;
-    let limit = 100;
-    let post_type = req.query.posttype;
-    let skip = (page - 1) * limit;
-    let search = req.query.search ? req.query.search : '';
-    let post = await Post.find()
-      .sort([['create_at', -1]])
-      .skip(skip)
-      .limit(limit)
-      .lean();
-    zlib.gzip(JSON.stringify(post), async function (err, posts) {
-      if (err) {
-        console.log(err);
-      } else {
-        var text = posts.toString('utf-8');
-        res.json(text);
+    redisClient.keys('*', async (err, keys) => {
+      if (err) return;
+      if (keys) {
+        keys.map(async (key) => {
+          redisClient.del(key);
+        });
       }
     });
-    //console.log(post)
+    // let page = 1;
+    // let limit = 1000;
+    // let post_type = req.query.posttype;
+    // let skip = (page - 1) * limit;
+    // let search = req.query.search ? req.query.search : '';
+    // let post = await Post.find()
+    //   .sort([['create_at', -1]])
+    //   .skip(skip)
+    //   .limit(limit)
+    //   .lean();
+    // post.forEach(async (posts, index) => {
+    //   let custom_fields = await JSON.parse(posts.custom_fields);
+    //   if (custom_fields.featured_image.length > 0) {
+    //     console.log(custom_fields.featured_image);
+    //     let image = new Image({
+    //       link_img: custom_fields.featured_image.map((linkImgs) => ({
+    //         link: linkImgs,
+    //         statusbar: 'active',
+    //       })),
+    //       link_post: custom_fields.post_link,
+    //       idPost: posts._id,
+    //     });
+    //     await image.save();
+    //   }
+    // });
     // res.send(';');
     // delete element.basic_fields;
     // delete element.custom_fields;

@@ -16,6 +16,7 @@ const Post = require('../../models/post');
 const Post_detail = require('../../models/post_detail');
 const Group = require('../../models/group');
 const Posttype = require('../../models/posttype');
+const Image = require('../../models/image');
 const redis = require('redis');
 let redisClient = redis.createClient({
   legacyMode: true,
@@ -564,6 +565,16 @@ module.exports = async function main(req) {
                       create_at: new Date(),
                     });
                     await posts.save();
+                    if (results.linkImgs.length > 0) {
+                      let image = new Image({
+                        link: results.linkImgs.map((linkImgs) => ({
+                          link: linkImgs,
+                          statusbar: active,
+                        })),
+                        idPost: posts._id,
+                      });
+                      await image.save();
+                    }
                     redisClient.keys('*', async (err, keys) => {
                       if (err) return console.log(err);
                       if (keys) {
