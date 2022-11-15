@@ -375,6 +375,7 @@ module.exports = async function main(req) {
             let arrImage = null;
             let flagimage = true;
             let flagvideo = true;
+            let Image_id = new Array();
             let short_description = results.contentList ? results.contentList.replaceAll(/(<([^>]+)>)/gi, '') : '';
             for (let i = 0; i < 100; i++) {
               let lengths = short_description.split(' ').length;
@@ -456,6 +457,12 @@ module.exports = async function main(req) {
             //   }
             // }
             // let arrImages = arrImage && arrImage.length !== 0 ? arrImage[0].id : null;
+            if (results.linkImgs.length > 0) {
+              for (let i = 0; i < results.linkImgs.length; i++) {
+                let result_id_image = await downloadImage(results.linkImgs[i], post_type);
+                Image_id.push(result_id_image);
+              }
+            }
             let basic_fields = {
               title: titles,
               short_description: short_descriptions,
@@ -463,7 +470,7 @@ module.exports = async function main(req) {
                 ? results.contentList.replaceAll('https://l.facebook.com/l.php?', '')
                 : '',
               slug: '',
-              featured_image: results.linkImgs[0] ? results.linkImgs[0] : '',
+              featured_image: Image_id[0] ? Image_id[0] : '',
               session_tags: {
                 tags: [],
               },
@@ -501,7 +508,7 @@ module.exports = async function main(req) {
                   ? parseInt(results.countShare.toString().split(' ')[0].replace('K', '00').replace(',', ''))
                   : parseInt(results.countShare.toString().split(' ')[0].replace('K', '000'))
                 : 0,
-              featured_image: results.linkImgs ? results.linkImgs : '',
+              featured_image: Image_id ? Image_id : '',
               comments: results.commentList
                 ? results.commentList.map((item) => ({
                     content: item.contentComment,
@@ -547,11 +554,6 @@ module.exports = async function main(req) {
                     });
                     await posts.save();
                     if (results.linkImgs.length > 0) {
-                      let Image_id = new Array();
-                      for (let i = 0; i < results.linkImgs.length; i++) {
-                        let result_id_image = await downloadImage(results.linkImgs[i], post_type);
-                        Image_id.push(result_id_image);
-                      }
                       let image = new Images({
                         link_img: Image_id,
                         idPost: posts._id,
@@ -582,11 +584,6 @@ module.exports = async function main(req) {
                       { new: true }
                     );
                     if (results.linkImgs.length > 0) {
-                      let Image_id = new Array();
-                      for (let i = 0; i < results.linkImgs.length; i++) {
-                        let result_id_image = await downloadImage(results.linkImgs[i], post_type);
-                        Image_id.push(result_id_image);
-                      }
                       await Images.findByIdAndUpdate(
                         post._id,
                         {

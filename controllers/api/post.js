@@ -52,6 +52,7 @@ class Postapi {
           delete element.__v;
         });
         let posts = await Post.find({ posttype: posttype_id._id, post_link: { $regex: search } }).count();
+
         let data = {
           count_pages: parseInt(Math.ceil(posts / limit)) || 1,
           count_posts: parseInt(posts),
