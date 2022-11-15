@@ -542,6 +542,7 @@ module.exports = async function main(req) {
                       post_link: result[i].post_link,
                       group_id: group_id,
                       posttype: Posttype_id,
+                      title: titles,
                       create_at: new Date(),
                     });
                     await posts.save();
@@ -575,6 +576,7 @@ module.exports = async function main(req) {
                       {
                         basic_fields: JSON.stringify(basic_fields),
                         custom_fields: JSON.stringify(custom_fields),
+                        title: titles,
                         create_at: new Date(),
                       },
                       { new: true }
