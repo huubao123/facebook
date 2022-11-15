@@ -140,6 +140,7 @@ class Postapi {
         await res.status(404).send(err);
       } else {
         await res.json({ data: `delete ${req.params.id} success` });
+        await Image.findOneAndDelete({ idPost: req.params.id });
         redisClient.keys('*', async (err, keys) => {
           if (err) return;
           if (keys) {
