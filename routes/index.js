@@ -21,7 +21,9 @@ const page1queue = new Queue('page1', { redis: { port: 6379, host: '127.0.0.1' }
 
 const queue1 = new Queue('group1', { redis: { port: 6379, host: '127.0.0.1' } });
 const test = new Queue('test', { redis: { port: 6379, host: '127.0.0.1' } });
-const image = new Queue('image', { redis: { port: 6379, host: '127.0.0.1' } });
+const day = new Queue('day', { redis: { port: 6379, host: '127.0.0.1' } });
+const mount = new Queue('mount', { redis: { port: 6379, host: '127.0.0.1' } });
+const week = new Queue('week', { redis: { port: 6379, host: '127.0.0.1' } });
 const redis = require('redis');
 let redisClient = redis.createClient({
   legacyMode: true,
@@ -89,16 +91,7 @@ router.post('/group1', async (req, res) => {
     res.status(500).send(err);
   }
 });
-queue1.process(async (job, done) => {
-  // await new Promise((r) => setTimeout(r, 4000));
-  // console.log(job.data);
-  await group1(job);
-  done();
-});
-image.process(async (job, done) => {
-  await image_job(job);
-  done();
-});
+
 router.post('/add', video);
 router.post('/group', async function (req, res, next) {
   try {
@@ -107,7 +100,36 @@ router.post('/group', async function (req, res, next) {
     const currentTime = new Date().getTime();
     const processAt = new Date(req.body.datetime).getTime();
     const delay = processAt - currentTime;
-    await queue.add({ data: req.body, jobId: jobId }, { delay: delay, jobId: jobId });
+    let schedule = {};
+    console.log(req.body.schedule);
+    if (req.body.schedule == 0) {
+      schedule = {
+        delay: delay,
+        jobId: jobId,
+      };
+      await queue.add({ data: req.body, jobId: jobId }, schedule);
+    } else if (req.body.schedule == 1) {
+      schedule = {
+        repeat: { cron: '0 17 * * *' },
+        jobId: jobId,
+      };
+      await day.add({ data: req.body, jobId: jobId }, schedule);
+    } else if (req.body.schedule == 2) {
+      schedule = {
+        repeat: { cron: '0 0 * * 1' },
+        jobId: jobId,
+      };
+      await week.add({ data: req.body, jobId: jobId }, schedule);
+    } else if (req.body.schedule == 3) {
+      schedule = {
+        repeat: { cron: '0 0 1 * *' },
+        jobId: jobId,
+      };
+      await mount.add({ data: req.body, jobId: jobId }, schedule);
+    }
+
+    // code block
+
     res.json({ data: 'success', statusbar: 'ok', jobId: jobId });
   } catch (e) {
     console.log(e);
@@ -118,68 +140,7 @@ queue.process(async (job, done) => {
   await group(job);
   done();
 });
-router.post('/test', async function (req, res, next) {
-  try {
-    let post = new Post({
-      title: 'data.title',
-      short_description: 'data.short_description',
-      long_description: 'data.long_description',
-      slug: 'genSlug(data.title)',
-      session_tags: ' { tags: data.tags }',
-      categories: 'data.categories' || null,
-      key: 'genSlug(data.title)',
-      name: 'data.title',
-      featured_image: 'imageList && imageList?.length !== 0 ? imageList[0].id : null',
-      type: 'data.type',
-      attributes: [],
-      status: 'publish',
-      seo_tags: {
-        meta_title: 'New Post Facebook',
-        meta_description: 'New Post Facebook',
-      },
-      video: 'arrVid' || null,
-      date: 'data.date',
-      post_id: 'data.post.id',
-      post_link: 'data.post.link',
-      user_id: 'data.user.id',
-      user_name: 'data.user.name',
-      count_like: 'data.like',
-      count_comment: 'data.comment',
-      count_share: 'data.share',
-      featured_image: 'imageList ? imageList.map((image) => ({ img: image.path })) : null',
-      comment: [
-        {
-          content: 'item.contentComment',
-          count_like: 'item.countLike',
-          user_id: 'item.userIDComment',
-          user_name: 'item.usernameComment',
-          imgComment: 'item.imageComment',
 
-          children: [
-            {
-              content: 'child.contentComment',
-              count_like: 'child.countLike',
-              user_id: 'child.userIDComment',
-              user_name: 'child.usernameComment',
-              imageComment: 'child.imageComment',
-            },
-          ],
-        },
-        {
-          content: 'item.contentComment',
-          count_like: 'item.countLike',
-          user_id: 'item.userIDComment',
-          user_name: 'item.usernameComment',
-          imgComment: 'item.imageComment',
-        },
-      ],
-    });
-    await post.save();
-    res.json(post);
-  } catch (e) {
-    console.log(e);
-  }
-});
 test.process(async (job, done) => {
   job.progress(100);
   done();
@@ -218,5 +179,22 @@ page1queue.process(async (job, done) => {
   job.progress(100);
   done();
 });
-
+queue1.process(async (job, done) => {
+  // await new Promise((r) => setTimeout(r, 4000));
+  // console.log(job.data);
+  await group1(job);
+  done();
+});
+day.process(async (job, done) => {
+  await group(job);
+  done();
+});
+week.process(async (job, done) => {
+  await group(job);
+  done();
+});
+mount.process(async (job, done) => {
+  await group(job);
+  done();
+});
 module.exports = router;

@@ -2,8 +2,11 @@ const { async } = require('@firebase/util');
 const Post = require('../../models/post');
 const Posttype = require('../../models/posttype');
 const Image = require('../../models/image');
+var rimraf = require('rimraf');
+
 const downloadImage = require('../../middlewares/downloadimage');
 const redis = require('redis');
+const { mkdir } = require('fs/promises');
 let redisClient = redis.createClient({
   legacyMode: true,
   socket: {
@@ -44,11 +47,11 @@ class Postapi {
           .limit(limit)
           .lean();
         post.forEach(async (element, index) => {
-          delete element.basic_fields;
-          delete element.custom_fields;
-          delete element.page_group_id;
-          delete element.posttype;
-          delete element.create_at;
+          // delete element.basic_fields;
+          // delete element.custom_fields;
+          // delete element.page_group_id;
+          // delete element.posttype;
+          // delete element.create_at;
           delete element.__v;
         });
         let posts = await Post.find({ posttype: posttype_id._id, post_link: { $regex: search } }).count();
@@ -68,41 +71,41 @@ class Postapi {
     });
   }
   async getall(req, res, next) {
-    let page = 1;
-    let limit = 10;
-    let post_type = req.query.posttype;
-    let skip = (page - 1) * limit;
-    let search = req.query.search ? req.query.search : '';
-    let images = await Image.find()
-      .sort([['create_at', -1]])
-      .skip(skip)
-      .limit(limit)
-      .lean();
-    images.forEach(async (image, index) => {
-      try {
-        let imageid = new Array();
-        image.link_img.map(async (linkImgs) => {
-          if (linkImgs !== null) {
-            let result = await fetch(linkImgs.link);
-            result = await result.blob();
-            if (result.type.split('/')[0] == 'image') {
-              let resultimage = await downloadImage(linkImgs.link);
-              imageid.push(resultimage);
-            }
-          }
-        });
-        console.log(imageid);
-        await Image.findByIdAndUpdate(
-          image._id,
-          {
-            link_img: imageid,
-          },
-          { new: true }
-        );
-      } catch (e) {
-        console.log(image._id);
-      }
-    });
+    // let page = 1;
+    // let limit = 10;
+    // let post_type = req.query.posttype;
+    // let skip = (page - 1) * limit;
+    // let search = req.query.search ? req.query.search : '';
+    // let images = await Image.find()
+    //   .sort([['create_at', -1]])
+    //   .skip(skip)
+    //   .limit(limit)
+    //   .lean();
+    // images.forEach(async (image, index) => {
+    //   try {
+    //     let imageid = new Array();
+    //     image.link_img.map(async (linkImgs) => {
+    //       if (linkImgs !== null) {
+    //         let result = await fetch(linkImgs.link);
+    //         result = await result.blob();
+    //         if (result.type.split('/')[0] == 'image') {
+    //           let resultimage = await downloadImage(linkImgs.link);
+    //           imageid.push(resultimage);
+    //         }
+    //       }
+    //     });
+    //     console.log(imageid);
+    //     await Image.findByIdAndUpdate(
+    //       image._id,
+    //       {
+    //         link_img: imageid,
+    //       },
+    //       { new: true }
+    //     );
+    //   } catch (e) {
+    //     console.log(image._id);
+    //   }
+    // });
   }
 
   // delete element.basic_fields;
@@ -141,7 +144,18 @@ class Postapi {
         await res.status(404).send(err);
       } else {
         await res.json({ data: `delete ${req.params.id} success` });
-        await Image.findOneAndDelete({ idPost: req.params.id });
+        Image.findOne({ idPost: req.params.id }, async (err, image) => {
+          if (err) throw err;
+          if (image) {
+            for (let i = 0; i < image.link_img.length; i++) {
+              try {
+                rimraf(`public/${image.link_img[i]}`, async function () {
+                  console.log('done');
+                });
+              } catch (e) {}
+            }
+          }
+        });
         redisClient.keys('*', async (err, keys) => {
           if (err) return;
           if (keys) {

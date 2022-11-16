@@ -41,6 +41,9 @@ const page = new Queue('page', {
 const page1 = new Queue('page1', { redis: { port: 6379, host: '127.0.0.1' } });
 const group1 = new Queue('group1', { redis: { port: 6379, host: '127.0.0.1' } });
 const test = new Queue('test', { redis: { port: 6379, host: '127.0.0.1' } });
+const day = new Queue('day', { redis: { port: 6379, host: '127.0.0.1' } });
+const week = new Queue('week', { redis: { port: 6379, host: '127.0.0.1' } });
+const mount = new Queue('mount', { redis: { port: 6379, host: '127.0.0.1' } });
 
 const serverAdapter = new ExpressAdapter();
 serverAdapter.setBasePath('/admin/queues');
@@ -54,6 +57,9 @@ const { addQueue, removeQueue, setQueues, replaceQueues } = createBullBoard({
     new BullMQAdapter(page),
     new BullMQAdapter(page1),
     new BullMQAdapter(test),
+    new BullMQAdapter(day),
+    new BullMQAdapter(week),
+    new BullMQAdapter(mount),
   ],
   serverAdapter: serverAdapter,
 });
@@ -73,6 +79,18 @@ queueConfigArray = [
   },
   {
     name: 'page1',
+    url: '127.0.0.1://127.0.0.1:6379',
+  },
+  {
+    name: 'day',
+    url: '127.0.0.1://127.0.0.1:6379',
+  },
+  {
+    name: 'week',
+    url: '127.0.0.1://127.0.0.1:6379',
+  },
+  {
+    name: 'mount',
     url: '127.0.0.1://127.0.0.1:6379',
   },
 ];
