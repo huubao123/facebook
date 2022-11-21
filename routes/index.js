@@ -101,7 +101,6 @@ router.post('/group', async function (req, res, next) {
     const processAt = new Date(req.body.datetime).getTime();
     const delay = processAt - currentTime;
     let schedule = {};
-    console.log(req.body.schedule);
     if (req.body.schedule == 0) {
       schedule = {
         delay: delay,

@@ -41,19 +41,11 @@ class Postapi {
           res.json({ data: 'error', error: 'no such posttype' });
           return;
         } //https://www.facebook.com/groups/j2team.community/posts/1980870165578427/
-        let post = await Post.find({ posttype: posttype_id._id, post_link: { $regex: search } })
+        let post = await Post.find({ posttype: posttype_id._id, post_link: { $regex: search } },{ basic_fields: 1, create_at: 1, })
           .sort([['create_at', -1]])
           .skip(skip)
           .limit(limit)
           .lean();
-        post.forEach(async (element, index) => {
-          // delete element.basic_fields;
-          // delete element.custom_fields;
-          // delete element.page_group_id;
-          // delete element.posttype;
-          // delete element.create_at;
-          delete element.__v;
-        });
         let posts = await Post.find({ posttype: posttype_id._id, post_link: { $regex: search } }).count();
 
         let data = {
