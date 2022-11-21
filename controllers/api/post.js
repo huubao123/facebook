@@ -2,6 +2,8 @@ const { async } = require('@firebase/util');
 const Post = require('../../models/post');
 const Posttype = require('../../models/posttype');
 const Image = require('../../models/image');
+const Trash = require('../../models/trash');
+
 var rimraf = require('rimraf');
 
 const downloadImage = require('../../middlewares/downloadimage');
@@ -63,41 +65,8 @@ class Postapi {
     });
   }
   async getall(req, res, next) {
-    // let page = 1;
-    // let limit = 10;
-    // let post_type = req.query.posttype;
-    // let skip = (page - 1) * limit;
-    // let search = req.query.search ? req.query.search : '';
-    // let images = await Image.find()
-    //   .sort([['create_at', -1]])
-    //   .skip(skip)
-    //   .limit(limit)
-    //   .lean();
-    // images.forEach(async (image, index) => {
-    //   try {
-    //     let imageid = new Array();
-    //     image.link_img.map(async (linkImgs) => {
-    //       if (linkImgs !== null) {
-    //         let result = await fetch(linkImgs.link);
-    //         result = await result.blob();
-    //         if (result.type.split('/')[0] == 'image') {
-    //           let resultimage = await downloadImage(linkImgs.link);
-    //           imageid.push(resultimage);
-    //         }
-    //       }
-    //     });
-    //     console.log(imageid);
-    //     await Image.findByIdAndUpdate(
-    //       image._id,
-    //       {
-    //         link_img: imageid,
-    //       },
-    //       { new: true }
-    //     );
-    //   } catch (e) {
-    //     console.log(image._id);
-    //   }
-    // });
+   let trash = Trash.find()
+   res.json(trash) 
   }
 
   // delete element.basic_fields;
@@ -113,8 +82,13 @@ class Postapi {
       if (err) console.log(err);
       if (data != null) {
         let datas = JSON.parse(data);
+
         return res.json(datas);
       } else {
+
+
+
+        
         Post.findById(req.params.id, async function (err, post) {
           if (err) {
             await res.status(500).send(err);
