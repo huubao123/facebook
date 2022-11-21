@@ -7,6 +7,7 @@ const postSchema = mongoose.Schema({
   posttype: String,
   title: String,
   create_at: Date,
+  status: String,
 });
 
 const Post = mongoose.model('Post', postSchema);

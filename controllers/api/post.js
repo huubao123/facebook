@@ -2,11 +2,12 @@ const { async } = require('@firebase/util');
 const Post = require('../../models/post');
 const Posttype = require('../../models/posttype');
 const Image = require('../../models/image');
+const Trash = require('../../models/trash');
+
 var rimraf = require('rimraf');
 
 const downloadImage = require('../../middlewares/downloadimage');
 const redis = require('redis');
-const { mkdir } = require('fs/promises');
 let redisClient = redis.createClient({
   legacyMode: true,
   socket: {
@@ -41,7 +42,10 @@ class Postapi {
           res.json({ data: 'error', error: 'no such posttype' });
           return;
         } //https://www.facebook.com/groups/j2team.community/posts/1980870165578427/
-        let post = await Post.find({ posttype: posttype_id._id, post_link: { $regex: search } },{ basic_fields: 1, create_at: 1, })
+        let post = await Post.find(
+          { posttype: posttype_id._id, post_link: { $regex: search } },
+          { basic_fields: 1, create_at: 1 }
+        )
           .sort([['create_at', -1]])
           .skip(skip)
           .limit(limit)
@@ -63,41 +67,17 @@ class Postapi {
     });
   }
   async getall(req, res, next) {
-    // let page = 1;
-    // let limit = 10;
-    // let post_type = req.query.posttype;
-    // let skip = (page - 1) * limit;
-    // let search = req.query.search ? req.query.search : '';
-    // let images = await Image.find()
-    //   .sort([['create_at', -1]])
-    //   .skip(skip)
-    //   .limit(limit)
-    //   .lean();
-    // images.forEach(async (image, index) => {
-    //   try {
-    //     let imageid = new Array();
-    //     image.link_img.map(async (linkImgs) => {
-    //       if (linkImgs !== null) {
-    //         let result = await fetch(linkImgs.link);
-    //         result = await result.blob();
-    //         if (result.type.split('/')[0] == 'image') {
-    //           let resultimage = await downloadImage(linkImgs.link);
-    //           imageid.push(resultimage);
-    //         }
-    //       }
-    //     });
-    //     console.log(imageid);
-    //     await Image.findByIdAndUpdate(
-    //       image._id,
-    //       {
-    //         link_img: imageid,
-    //       },
-    //       { new: true }
-    //     );
-    //   } catch (e) {
-    //     console.log(image._id);
-    //   }
-    // });
+    let trash = await Trash.find();
+
+    await Trash.findByIdAndUpdate(trash[0]._id, {
+      $pull: { ids: '123' },
+    });
+    let id = await trash[0].ids.find((id) => id == 'dasdasda');
+    if (id) {
+      console.log(id);
+    } else {
+      console.log('dads');
+    }
   }
 
   // delete element.basic_fields;
@@ -135,6 +115,15 @@ class Postapi {
       if (err) {
         await res.status(404).send(err);
       } else {
+        let trash = await Trash.find();
+
+        await Trash.findByIdAndUpdate(
+          trash[0]._id,
+          {
+            $push: { ids: post.post_link.split('/')[6] },
+          },
+          { safe: true, upsert: true, new: true }
+        );
         await res.json({ data: `delete ${req.params.id} success` });
         Image.findOne({ idPost: req.params.id }, async (err, image) => {
           if (err) throw err;
