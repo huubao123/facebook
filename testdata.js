@@ -28,7 +28,7 @@ const headers = {
 async function get() {
   let hour = new Date().getHours();
   let minute = new Date().getMinutes() + 1;
-  if (minute > 23) {
+  if (hour > 23) {
     hour = 0;
   }
   if (minute > 59) {
