@@ -107,7 +107,7 @@ module.exports = async function main(req) {
     const like = req.data.data.like ? req.data.data.like : 0;
     const comment = req.data.data.comment ? req.data.data.comment : 0;
     const share = req.data.data.share ? req.data.data.share : 0;
-    const post_type = req.data.data.posttype ? req.data.data.posttype : "";
+    const post_type = req.data.data.post_type ? req.data.data.post_type : "";
     const craw_id = crypto.randomBytes(16).toString("hex");
     let group_id = "";
     let Posttype_id = "";
@@ -289,7 +289,7 @@ module.exports = async function main(req) {
 
     await getlink(page, conten_length, like, comment, share).then(async function (result) {
       let proces = 0;
-      // await browser.close();
+      await browser.close();
       const page1 = await browser2.newPage();
       await page1.setDefaultNavigationTimeout(60000);
       const pages = await browser2.pages();
@@ -603,7 +603,7 @@ module.exports = async function main(req) {
                     } else {
                       if (post === null) {
                         let posts = new Post({
-                          basic_fields: JSON.stringisfy(basic_fields),
+                          basic_fields: JSON.stringify(basic_fields),
                           custom_fields: JSON.stringify(custom_fields),
                           post_link: result[i].post_link,
                           group_id: group_id,
