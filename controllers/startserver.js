@@ -1,7 +1,6 @@
 // const api = require('./middlewares/api');
 const axios = require('axios');
 const Queue = require('bull');
-const group = require('./controllers/api/group');
 const queue = new Queue('group', { redis: { port: 6379, host: '127.0.0.1' } });
 const schedule = new Queue('schedule', { redis: { port: 6379, host: '127.0.0.1' } });
 const day = new Queue('day', { redis: { port: 6379, host: '127.0.0.1' } });
@@ -25,17 +24,16 @@ const headers = {
   'x-requested-store': 'default',
   'x-requested-with': 'XMLHttpRequest',
 };
-async function get() {
-  let hour = new Date().getHours();
-  let minute = new Date().getMinutes() + 1;
-  if (hour > 23) {
-    hour = 0;
-  }
-  if (minute > 59) {
-    minute = 0;
-  }
-  schedule.add({}, { deplay: { cron: `0 2 * * *` } }); //}
-}
+module.exports = async function startserver(req, res) {
+  const currentTime2 = new Date();
+  const nextDay = new Date(currentTime2);
+  nextDay.setDate(currentTime2.getDate() + 1);
+  nextDay.setHours(1, 0, 0);
+  const delay2 = nextDay.getTime() - currentTime2.getTime();
+  schedule.add({}, { delay: delay2 }); //}
+
+  res.send('done');
+};
 schedule.process(async (job, done) => {
   const post = await axios({
     method: 'get',
@@ -110,5 +108,3 @@ schedule.process(async (job, done) => {
   });
   done();
 });
-
-get();
