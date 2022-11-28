@@ -11,6 +11,8 @@ const Group = require('.././models/group');
 const group1 = require('../controllers/api/group1');
 const video = require('../controllers/sitemap');
 const fs = require('fs');
+const path = require('path');
+
 const Queue = require('bull');
 const crypto = require('crypto');
 const ipadd = require('.././middlewares/request_ip_address');
@@ -37,6 +39,14 @@ redisClient.connect();
 router.get('/', async function (req, res, next) {
   res.json({ aaa: 'aaaa' });
 });
+router.get('/video:id', async function (req, res, next) {
+  var options = {
+    root: path.join(__dirname, '../public/video'),
+  };
+  console.log(options);
+  res.sendFile(`${id}.mp4`, options);
+});
+
 router.put('/image', async function (req, res, next) {
   res.send('ok');
   await image.add();
@@ -94,7 +104,7 @@ router.post('/group1', async (req, res) => {
 });
 
 router.post('/add', video);
-router.get('/crawl', startserver);
+router.post('/crawl', startserver);
 
 router.post('/group', async function (req, res, next) {
   try {
@@ -138,15 +148,6 @@ router.post('/group', async function (req, res, next) {
     res.status(500).send(e);
   }
 });
-queue.process(async (job, done) => {
-  await group(job);
-  done();
-});
-
-test.process(async (job, done) => {
-  job.progress(100);
-  done();
-});
 
 router.post('/page', async function (req, res, next) {
   const jobId = crypto.randomBytes(10).toString('hex');
@@ -158,11 +159,7 @@ router.post('/page', async function (req, res, next) {
 
   await pagequeue.add({ data: req.body, jobId: jobId }, { delay: delay, jobId: jobId });
 });
-pagequeue.process(async (job, done) => {
-  await page(job);
-  job.progress(100);
-  done();
-});
+
 router.post('/page1', async function (req, res, next) {
   try {
     const jobId = crypto.randomBytes(10).toString('hex');
@@ -176,27 +173,5 @@ router.post('/page1', async function (req, res, next) {
     res.status(500).send(e);
   }
 });
-page1queue.process(async (job, done) => {
-  await page1(job);
-  job.progress(100);
-  done();
-});
-queue1.process(async (job, done) => {
-  // await new Promise((r) => setTimeout(r, 4000));
-  // console.log(job.data);
-  await group1(job);
-  done();
-});
-day.process(async (job, done) => {
-  await group(job);
-  done();
-});
-week.process(async (job, done) => {
-  await group(job);
-  done();
-});
-mount.process(async (job, done) => {
-  await group(job);
-  done();
-});
+
 module.exports = router;

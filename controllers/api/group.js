@@ -98,7 +98,6 @@ async function autoScroll(page, lengthss, like, comment, share) {
 module.exports = async function main(req) {
   try {
     await req.progress(10);
-    console.log(req.data.data);
     const url = req.data.data.link;
     const lengths = req.data.data.lengths == '' ? 0 : parseInt(req.data.data.lengths);
     const cmt_length = req.data.data.length_comment == '' ? 0 : req.data.data.length_comment;

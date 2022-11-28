@@ -25,14 +25,24 @@ const headers = {
   'x-requested-with': 'XMLHttpRequest',
 };
 module.exports = async function startserver(req, res) {
-  const currentTime2 = new Date();
-  const nextDay = new Date(currentTime2);
-  nextDay.setDate(currentTime2.getDate() + 1);
-  nextDay.setHours(1, 0, 0);
-  const delay2 = nextDay.getTime() - currentTime2.getTime();
-  schedule.add({}, { delay: delay2 }); //}
+  try {
+    if (req.body.datetime) {
+      const currentTime2 = new Date().getTime();
+      const processAt = new Date(req.body.datetime).getTime();
 
-  res.send('done');
+      const delay = processAt - currentTime2;
+      // const nextDay = new Date(currentTime2);
+      // nextDay.setDate(currentTime2.getDate() + 1);
+      // nextDay.setHours(1, 0, 0);
+      //const delay2 = nextDay - currentTime2;
+      schedule.add({}, { delay: delay });
+      res.status(200).send('done');
+    } else {
+      res.status(304).send('error datetime');
+    }
+  } catch (e) {
+    res.status(500).send(e);
+  }
 };
 schedule.process(async (job, done) => {
   const post = await axios({
@@ -46,7 +56,9 @@ schedule.process(async (job, done) => {
       url: 'https://mgs-api-v2.internal.mangoads.com.vn/api/v1/posts/' + element.id,
       headers: headers,
     });
-    let schedules = detail.data.data.formData.custom_fields.schedule;
+    let schedules = detail.data.data.formData.custom_fields.schedule
+      ? detail.data.data.formData.custom_fields.schedule
+      : 0;
     const datas = {
       data: {
         data: {
@@ -82,7 +94,8 @@ schedule.process(async (job, done) => {
       : new Date().getTime();
 
     const delay = processAt - currentTime;
-
+    console.log(datas.data.data);
+    console.log(schedules);
     let schedule = {};
     if (schedules == 0) {
       schedule = {
@@ -96,7 +109,7 @@ schedule.process(async (job, done) => {
       await day.add({ data: datas.data.data }, schedule);
     } else if (schedules == 2) {
       schedule = {
-        repeat: { cron: '0 0 * * 1' },
+        repeat: { cron: '0 0 * * 2' },
       };
       await week.add({ data: datas.data.data }, schedule);
     } else if (schedules == 3) {

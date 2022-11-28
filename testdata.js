@@ -84,7 +84,7 @@ schedule.process(async (job, done) => {
       : new Date().getTime();
 
     const delay = processAt - currentTime;
-
+    console.log(datas.data.data);
     let schedule = {};
     if (schedules == 0) {
       schedule = {
