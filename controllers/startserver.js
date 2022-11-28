@@ -43,11 +43,19 @@ module.exports = async function startserver(req, res) {
     nextDay.setDate(currentTime2.getDate() + 1);
     nextDay.setHours(1, 0, 0);
     const delay2 = nextDay.getTime() - currentTime2.getTime();
-    schedule.add(
-      { datetime: Intl.DateTimeFormat('en-GB', options).format(currentTime2) },
-      { delay: delay2 }
-    );
-    res.send('done');
+    schedule.getDelayedCount().then((data) => {
+      console.log(data);
+      if (data > 0) {
+        res.status(400).json({ success: 'error', message: 'có hàng đợi crawl rồi vui lòng xóa hàng đợi' });
+        return;
+      } else {
+        schedule.add(
+          { datetime: Intl.DateTimeFormat('en-GB', options).format(currentTime2) },
+          { delay: delay2, jobId: '123456' }
+        );
+        res.send('done');
+      }
+    });
   } catch (e) {
     res.status(500).send(e);
   }
@@ -71,9 +79,7 @@ schedule.process(async (job, done) => {
       data: {
         data: {
           link: element.title ? element.title : '',
-          lengths: detail.data.data.formData.custom_fields.count
-            ? detail.data.data.formData.custom_fields.count
-            : 1,
+          lengths: detail.data.data.formData.custom_fields.count ? detail.data.data.formData.custom_fields.count : 1,
           length_comment: detail.data.data.formData.custom_fields.filter.length_comment
             ? detail.data.data.formData.custom_fields.filter.length_comment
             : 1,

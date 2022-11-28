@@ -32,7 +32,7 @@ router.get('/', async function (req, res, next) {
 router.post('/add', video);
 router.get('/crawl', startserver);
 router.get('/now', async function (req, res, next) {
-  schedule.getJob;
+  schedule.getJobCounts().then((data) => res.send(data));
 });
 
 router.post('/group', crawl_group);
