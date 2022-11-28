@@ -1,32 +1,19 @@
 const express = require('express');
 const router = express.Router();
-// const passport = require('passport');
 const bodyParser = require('body-parser');
 router.use(bodyParser.urlencoded({ extended: true }));
-const group = require('../controllers/api/group');
-const page1 = require('../controllers/api/page1');
-const page = require('../controllers/api/page');
 const Post = require('.././models/post');
 const Group = require('.././models/group');
-const group1 = require('../controllers/api/group1');
 const video = require('../controllers/sitemap');
 const fs = require('fs');
 const path = require('path');
-
+const crawl_group = require('../controllers/api/crawl/group');
 const Queue = require('bull');
 const crypto = require('crypto');
-const ipadd = require('.././middlewares/request_ip_address');
-const image_job = require('.././controllers/api/image');
-const queue = new Queue('group', { redis: { port: 6379, host: '127.0.0.1' } });
 const pagequeue = new Queue('page', { redis: { port: 6379, host: '127.0.0.1' } });
 const page1queue = new Queue('page1', { redis: { port: 6379, host: '127.0.0.1' } });
 const startserver = require('../controllers/startserver');
-const schedule = new Queue('schedule', { redis: { port: 6379, host: '127.0.0.1' } });
 const queue1 = new Queue('group1', { redis: { port: 6379, host: '127.0.0.1' } });
-const test = new Queue('test', { redis: { port: 6379, host: '127.0.0.1' } });
-const day = new Queue('day', { redis: { port: 6379, host: '127.0.0.1' } });
-const mount = new Queue('mount', { redis: { port: 6379, host: '127.0.0.1' } });
-const week = new Queue('week', { redis: { port: 6379, host: '127.0.0.1' } });
 const redis = require('redis');
 let redisClient = redis.createClient({
   legacyMode: true,
@@ -39,6 +26,12 @@ redisClient.connect();
 router.get('/', async function (req, res, next) {
   res.json({ aaa: 'aaaa' });
 });
+
+router.post('/add', video);
+router.get('/crawl', startserver);
+
+router.post('/group', crawl_group);
+
 router.get('/video:id', async function (req, res, next) {
   var options = {
     root: path.join(__dirname, '../public/video'),
@@ -100,52 +93,6 @@ router.post('/group1', async (req, res) => {
     res.json({ data: 'success', statusbar: 'ok', jobId: jobId });
   } catch (err) {
     res.status(500).send(err);
-  }
-});
-
-router.post('/add', video);
-router.get('/crawl', startserver);
-
-router.post('/group', async function (req, res, next) {
-  try {
-    const ip = ipadd.getRequestIpAddress(req);
-    const jobId = crypto.randomBytes(10).toString('hex');
-    const currentTime = new Date().getTime();
-    const processAt = new Date(req.body.datetime).getTime();
-    const delay = processAt - currentTime;
-    let schedule = {};
-    if (req.body.schedule == 0) {
-      schedule = {
-        delay: delay,
-        jobId: jobId,
-      };
-      await queue.add({ data: req.body, jobId: jobId }, schedule);
-    } else if (req.body.schedule == 1) {
-      schedule = {
-        repeat: { cron: '0 17 * * *' },
-        jobId: jobId,
-      };
-      await day.add({ data: req.body, jobId: jobId }, schedule);
-    } else if (req.body.schedule == 2) {
-      schedule = {
-        repeat: { cron: '0 0 * * 1' },
-        jobId: jobId,
-      };
-      await week.add({ data: req.body, jobId: jobId }, schedule);
-    } else if (req.body.schedule == 3) {
-      schedule = {
-        repeat: { cron: '0 0 1 * *' },
-        jobId: jobId,
-      };
-      await mount.add({ data: req.body, jobId: jobId }, schedule);
-    }
-
-    // code block
-
-    res.json({ data: 'success', statusbar: 'ok', jobId: jobId });
-  } catch (e) {
-    console.log(e);
-    res.status(500).send(e);
   }
 });
 
