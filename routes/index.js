@@ -104,7 +104,7 @@ router.post('/group1', async (req, res) => {
 });
 
 router.post('/add', video);
-router.post('/crawl', startserver);
+router.get('/crawl', startserver);
 
 router.post('/group', async function (req, res, next) {
   try {

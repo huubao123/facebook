@@ -26,20 +26,17 @@ const headers = {
 };
 module.exports = async function startserver(req, res) {
   try {
-    if (req.body.datetime) {
-      const currentTime2 = new Date().getTime();
-      const processAt = new Date(req.body.datetime).getTime();
+    const currentTime2 = new Date();
+    // const processAt = new Date(req.body.datetime).getTime();
 
-      const delay = processAt - currentTime2;
-      // const nextDay = new Date(currentTime2);
-      // nextDay.setDate(currentTime2.getDate() + 1);
-      // nextDay.setHours(1, 0, 0);
-      //const delay2 = nextDay - currentTime2;
-      schedule.add({}, { delay: delay });
-      res.status(200).send('done');
-    } else {
-      res.status(304).send('error datetime');
-    }
+    //const delay = processAt - currentTime2;
+    const nextDay = new Date(currentTime2);
+    nextDay.setDate(currentTime2.getDate() + 1);
+    nextDay.setHours(1, 0, 0);
+    const delay2 = nextDay.getTime() - currentTime2.getTime();
+    schedule.add({}, { delay: delay2 });
+    res.status(200).send('done');
+    // res.status(304).send('error datetime');
   } catch (e) {
     res.status(500).send(e);
   }
