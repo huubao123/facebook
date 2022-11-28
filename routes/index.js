@@ -14,6 +14,8 @@ const pagequeue = new Queue('page', { redis: { port: 6379, host: '127.0.0.1' } }
 const page1queue = new Queue('page1', { redis: { port: 6379, host: '127.0.0.1' } });
 const startserver = require('../controllers/startserver');
 const queue1 = new Queue('group1', { redis: { port: 6379, host: '127.0.0.1' } });
+const schedule = new Queue('schedule', { redis: { port: 6379, host: '127.0.0.1' } });
+
 const redis = require('redis');
 let redisClient = redis.createClient({
   legacyMode: true,
@@ -29,6 +31,9 @@ router.get('/', async function (req, res, next) {
 
 router.post('/add', video);
 router.get('/crawl', startserver);
+router.get('/now', async function (req, res, next) {
+  schedule.getJob;
+});
 
 router.post('/group', crawl_group);
 

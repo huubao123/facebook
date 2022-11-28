@@ -26,6 +26,15 @@ const headers = {
 };
 module.exports = async function startserver(req, res) {
   try {
+    options = {
+      year: 'numeric',
+      month: 'numeric',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: 'numeric',
+      second: 'numeric',
+      hour12: false,
+    };
     const currentTime2 = new Date();
     // const processAt = new Date(req.body.datetime).getTime();
 
@@ -34,9 +43,11 @@ module.exports = async function startserver(req, res) {
     nextDay.setDate(currentTime2.getDate() + 1);
     nextDay.setHours(1, 0, 0);
     const delay2 = nextDay.getTime() - currentTime2.getTime();
-    schedule.add({}, { delay: delay2 });
-    res.status(200).send('done');
-    // res.status(304).send('error datetime');
+    schedule.add(
+      { datetime: Intl.DateTimeFormat('en-GB', options).format(currentTime2) },
+      { delay: delay2 }
+    );
+    res.send('done');
   } catch (e) {
     res.status(500).send(e);
   }
