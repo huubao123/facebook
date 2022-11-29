@@ -45,9 +45,7 @@ module.exports = async function startserver(req, res) {
     const delay2 = nextDay.getTime() - currentTime2.getTime();
     schedule.getDelayedCount().then((data) => {
       if (data > 0) {
-        res
-          .status(400)
-          .json({ success: 'error', message: 'có hàng đợi crawl rồi vui lòng xóa hàng đợi' });
+        res.status(400).json({ success: 'error', message: 'có hàng đợi crawl rồi vui lòng xóa hàng đợi' });
         return;
       } else {
         schedule.add(
@@ -80,9 +78,7 @@ schedule.process(async (job, done) => {
       data: {
         data: {
           link: element.short_description ? element.short_description : '',
-          lengths: detail.data.data.formData.custom_fields.count
-            ? detail.data.data.formData.custom_fields.count
-            : 1,
+          lengths: detail.data.data.formData.custom_fields.count ? detail.data.data.formData.custom_fields.count : 1,
           length_comment: detail.data.data.formData.custom_fields.filter.length_comment
             ? detail.data.data.formData.custom_fields.filter.length_comment
             : 1,
@@ -119,8 +115,8 @@ schedule.process(async (job, done) => {
       await queue.add({ data: datas.data.data }, schedule);
     } else if (schedules == 1) {
       const d = new Date(detail.data.data.published_start);
-      let hour = d.getHours();
-      let minute = d.getMinutes();
+      let hour = d.getHours() > 23 ? 23 : d.getHours();
+      let minute = d.getMinutes() > 59 ? 59 : d.getMinutes();
       schedule = {
         repeat: { cron: `${minute} ${hour} * * *` },
       };
@@ -129,17 +125,18 @@ schedule.process(async (job, done) => {
       await day.add({ data: datas.data.data }, schedule);
     } else if (schedules == 2) {
       const d = new Date(detail.data.data.published_start);
-      let hour = d.getHours();
-      let minute = d.getMinutes();
-      let day = d.getDay();
+      let hour = d.getHours() > 23 ? 23 : d.getHours();
+      let minute = d.getMinutes() > 59 ? 59 : d.getMinutes();
+      let day = d.getDay() > 6 ? 6 : d.getDay();
       schedule = {
         repeat: { cron: `${minute} ${hour} * * ${day}` },
+        jobId: jobId,
       };
       await week.add({ data: datas.data.data }, schedule);
     } else if (schedules == 3) {
       const d = new Date(detail.data.data.published_start);
-      let hour = d.getHours();
-      let date = d.getDate();
+      let hour = d.getHours() > 23 ? 23 : d.getHours();
+      let date = d.getDate() > 28 ? 28 : d.getDate();
       if (date > 28) {
         date = 28;
       }
