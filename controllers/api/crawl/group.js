@@ -4,9 +4,29 @@ const queue = new Queue('queue', { redis: { port: 6379, host: '127.0.0.1' } });
 const day = new Queue('day', { redis: { port: 6379, host: '127.0.0.1' } });
 const week = new Queue('week', { redis: { port: 6379, host: '127.0.0.1' } });
 const mount = new Queue('mount', { redis: { port: 6379, host: '127.0.0.1' } });
+const redis = require('redis');
+let redisClient = redis.createClient({
+  legacyMode: true,
+  socket: {
+    port: 6379,
+    host: '127.0.0.1',
+  },
+});
+redisClient.connect();
+
 module.exports = async function (req, res, next) {
   try {
-    const jobId = crypto.randomBytes(10).toString('hex');
+    const jobId = req.body.data.link.split('/')[6];
+    redisClient.keys('*', async (err, keys) => {
+      if (err) return console.log(err);
+      if (keys) {
+        keys.map(async (key) => {
+          if (key.indexOf(jobId) > -1) {
+            await redisClient.del(key);
+          }
+        });
+      }
+    });
     const currentTime = new Date().getTime();
     const processAt = new Date(req.body.datetime).getTime();
     const delay = processAt - currentTime;
