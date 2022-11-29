@@ -10,6 +10,8 @@ const day = new Queue('day', { redis: { port: 6379, host: '127.0.0.1' } });
 const mount = new Queue('mount', { redis: { port: 6379, host: '127.0.0.1' } });
 const week = new Queue('week', { redis: { port: 6379, host: '127.0.0.1' } });
 const group = require('././controllers/api/group');
+const group1 = require('././controllers/api/group1');
+
 queue.process(async (job, done) => {
   await group(job);
   done();

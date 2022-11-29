@@ -485,7 +485,7 @@ module.exports = async function main(req) {
       console.log('lỗi error');
     }
 
-    await browser.close();
+    // await browser.close();
   } catch (err) {
     console.log('lỗi server', err);
   }
