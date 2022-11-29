@@ -4,15 +4,17 @@ const queue = new Queue('queue', { redis: { port: 6379, host: '127.0.0.1' } });
 const day = new Queue('day', { redis: { port: 6379, host: '127.0.0.1' } });
 const week = new Queue('week', { redis: { port: 6379, host: '127.0.0.1' } });
 const mount = new Queue('mount', { redis: { port: 6379, host: '127.0.0.1' } });
-
 module.exports = async function (req, res, next) {
   try {
-    const ip = ipadd.getRequestIpAddress(req);
     const jobId = crypto.randomBytes(10).toString('hex');
     const currentTime = new Date().getTime();
     const processAt = new Date(req.body.datetime).getTime();
     const delay = processAt - currentTime;
     let schedule = {};
+    if (!req.body.published_start) {
+      res.status(404).send('thiếu published_start');
+      return;
+    }
     if (req.body.schedule == 0) {
       schedule = {
         delay: delay,
