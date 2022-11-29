@@ -112,7 +112,7 @@ schedule.process(async (job, done) => {
       schedule = {
         delay: delay,
       };
-      await queue.add({ data: datas.data.data }, schedule);
+      await queue.add({ data: datas.data.data, jobId: element.short_description }, schedule);
     } else if (schedules == 1) {
       const d = new Date(detail.data.data.published_start);
       let hour = d.getHours() > 23 ? 23 : d.getHours();
@@ -122,7 +122,7 @@ schedule.process(async (job, done) => {
       };
 
       console.log(detail.data.data.published_start);
-      await day.add({ data: datas.data.data }, schedule);
+      await day.add({ data: datas.data.data, jobId: element.short_description }, schedule);
     } else if (schedules == 2) {
       const d = new Date(detail.data.data.published_start);
       let hour = d.getHours() > 23 ? 23 : d.getHours();
@@ -131,7 +131,7 @@ schedule.process(async (job, done) => {
       schedule = {
         repeat: { cron: `${minute} ${hour} * * ${day}` },
       };
-      await week.add({ data: datas.data.data }, schedule);
+      await week.add({ data: datas.data.data, jobId: element.short_description }, schedule);
     } else if (schedules == 3) {
       const d = new Date(detail.data.data.published_start);
       let hour = d.getHours() > 23 ? 23 : d.getHours();
@@ -139,7 +139,7 @@ schedule.process(async (job, done) => {
       schedule = {
         repeat: { cron: `0 ${hour} ${date} * *` },
       };
-      await mount.add({ data: datas.data.data }, schedule);
+      await mount.add({ data: datas.data.data, jobId: element.short_description }, schedule);
     }
   });
   done();

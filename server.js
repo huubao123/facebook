@@ -12,6 +12,7 @@ const app = express();
 const requestIp = require('request-ip');
 // view engine setup
 require('./redis_queuess');
+require('./testdata');
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 app.use(cors());
@@ -46,6 +47,7 @@ const day = new Queue('day', { redis: { port: 6379, host: '127.0.0.1' } });
 const week = new Queue('week', { redis: { port: 6379, host: '127.0.0.1' } });
 const mount = new Queue('mount', { redis: { port: 6379, host: '127.0.0.1' } });
 const schedule = new Queue('schedule', { redis: { port: 6379, host: '127.0.0.1' } });
+const update = new Queue('update', { redis: { port: 6379, host: '127.0.0.1' } });
 
 const serverAdapter = new ExpressAdapter();
 serverAdapter.setBasePath('/admin/queues');
@@ -63,6 +65,7 @@ const { addQueue, removeQueue, setQueues, replaceQueues } = createBullBoard({
     new BullMQAdapter(week),
     new BullMQAdapter(mount),
     new BullMQAdapter(schedule),
+    new BullMQAdapter(update),
   ],
   serverAdapter: serverAdapter,
 });

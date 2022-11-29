@@ -5,7 +5,7 @@
   "scripts": {
     "start": "node ./bin/www",
     "dev": "nodemon ./bin/www",
-    "test": "nodemon test.js"
+    "test": "nodemon testdata.js"
   },
   "engines": {
     "node": ">=7.10.0",
@@ -25,6 +25,8 @@
     "connect-timeout": "^1.9.0",
     "cookie-parser": "~1.4.4",
     "cors": "^2.8.5",
+    "cron-parser": "^4.7.0",
+    "dayjs": "^1.11.6",
     "debug": "~2.6.9",
     "dotenv": "^16.0.3",
     "express": "~4.16.1",

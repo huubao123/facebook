@@ -111,6 +111,7 @@ module.exports = async function main(req) {
     const craw_id = crypto.randomBytes(16).toString('hex');
     let group_id = '';
     let Posttype_id = '';
+    return;
     const browser2 = await puppeteer.launch({
       ignoreHTTPSErrors: true,
       ignoreDefaultArgs: ['--disable-extensions'],
