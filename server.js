@@ -109,7 +109,6 @@ app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Methods', 'Content-Type', 'Authorization');
   next();
 });
-
 app.use('/', ipMiddleware, indexRouter);
 app.use('/posts', postRouter);
 app.use('/admin/queues', serverAdapter.getRouter());

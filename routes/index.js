@@ -77,7 +77,9 @@ router.delete('/key', async function (req, res) {
     if (err) return;
     if (keys) {
       keys.map(async (key) => {
-        redisClient.del(key);
+        if (key.indexOf('stalled-check') < 0) {
+          redisClient.del(key);
+        }
       });
     }
   });

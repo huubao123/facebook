@@ -44,13 +44,14 @@ module.exports = async function startserver(req, res) {
     nextDay.setHours(1, 0, 0);
     const delay2 = nextDay.getTime() - currentTime2.getTime();
     schedule.getDelayedCount().then((data) => {
-      console.log(data);
       if (data > 0) {
-        res.status(400).json({ success: 'error', message: 'có hàng đợi crawl rồi vui lòng xóa hàng đợi' });
+        res
+          .status(400)
+          .json({ success: 'error', message: 'có hàng đợi crawl rồi vui lòng xóa hàng đợi' });
         return;
       } else {
         schedule.add(
-          { datetime: Intl.DateTimeFormat('en-GB', options).format(currentTime2) },
+          { datetime: Intl.DateTimeFormat('vi-VN', options).format(currentTime2) },
           { delay: delay2, jobId: '123456' }
         );
         res.send('done');
@@ -78,8 +79,10 @@ schedule.process(async (job, done) => {
     const datas = {
       data: {
         data: {
-          link: element.title ? element.title : '',
-          lengths: detail.data.data.formData.custom_fields.count ? detail.data.data.formData.custom_fields.count : 1,
+          link: element.short_description ? element.short_description : '',
+          lengths: detail.data.data.formData.custom_fields.count
+            ? detail.data.data.formData.custom_fields.count
+            : 1,
           length_comment: detail.data.data.formData.custom_fields.filter.length_comment
             ? detail.data.data.formData.custom_fields.filter.length_comment
             : 1,
@@ -108,8 +111,6 @@ schedule.process(async (job, done) => {
       : new Date().getTime();
 
     const delay = processAt - currentTime;
-    console.log(datas.data.data);
-    console.log(schedules);
     let schedule = {};
     if (schedules == 0) {
       schedule = {
@@ -117,18 +118,33 @@ schedule.process(async (job, done) => {
       };
       await queue.add({ data: datas.data.data }, schedule);
     } else if (schedules == 1) {
+      const d = new Date(detail.data.data.published_start);
+      let hour = d.getHours();
+      let minute = d.getMinutes();
       schedule = {
-        repeat: { cron: '0 17 * * *' },
+        repeat: { cron: `${minute} ${hour} * * *` },
       };
+
+      console.log(detail.data.data.published_start);
       await day.add({ data: datas.data.data }, schedule);
     } else if (schedules == 2) {
+      const d = new Date(detail.data.data.published_start);
+      let hour = d.getHours();
+      let minute = d.getMinutes();
+      let day = d.getDay();
       schedule = {
-        repeat: { cron: '0 0 * * 2' },
+        repeat: { cron: `${minute} ${hour} * * ${day}` },
       };
       await week.add({ data: datas.data.data }, schedule);
     } else if (schedules == 3) {
+      const d = new Date(detail.data.data.published_start);
+      let hour = d.getHours();
+      let date = d.getDate();
+      if (date > 28) {
+        date = 28;
+      }
       schedule = {
-        repeat: { cron: '0 0 1 * *' },
+        repeat: { cron: `0 ${hour} ${date} * *` },
       };
       await mount.add({ data: datas.data.data }, schedule);
     }
