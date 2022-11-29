@@ -12,7 +12,7 @@ const app = express();
 const requestIp = require('request-ip');
 // view engine setup
 require('./redis_queuess');
-require('./testdata');
+// require('./testdata');
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 app.use(cors());

@@ -8,11 +8,4 @@ const update = new Queue('update', { redis: { port: 6379, host: '127.0.0.1' } })
 const day = new Queue('day', { redis: { port: 6379, host: '127.0.0.1' } });
 const mount = new Queue('mount', { redis: { port: 6379, host: '127.0.0.1' } });
 const week = new Queue('week', { redis: { port: 6379, host: '127.0.0.1' } });
-(async function startserver() {
-  await update.add(
-    {},
-    {
-      repeat: { cron: '*/15 * * * *' },
-    }
-  );
-})();
+(async function startserver() {})();
