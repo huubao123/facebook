@@ -166,17 +166,17 @@ module.exports = async function getdata(page, cmt_lengths) {
             element.childNodes[0].childNodes.forEach(function (node) {
               if (node.nodeName == 'SPAN') {
                 for (let c = 0; c < node.childNodes.length; c++) {
-                  content += node.childNodes[c].innerHTML
-                    .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
-                    .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
-                    .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
+                  let con_fil = node.childNodes[c].innerHTML
+                    .replaceAll(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/g, '')
+                    .replaceAll(/^[+]*[(]{0,1}[0-9]{1,3}[)]{0,1}[-\s\./0-9]*$/g, '');
+                  content += con_fil;
                 }
               } else {
                 for (let c = 0; c < node.childNodes[0].childNodes[0].childNodes.length; c++) {
-                  content += node.childNodes[0].childNodes[0].childNodes[c].innerHTML
-                    .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
-                    .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
-                    .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
+                  let con_fil = node.childNodes[0].childNodes[0].childNodes[c].innerHTML
+                    .replaceAll(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/g, '')
+                    .replaceAll(/^[+]*[(]{0,1}[0-9]{1,3}[)]{0,1}[-\s\./0-9]*$/g, '');
+                  content += con_fil;
                 }
               }
             });
@@ -414,20 +414,7 @@ module.exports = async function getdata(page, cmt_lengths) {
                         user_cmt_id = elementsss.childNodes[0].childNodes[0].href.split('/')[6];
                       } else if (elementsss.nodeName == 'DIV') {
                         for (let l = 0; l < elementsss.childNodes[0].childNodes.length; l++) {
-                          cotent_cmt += elementsss.childNodes[0].childNodes[l].innerText
-                            .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
-                            .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
-                            .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
-                          cotent_cmt_text += elementsss.childNodes[0].childNodes[l].innerText
-                            .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
-                            .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
-                            .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
-                        }
-                        if (cotent_cmt_text.length < cmt_lengths) {
-                          cotent_cmt_text = '';
-                          console.log(abc);
-                        } else {
-                          cotent_cmt_text = '';
+                          cotent_cmt += elementsss.childNodes[0].childNodes[l].innerText;
                         }
                       }
                     }
@@ -480,20 +467,7 @@ module.exports = async function getdata(page, cmt_lengths) {
                       user_cmt_id = cmt.childNodes[0].childNodes[0].href.split('/')[6];
                     } else if (cmt.nodeName == 'DIV') {
                       for (let l = 0; l < cmt.childNodes[0].childNodes.length; l++) {
-                        cotent_cmt += cmt.childNodes[0].childNodes[l].innerText
-                          .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
-                          .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
-                          .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
-                        cotent_cmt_text += cmt.childNodes[0].childNodes[l].innerText
-                          .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
-                          .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
-                          .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
-                      }
-                      if (cotent_cmt_text.length < cmt_lengths) {
-                        cotent_cmt_text = '';
-                        console.log(abc);
-                      } else {
-                        cotent_cmt_text = '';
+                        cotent_cmt += cmt.childNodes[0].childNodes[l].innerText;
                       }
                     }
                   });
@@ -529,20 +503,7 @@ module.exports = async function getdata(page, cmt_lengths) {
                         user_cmt_id = child.childNodes[0].childNodes[0].href.split('/')[6];
                       } else if (child.nodeName == 'DIV') {
                         for (let l = 0; l < child.childNodes[0].childNodes.length; l++) {
-                          cotent_cmt += child.childNodes[0].childNodes[l].innerText
-                            .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
-                            .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
-                            .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
-                          cotent_cmt_text += child.childNodes[0].childNodes[l].innerText
-                            .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
-                            .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
-                            .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
-                        }
-                        if (cotent_cmt_text.length < cmt_lengths) {
-                          cotent_cmt_text = '';
-                          console.log(abc);
-                        } else {
-                          cotent_cmt_text = '';
+                          cotent_cmt += child.childNodes[0].childNodes[l].innerText;
                         }
                       } else if (child.nodeName == 'A') {
                         console.log('user3:', child);
@@ -573,20 +534,7 @@ module.exports = async function getdata(page, cmt_lengths) {
                                   user_cmtchild_id = child.childNodes[0].childNodes[0].href.split('/')[6];
                                 } else if (child.nodeName == 'DIV') {
                                   for (let l = 0; l < child.childNodes[0].childNodes.length; l++) {
-                                    cotent_cmtchild += child.childNodes[0].childNodes[l].innerText
-                                      .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
-                                      .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
-                                      .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
-                                    cotent_cmtchild_text += child.childNodes[0].childNodes[l].innerText
-                                      .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
-                                      .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
-                                      .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
-                                  }
-                                  if (cotent_cmtchild_text.length < cmt_lengths) {
-                                    cotent_cmtchild_text = '';
-                                    console.log(abc);
-                                  } else {
-                                    cotent_cmtchild_text = '';
+                                    cotent_cmtchild += child.childNodes[0].childNodes[l].innerText;
                                   }
                                 }
                               }
@@ -750,20 +698,7 @@ module.exports = async function getdata(page, cmt_lengths) {
                                 user_cmtchild_id = child.childNodes[0].childNodes[0].href.split('/')[6];
                               } else if (child.nodeName == 'DIV') {
                                 for (let l = 0; l < child.childNodes[0].childNodes.length; l++) {
-                                  cotent_cmtchild += child.childNodes[0].childNodes[l].innerText
-                                    .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
-                                    .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
-                                    .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
-                                  cotent_cmtchild_text += child.childNodes[0].childNodes[l].innerText
-                                    .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
-                                    .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
-                                    .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
-                                }
-                                if (cotent_cmtchild_text.length < cmt_lengths) {
-                                  cotent_cmtchild_text = '';
-                                  console.log(abc);
-                                } else {
-                                  cotent_cmtchild_text = '';
+                                  cotent_cmtchild += child.childNodes[0].childNodes[l].innerText;
                                 }
                               }
                             });
@@ -775,20 +710,7 @@ module.exports = async function getdata(page, cmt_lengths) {
                                 user_cmtchild_id = child.childNodes[0].childNodes[0].href.split('/')[6];
                               } else if (child.nodeName == 'DIV') {
                                 for (let l = 0; l < child.childNodes[0].childNodes.length; l++) {
-                                  cotent_cmtchild += child.childNodes[0].childNodes[l].innerText
-                                    .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
-                                    .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
-                                    .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
-                                  cotent_cmtchild_text += child.childNodes[0].childNodes[l].innerText
-                                    .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
-                                    .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
-                                    .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
-                                }
-                                if (cotent_cmtchild_text.length < cmt_lengths) {
-                                  cotent_cmtchild_text = '';
-                                  console.log(abc);
-                                } else {
-                                  cotent_cmtchild_text = '';
+                                  cotent_cmtchild += child.childNodes[0].childNodes[l].innerText;
                                 }
                               }
                             });
@@ -834,20 +756,7 @@ module.exports = async function getdata(page, cmt_lengths) {
                                           user_cmtchild_id = child.childNodes[0].childNodes[0].href.split('/')[6];
                                         } else if (child.nodeName == 'DIV') {
                                           for (let l = 0; i < child.childNodes[0].childNodes.length; l++) {
-                                            cotent_cmtchild += child.childNodes[0].childNodes[l].innerText
-                                              .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
-                                              .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
-                                              .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
-                                            cotent_cmtchild_text += child.childNodes[0].childNodes[l].innerText
-                                              .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
-                                              .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
-                                              .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
-                                          }
-                                          if (cotent_cmtchild_text.length < cmt_lengths) {
-                                            cotent_cmtchild_text = '';
-                                            console.log(abc);
-                                          } else {
-                                            cotent_cmtchild_text = '';
+                                            cotent_cmtchild += child.childNodes[0].childNodes[l].innerText;
                                           }
                                         }
                                       }
@@ -901,20 +810,7 @@ module.exports = async function getdata(page, cmt_lengths) {
                                             user_cmtchild_id = child.childNodes[0].childNodes[0].href.split('/')[6];
                                           } else if (child.nodeName == 'DIV') {
                                             for (let l = 0; l < child.childNodes[0].childNodes.length; l++) {
-                                              cotent_cmtchild += child.childNodes[0].childNodes[l].innerText
-                                                .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
-                                                .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
-                                                .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
-                                              cotent_cmtchild_text += child.childNodes[0].childNodes[l].innerText
-                                                .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
-                                                .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
-                                                .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
-                                            }
-                                            if (cotent_cmtchild_text.length < cmt_lengths) {
-                                              cotent_cmtchild_text = '';
-                                              console.log(abc);
-                                            } else {
-                                              cotent_cmtchild_text = '';
+                                              cotent_cmtchild += child.childNodes[0].childNodes[l].innerText;
                                             }
                                           }
                                         }
@@ -938,20 +834,7 @@ module.exports = async function getdata(page, cmt_lengths) {
                                             user_cmtchild_id = child.childNodes[0].childNodes[0].href.split('/')[6];
                                           } else if (child.nodeName == 'DIV') {
                                             for (var l = 0; l < child.childNodes[0].childNodes.length; l++) {
-                                              cotent_cmtchild += child.childNodes[0].childNodes[l].innerText
-                                                .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
-                                                .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
-                                                .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
-                                              cotent_cmtchild_text += child.childNodes[0].childNodes[l].innerText
-                                                .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
-                                                .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
-                                                .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
-                                            }
-                                            if (cotent_cmtchild_text.length < cmt_lengths) {
-                                              cotent_cmtchild_text = '';
-                                              console.log(abc);
-                                            } else {
-                                              cotent_cmtchild_text = '';
+                                              cotent_cmtchild += child.childNodes[0].childNodes[l].innerText;
                                             }
                                           }
                                         }
@@ -1065,20 +948,7 @@ module.exports = async function getdata(page, cmt_lengths) {
                       user_cmt_id = element.childNodes[0].childNodes[0].href.split('/')[6];
                     } else if (element.nodeName == 'DIV') {
                       for (let l = 0; l < element.childNodes[0].childNodes.length; l++) {
-                        cotent_cmt += element.childNodes[0].childNodes[l].innerText
-                          .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
-                          .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
-                          .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
-                        cotent_cmt_text += element.childNodes[0].childNodes[l].innerText
-                          .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
-                          .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
-                          .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
-                      }
-                      if (cotent_cmt_text.length < cmt_lengths) {
-                        cotent_cmt_text = '';
-                        console.log(abc);
-                      } else {
-                        cotent_cmt_text = '';
+                        cotent_cmt += element.childNodes[0].childNodes[l].innerText;
                       }
                     }
                   });
@@ -1090,20 +960,7 @@ module.exports = async function getdata(page, cmt_lengths) {
                       user_cmt_id = element.childNodes[0].childNodes[0].href.split('/')[6];
                     } else if (element.nodeName == 'DIV') {
                       for (let l = 0; l < element.childNodes[0].childNodes.length; l++) {
-                        cotent_cmt += element.childNodes[0].childNodes[l].innerText
-                          .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
-                          .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
-                          .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
-                        cotent_cmt_text += element.childNodes[0].childNodes[l].innerText
-                          .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
-                          .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
-                          .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
-                      }
-                      if (cotent_cmt_text.length < cmt_lengths) {
-                        cotent_cmt_text = '';
-                        console.log(abc);
-                      } else {
-                        cotent_cmt_text = '';
+                        cotent_cmt += element.childNodes[0].childNodes[l].innerText;
                       }
                     }
                   });

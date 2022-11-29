@@ -43,7 +43,10 @@ class Postapi {
           res.json({ data: 'error', error: 'no such posttype' });
           return;
         } //https://www.facebook.com/groups/j2team.community/posts/1980870165578427/
-        let post = await Post.find({ posttype: posttype_id._id, post_link: { $regex: search } },{ basic_fields: 1, create_at: 1, })
+        let post = await Post.find(
+          { posttype: posttype_id._id, post_link: { $regex: search } },
+          { basic_fields: 1, create_at: 1 }
+        )
           .sort([['create_at', -1]])
           .skip(skip)
           .limit(limit)
@@ -65,8 +68,20 @@ class Postapi {
     });
   }
   async getall(req, res, next) {
-   let trash = Trash.find()
-   res.json(trash) 
+    let post = await Post.find();
+    post.forEach(async (element) => {
+      console.log(element._id);
+      await Post.findByIdAndUpdate(
+        element._id,
+        {
+          filter: true,
+        },
+        {
+          new: true,
+        }
+      );
+    });
+    res.send('das');
   }
 
   // delete element.basic_fields;
@@ -85,10 +100,6 @@ class Postapi {
 
         return res.json(datas);
       } else {
-
-
-
-        
         Post.findById(req.params.id, async function (err, post) {
           if (err) {
             await res.status(500).send(err);

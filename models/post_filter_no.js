@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const postSchema = mongoose.Schema({
+const post_filter_no_Schema = mongoose.Schema({
   basic_fields: String,
   custom_fields: String,
   post_link: String,
@@ -11,5 +11,5 @@ const postSchema = mongoose.Schema({
   filter: Boolean,
 });
 
-const Post = mongoose.model('Post', postSchema);
-module.exports = Post;
+const Post_filter_no = mongoose.model('Post_filter_no', post_filter_no_Schema);
+module.exports = Post_filter_no;
