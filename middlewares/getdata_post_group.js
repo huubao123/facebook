@@ -49,8 +49,8 @@ module.exports = async function getdata(page, cmt_lengths) {
       let post = document.querySelectorAll('[role="main"]')[2];
       if (!post) {
         let post1 =
-          document.querySelectorAll('[role="article"]')[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-            .childNodes[0];
+          document.querySelectorAll('[role="article"]')[0].childNodes[0].childNodes[0].childNodes[0]
+            .childNodes[0].childNodes[0];
         if (post1.childNodes.length > 5) {
           contens = post1.childNodes[7].childNodes[0];
         } else {
@@ -59,52 +59,50 @@ module.exports = async function getdata(page, cmt_lengths) {
       } else {
         try {
           if (
-            post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-              .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-              .childNodes[1] &&
-            !post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-              .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-              .childNodes[7]
+            post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+              .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+              .childNodes[0].childNodes[1]
           ) {
             contens =
-              post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                .childNodes[1].childNodes[0];
+              post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                .childNodes[0].childNodes[0].childNodes[1].childNodes[0];
           } else if (
-            post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-              .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-              .childNodes[0].childNodes[1].childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes[0]
-              .childNodes[0]
+            post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+              .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+              .childNodes[0].childNodes[0].childNodes[1].childNodes[0].childNodes[1].childNodes[0]
+              .childNodes[0].childNodes[0].childNodes[0]
           ) {
             contens =
-              post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                .childNodes[0].childNodes[1].childNodes[0];
+              post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                .childNodes[0].childNodes[0].childNodes[0].childNodes[1].childNodes[0];
           }
         } catch (e) {
           try {
             if (
-              post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                .childNodes[0].childNodes[7].childNodes[0]
+              post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                .childNodes[0].childNodes[0].childNodes[0].childNodes[7].childNodes[0]
             ) {
               contens =
-                post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                  .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                  .childNodes[0].childNodes[7].childNodes[0];
+                post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                  .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                  .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[7]
+                  .childNodes[0];
             }
           } catch (e) {
             if (
-              document.querySelector('[aria-posinset="1"]').childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                .childNodes[0].childNodes[7]
+              document.querySelector('[aria-posinset="1"]').childNodes[0].childNodes[0]
+                .childNodes[0].childNodes[0].childNodes[0].childNodes[7]
             ) {
               contens =
-                document.querySelector('[aria-posinset="1"]').childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                  .childNodes[0].childNodes[7].childNodes[0];
+                document.querySelector('[aria-posinset="1"]').childNodes[0].childNodes[0]
+                  .childNodes[0].childNodes[0].childNodes[0].childNodes[7].childNodes[0];
             } else {
               contens =
-                document.querySelector('[aria-posinset="1"]').childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                  .childNodes[0].childNodes[1].childNodes[0];
+                document.querySelector('[aria-posinset="1"]').childNodes[0].childNodes[0]
+                  .childNodes[0].childNodes[0].childNodes[0].childNodes[1].childNodes[0];
             }
           }
         }
@@ -132,20 +130,22 @@ module.exports = async function getdata(page, cmt_lengths) {
       // );
       try {
         if (
-          contens.childNodes[1].childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-            .childNodes[0].childNodes.length > 1
+          contens.childNodes[1].childNodes[0].childNodes[1].childNodes[0].childNodes[0]
+            .childNodes[0].childNodes[0].childNodes[0].childNodes.length > 1
         ) {
           admin =
-            contens.childNodes[1].childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-              .childNodes[0].childNodes[0].childNodes;
+            contens.childNodes[1].childNodes[0].childNodes[1].childNodes[0].childNodes[0]
+              .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes;
         } else {
           admin =
-            contens.childNodes[1].childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-              .childNodes[0].childNodes;
+            contens.childNodes[1].childNodes[0].childNodes[1].childNodes[0].childNodes[0]
+              .childNodes[0].childNodes[0].childNodes[0].childNodes;
         }
         admin.forEach((element) => {
           if (element.nodeName == 'SPAN') {
-            userhref = element.children[0].href ? element.childNodes[0].href : element.childNodes[0].href;
+            userhref = element.children[0].href
+              ? element.childNodes[0].href
+              : element.childNodes[0].href;
             user_name = element.childNodes[0].innerText
               ? element.childNodes[0].innerText
               : element.childNodes[0].innerText;
@@ -196,10 +196,12 @@ module.exports = async function getdata(page, cmt_lengths) {
             //     .innerHTML;
           } else {
             console.log(element.childNodes[0].childNodes[0].childNodes[0].childNodes);
-            if (element.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes.length == 2) {
+            if (
+              element.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes.length == 2
+            ) {
               checkitemlength =
-                element.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[1]
-                  .childNodes[0].childNodes[1].childNodes[0].childNodes;
+                element.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                  .childNodes[1].childNodes[0].childNodes[1].childNodes[0].childNodes;
               if (checkitemlength.length == 7) {
                 if (checkitemlength[5].childNodes.length == 11) {
                   video.push(
@@ -243,16 +245,23 @@ module.exports = async function getdata(page, cmt_lengths) {
                   );
                 }
               }
-            } else if (element.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes.length == 1) {
+            } else if (
+              element.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes.length == 1
+            ) {
               try {
                 if (
-                  element.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes.length > 1
+                  element.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                    .childNodes.length > 1
                 ) {
-                  if (!element.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].href) {
+                  if (
+                    !element.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                      .href
+                  ) {
                     for (
                       let j = 0;
                       j <
-                      element.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes.length;
+                      element.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                        .childNodes.length;
                       j++
                     ) {
                       element.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[
@@ -266,15 +275,16 @@ module.exports = async function getdata(page, cmt_lengths) {
                               .split('?')[0]
                           )
                         : image_href.push(
-                            element.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[j]
-                              .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].currentSrc
+                            element.childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                              .childNodes[0].childNodes[j].childNodes[0].childNodes[0].childNodes[0]
+                              .childNodes[0].childNodes[0].currentSrc
                           );
 
                       try {
                         if (
                           j ==
-                          element.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes
-                            .length -
+                          element.childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                            .childNodes[0].childNodes.length -
                             1
                         ) {
                           const numberPattern = /\d+/g;
@@ -300,7 +310,8 @@ module.exports = async function getdata(page, cmt_lengths) {
                         if (element.childNodes.length == 3) {
                           for (let k = 0; k < element.childNodes.length; k++) {
                             image_href.push(
-                              element.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].href
+                              element.childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                                .childNodes[0].href
                             );
                           }
                         } else {
@@ -308,13 +319,15 @@ module.exports = async function getdata(page, cmt_lengths) {
                             if (element.childNodes.length == 2) {
                               console.log('image 3', element.childNodes);
                               image_href.push(
-                                element.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                                  .childNodes[0].childNodes[0].childNodes[0].currentSrc
+                                element.childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                                  .childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                                  .currentSrc
                               );
                             } else {
                               image_href.push(
-                                element.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                                  .childNodes[0].childNodes[0].childNodes[0].currentSrc
+                                element.childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                                  .childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                                  .currentSrc
                               );
                             }
                           });
@@ -327,8 +340,8 @@ module.exports = async function getdata(page, cmt_lengths) {
             } else {
               try {
                 image_href.push(
-                  element.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                    .childNodes[0].childNodes[0].childNodes[0].currentSrc
+                  element.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                    .childNodes[0].childNodes[0].childNodes[0].childNodes[0].currentSrc
                 );
               } catch (e) {}
 
@@ -356,13 +369,17 @@ module.exports = async function getdata(page, cmt_lengths) {
       try {
         if (divlikecomshare.childNodes.length == 5) {
           categori = divlikecomshare.childNodes[3].innerText;
-          likecomshare = divlikecomshare.childNodes[4].childNodes[0].childNodes[0].childNodes[0].childNodes[0];
-          divcommment = divlikecomshare.childNodes[4].childNodes[0].childNodes[0].childNodes[1].childNodes;
+          likecomshare =
+            divlikecomshare.childNodes[4].childNodes[0].childNodes[0].childNodes[0].childNodes[0];
+          divcommment =
+            divlikecomshare.childNodes[4].childNodes[0].childNodes[0].childNodes[1].childNodes;
         } else {
           categori = '';
-          likecomshare = divlikecomshare.childNodes[3].childNodes[0].childNodes[0].childNodes[0].childNodes[0];
+          likecomshare =
+            divlikecomshare.childNodes[3].childNodes[0].childNodes[0].childNodes[0].childNodes[0];
 
-          divcommment = divlikecomshare.childNodes[3].childNodes[0].childNodes[0].childNodes[1].childNodes;
+          divcommment =
+            divlikecomshare.childNodes[3].childNodes[0].childNodes[0].childNodes[1].childNodes;
         }
 
         if (likecomshare.childNodes.length > 1) {
@@ -372,8 +389,12 @@ module.exports = async function getdata(page, cmt_lengths) {
               likes = element.childNodes ? element.childNodes[1].textContent.split(' ')[0] : '0';
             }
             if (index == 1) {
-              count_comments = element.childNodes[1] ? element.childNodes[1].textContent.split(' ')[0] : '0';
-              shares = element.childNodes[2] ? element.childNodes[2].textContent.split(' ')[0] : '0';
+              count_comments = element.childNodes[1]
+                ? element.childNodes[1].textContent.split(' ')[0]
+                : '0';
+              shares = element.childNodes[2]
+                ? element.childNodes[2].textContent.split(' ')[0]
+                : '0';
             }
           });
         }
@@ -403,10 +424,10 @@ module.exports = async function getdata(page, cmt_lengths) {
             try {
               if (elementss.childNodes[0].childNodes.length == 2) {
                 if (
-                  elementss.childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes[0].children[0]
-                    .childNodes[0].childNodes[0].childNodes &&
-                  elementss.childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes[0].children[0]
-                    .childNodes[0].childNodes[0].childNodes.nodeName == 'SPAN'
+                  elementss.childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes[0]
+                    .children[0].childNodes[0].childNodes[0].childNodes &&
+                  elementss.childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes[0]
+                    .children[0].childNodes[0].childNodes[0].childNodes.nodeName == 'SPAN'
                 ) {
                   console.log('abc', elementss.childNodes[0].childNodes);
                   elementss.childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes[0].children[0].childNodes[0].childNodes[0].childNodes.forEach(
@@ -424,36 +445,42 @@ module.exports = async function getdata(page, cmt_lengths) {
                   );
                 }
                 // comment mới
-                elementss.childNodes[0].childNodes[1].childNodes[1].childNodes.forEach((element, index) => {
-                  if (index == 1 && element.className == '') {
-                    diw_newcmt = elementss.childNodes[0].childNodes[1].childNodes[1].childNodes[1];
-                  } else if (index == 1 && element.className !== '') {
-                    diw_newcmt = elementss.childNodes[0].childNodes[1].childNodes[1].childNodes[0];
+                elementss.childNodes[0].childNodes[1].childNodes[1].childNodes.forEach(
+                  (element, index) => {
+                    if (index == 1 && element.className == '') {
+                      diw_newcmt =
+                        elementss.childNodes[0].childNodes[1].childNodes[1].childNodes[1];
+                    } else if (index == 1 && element.className !== '') {
+                      diw_newcmt =
+                        elementss.childNodes[0].childNodes[1].childNodes[1].childNodes[0];
+                    }
                   }
-                });
+                );
 
                 if (
                   diw_newcmt.childNodes[0].childNodes[0].childNodes[0].childNodes.length > 1 &&
-                  elementss.childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes[0].children[0]
-                    .childNodes[0].childNodes[0].childNodes[0].nodeName !== 'SPAN'
+                  elementss.childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes[0]
+                    .children[0].childNodes[0].childNodes[0].childNodes[0].nodeName !== 'SPAN'
                 ) {
                   console.log('asd', elementss.childNodes[0].childNodes);
                   // cũ có hình ảnh
-                  elementss.childNodes[0].childNodes[1].childNodes[1].childNodes.forEach((elementsss, index) => {
-                    if (elementsss.nodeName == 'DIV' && index == 1) {
-                      if (elementsss.childNodes[0].childNodes.length > 1) {
-                        count_like_cmt =
-                          elementsss.childNodes[0].childNodes[1].textContent == ''
-                            ? 1
-                            : elementsss.childNodes[0].childNodes[1].textContent;
+                  elementss.childNodes[0].childNodes[1].childNodes[1].childNodes.forEach(
+                    (elementsss, index) => {
+                      if (elementsss.nodeName == 'DIV' && index == 1) {
+                        if (elementsss.childNodes[0].childNodes.length > 1) {
+                          count_like_cmt =
+                            elementsss.childNodes[0].childNodes[1].textContent == ''
+                              ? 1
+                              : elementsss.childNodes[0].childNodes[1].textContent;
+                        }
+                        imgComment = elementsss.childNodes[0].childNodes[0].childNodes[0]
+                          .childNodes[0].childNodes[0].childNodes[0]
+                          ? elementsss.childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                              .childNodes[0].childNodes[0].currentSrc
+                          : '';
                       }
-                      imgComment = elementsss.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                        .childNodes[0]
-                        ? elementsss.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                            .currentSrc
-                        : '';
                     }
-                  });
+                  );
                   // đếm like comment
                   console.log('diw_newcmt', diw_newcmt);
                   if (diw_newcmt.childNodes[0].childNodes[0].childNodes[1]) {
@@ -462,22 +489,24 @@ module.exports = async function getdata(page, cmt_lengths) {
                         ? 1
                         : diw_newcmt.childNodes[0].childNodes[0].childNodes[1].textContent;
                   }
-                  diw_newcmt.childNodes[0].childNodes[0].childNodes[0].childNodes.forEach((cmt, index) => {
-                    console.log('user1 :', cmt);
-                    if (cmt.nodeName == 'SPAN' && index == 0) {
-                      user_cmt_href = cmt.childNodes[0].childNodes[0].href;
-                      user_name_cmt = cmt.childNodes[0].childNodes[0].innerText;
-                      user_cmt_id = cmt.childNodes[0].childNodes[0].href.split('/')[6];
-                    } else if (cmt.nodeName == 'DIV') {
-                      for (let l = 0; l < cmt.childNodes[0].childNodes.length; l++) {
-                        cotent_cmt += cmt.childNodes[0].childNodes[l].innerText;
+                  diw_newcmt.childNodes[0].childNodes[0].childNodes[0].childNodes.forEach(
+                    (cmt, index) => {
+                      console.log('user1 :', cmt);
+                      if (cmt.nodeName == 'SPAN' && index == 0) {
+                        user_cmt_href = cmt.childNodes[0].childNodes[0].href;
+                        user_name_cmt = cmt.childNodes[0].childNodes[0].innerText;
+                        user_cmt_id = cmt.childNodes[0].childNodes[0].href.split('/')[6];
+                      } else if (cmt.nodeName == 'DIV') {
+                        for (let l = 0; l < cmt.childNodes[0].childNodes.length; l++) {
+                          cotent_cmt += cmt.childNodes[0].childNodes[l].innerText;
+                        }
                       }
                     }
-                  });
+                  );
                 } else if (
                   diw_newcmt.childNodes[0].childNodes[0].childNodes[0].childNodes.length == 1 &&
-                  elementss.childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes[0].children[0]
-                    .childNodes[0].childNodes[0].childNodes[0].nodeName !== 'SPAN'
+                  elementss.childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes[0]
+                    .children[0].childNodes[0].childNodes[0].childNodes[0].nodeName !== 'SPAN'
                 ) {
                   console.log('qwe', diw_newcmt.childNodes);
                   // đếm like comment
@@ -489,14 +518,16 @@ module.exports = async function getdata(page, cmt_lengths) {
                         : diw_newcmt.childNodes[0].childNodes[0].childNodes[1].textContent;
                   }
 
-                  elementss.childNodes[0].childNodes[1].childNodes[1].childNodes.forEach((elementsss, index) => {
-                    if (elementsss.nodeName == 'DIV' && index == 1) {
-                      //console.log('1', elementsss);
-                      imgComment =
-                        elementsss.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                          .currentSrc;
+                  elementss.childNodes[0].childNodes[1].childNodes[1].childNodes.forEach(
+                    (elementsss, index) => {
+                      if (elementsss.nodeName == 'DIV' && index == 1) {
+                        //console.log('1', elementsss);
+                        imgComment =
+                          elementsss.childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                            .childNodes[0].childNodes[0].currentSrc;
+                      }
                     }
-                  });
+                  );
                   diw_newcmt.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes.forEach(
                     (child, index) => {
                       console.log('user2: ', child);
@@ -519,8 +550,8 @@ module.exports = async function getdata(page, cmt_lengths) {
                   );
                 }
                 if (
-                  elementss.childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes[0].children[0]
-                    .childNodes[0].childNodes[0].childNodes[0].nodeName == 'SPAN'
+                  elementss.childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes[0]
+                    .children[0].childNodes[0].childNodes[0].childNodes[0].nodeName == 'SPAN'
                 ) {
                   if (elementss.childNodes[1].childNodes[0].childNodes.length > 0) {
                     elementss.childNodes[1].childNodes[0].childNodes.forEach((cmt_old) => {
@@ -534,7 +565,8 @@ module.exports = async function getdata(page, cmt_lengths) {
                                 if (child.nodeName == 'SPAN' && index == 0) {
                                   user_cmtchild_href = child.childNodes[0].childNodes[0].href;
                                   user_name_cmtchild = child.childNodes[0].childNodes[0].innerText;
-                                  user_cmtchild_id = child.childNodes[0].childNodes[0].href.split('/')[6];
+                                  user_cmtchild_id =
+                                    child.childNodes[0].childNodes[0].href.split('/')[6];
                                 } else if (child.nodeName == 'DIV') {
                                   for (let l = 0; l < child.childNodes[0].childNodes.length; l++) {
                                     cotent_cmtchild += child.childNodes[0].childNodes[l].innerText;
@@ -611,66 +643,78 @@ module.exports = async function getdata(page, cmt_lengths) {
                             ].childNodes[1].childNodes[0].childNodes[0]
                               ? elementsss.childNodes[m].childNodes[1].childNodes[
                                   elementsss.childNodes[m].childNodes[0].childNodes.length - 1
-                                ].childNodes[1].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes
+                                ].childNodes[1].childNodes[0].childNodes[0].childNodes[0]
+                                  .childNodes[0].childNodes
                               : elementsss.childNodes[m].childNodes[1].childNodes[
                                   elementsss.childNodes[m].childNodes[0].childNodes.length - 1
-                                ].childNodes[1].childNodes[1].childNodes[0].childNodes[0].childNodes[0].childNodes;
+                                ].childNodes[1].childNodes[1].childNodes[0].childNodes[0]
+                                  .childNodes[0].childNodes;
                           } else {
                             children_div = elementsss.childNodes[m].childNodes[0].childNodes[
                               elementsss.childNodes[m].childNodes[0].childNodes.length - 1
                             ].childNodes[1].childNodes[0].childNodes[0]
                               ? elementsss.childNodes[m].childNodes[0].childNodes[
                                   elementsss.childNodes[m].childNodes[0].childNodes.length - 1
-                                ].childNodes[1].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes
+                                ].childNodes[1].childNodes[0].childNodes[0].childNodes[0]
+                                  .childNodes[0].childNodes
                               : elementsss.childNodes[m].childNodes[0].childNodes[
                                   elementsss.childNodes[m].childNodes[0].childNodes.length - 1
-                                ].childNodes[1].childNodes[1].childNodes[0].childNodes[0].childNodes[0].childNodes;
+                                ].childNodes[1].childNodes[1].childNodes[0].childNodes[0]
+                                  .childNodes[0].childNodes;
                           }
                           // cmtchild1 mới  cũ có hình ảnh
                           if (
-                            children_div[0].parentNode.parentNode.parentNode.parentNode.parentNode.childNodes.length ==
-                            3
+                            children_div[0].parentNode.parentNode.parentNode.parentNode.parentNode
+                              .childNodes.length == 3
                           ) {
                             imgComment_cmt =
-                              children_div[0].parentNode.parentNode.parentNode.parentNode.parentNode.childNodes[1]
-                                .childNodes[0].childNodes[0].childNodes[0].childNodes.length > 2
-                                ? children_div[0].parentNode.parentNode.parentNode.parentNode.parentNode.childNodes[1]
-                                    .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                              children_div[0].parentNode.parentNode.parentNode.parentNode.parentNode
+                                .childNodes[1].childNodes[0].childNodes[0].childNodes[0].childNodes
+                                .length > 2
+                                ? children_div[0].parentNode.parentNode.parentNode.parentNode
+                                    .parentNode.childNodes[1].childNodes[0].childNodes[0]
+                                    .childNodes[0].childNodes[0].childNodes[0].childNodes[0]
                                     .currentSrc
                                 : '';
                             if (
-                              children_div[0].parentNode.parentNode.parentNode.parentNode.parentNode.childNodes[1]
-                                .childNodes[0].childNodes[1]
+                              children_div[0].parentNode.parentNode.parentNode.parentNode.parentNode
+                                .childNodes[1].childNodes[0].childNodes[1]
                             ) {
                               count_like_cmtchild =
-                                children_div[0].parentNode.parentNode.parentNode.parentNode.parentNode.childNodes[1]
-                                  .childNodes[0].childNodes[1].textContent == ''
+                                children_div[0].parentNode.parentNode.parentNode.parentNode
+                                  .parentNode.childNodes[1].childNodes[0].childNodes[1]
+                                  .textContent == ''
                                   ? 1
-                                  : children_div[0].parentNode.parentNode.parentNode.parentNode.parentNode.childNodes[1]
-                                      .childNodes[0].childNodes[1].textContent;
+                                  : children_div[0].parentNode.parentNode.parentNode.parentNode
+                                      .parentNode.childNodes[1].childNodes[0].childNodes[1]
+                                      .textContent;
                             }
                             // cmtchild1 mới có hình ảnh
                           } else if (
-                            children_div[0].parentNode.parentNode.parentNode.parentNode.parentNode.childNodes.length ==
-                            4
+                            children_div[0].parentNode.parentNode.parentNode.parentNode.parentNode
+                              .childNodes.length == 4
                           ) {
                             imgComment_cmt =
-                              children_div[0].parentNode.parentNode.parentNode.parentNode.parentNode.childNodes[2]
-                                .childNodes[0].childNodes[0].childNodes[0].childNodes.length > 2
-                                ? children_div[0].parentNode.parentNode.parentNode.parentNode.parentNode.childNodes[2]
-                                    .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                              children_div[0].parentNode.parentNode.parentNode.parentNode.parentNode
+                                .childNodes[2].childNodes[0].childNodes[0].childNodes[0].childNodes
+                                .length > 2
+                                ? children_div[0].parentNode.parentNode.parentNode.parentNode
+                                    .parentNode.childNodes[2].childNodes[0].childNodes[0]
+                                    .childNodes[0].childNodes[0].childNodes[0].childNodes[0]
                                     .currentSrc
                                 : '';
                             if (
-                              children_div[0].parentNode.parentNode.parentNode.parentNode.parentNode.childNodes[2]
-                                .childNodes[0].childNodes[1]
+                              children_div[0].parentNode.parentNode.parentNode.parentNode.parentNode
+                                .childNodes[2].childNodes[0].childNodes[1]
                             ) {
                               count_like_cmtchild =
-                                children_div[0].parentNode.parentNode.parentNode.parentNode.parentNode.childNodes[2]
-                                  .childNodes[0].childNodes[1].textContent == ''
+                                children_div[0].parentNode.parentNode.parentNode.parentNode
+                                  .parentNode.childNodes[2].childNodes[0].childNodes[1]
+                                  .textContent == ''
                                   ? 1
-                                  : children_div[0].parentNode.parentNode.parentNode.parentNode.parentNode.childNodes[2]
-                                      .childNodes[0].childNodes[1].textContent;
+                                  : children_div[0].parentNode.parentNode.parentNode.parentNode
+                                      .parentNode.childNodes[2].childNodes[0].childNodes[1]
+                                      .textContent;
                             }
                             // đếm like khi cmtchild1 cũ không có hình
                           }
@@ -680,16 +724,18 @@ module.exports = async function getdata(page, cmt_lengths) {
                                 ? 1
                                 : children_div[0].parentNode.parentNode.childNodes[1].textContent;
                           } else if (
-                            children_div[0].parentNode.parentNode.parentNode.parentNode.parentNode.childNodes[1]
-                              .childNodes[0].childNodes[0].childNodes[1]
+                            children_div[0].parentNode.parentNode.parentNode.parentNode.parentNode
+                              .childNodes[1].childNodes[0].childNodes[0].childNodes[1]
                           ) {
                             //đếm like khi cmtchild1 mới không có hình
                             count_like_cmtchild =
-                              children_div[0].parentNode.parentNode.parentNode.parentNode.parentNode.childNodes[1]
-                                .childNodes[0].childNodes[0].childNodes[1].textContent == ''
+                              children_div[0].parentNode.parentNode.parentNode.parentNode.parentNode
+                                .childNodes[1].childNodes[0].childNodes[0].childNodes[1]
+                                .textContent == ''
                                 ? 1
-                                : children_div[0].parentNode.parentNode.parentNode.parentNode.parentNode.childNodes[1]
-                                    .childNodes[0].childNodes[0].childNodes[1].textContent;
+                                : children_div[0].parentNode.parentNode.parentNode.parentNode
+                                    .parentNode.childNodes[1].childNodes[0].childNodes[0]
+                                    .childNodes[1].textContent;
                           }
 
                           // lấy thông tin cmt
@@ -698,7 +744,8 @@ module.exports = async function getdata(page, cmt_lengths) {
                               if (child.nodeName == 'SPAN' && index == 0) {
                                 user_cmtchild_href = child.childNodes[0].childNodes[0].href;
                                 user_name_cmtchild = child.childNodes[0].childNodes[0].innerText;
-                                user_cmtchild_id = child.childNodes[0].childNodes[0].href.split('/')[6];
+                                user_cmtchild_id =
+                                  child.childNodes[0].childNodes[0].href.split('/')[6];
                               } else if (child.nodeName == 'DIV') {
                                 for (let l = 0; l < child.childNodes[0].childNodes.length; l++) {
                                   cotent_cmtchild += child.childNodes[0].childNodes[l].innerText;
@@ -710,7 +757,8 @@ module.exports = async function getdata(page, cmt_lengths) {
                               if (child.nodeName == 'SPAN' && index == 0) {
                                 user_cmtchild_href = child.childNodes[0].childNodes[0].href;
                                 user_name_cmtchild = child.childNodes[0].childNodes[0].innerText;
-                                user_cmtchild_id = child.childNodes[0].childNodes[0].href.split('/')[6];
+                                user_cmtchild_id =
+                                  child.childNodes[0].childNodes[0].href.split('/')[6];
                               } else if (child.nodeName == 'DIV') {
                                 for (let l = 0; l < child.childNodes[0].childNodes.length; l++) {
                                   cotent_cmtchild += child.childNodes[0].childNodes[l].innerText;
@@ -739,7 +787,8 @@ module.exports = async function getdata(page, cmt_lengths) {
                             elementsss.childNodes[m].childNodes[1] &&
                             elementsss.childNodes[m].childNodes[1].className == ''
                           ) {
-                            children2 = elementsss.childNodes[m].childNodes[1].childNodes[0].childNodes;
+                            children2 =
+                              elementsss.childNodes[m].childNodes[1].childNodes[0].childNodes;
                             console.log(children2);
                             for (let n = 0; n < children2.length; n++) {
                               try {
@@ -754,12 +803,20 @@ module.exports = async function getdata(page, cmt_lengths) {
                                     element.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes.forEach(
                                       (child, index) => {
                                         if (child.nodeName == 'SPAN' && index == 0) {
-                                          user_cmtchild_href = child.childNodes[0].childNodes[0].href;
-                                          user_name_cmtchild = child.childNodes[0].childNodes[0].innerText;
-                                          user_cmtchild_id = child.childNodes[0].childNodes[0].href.split('/')[6];
+                                          user_cmtchild_href =
+                                            child.childNodes[0].childNodes[0].href;
+                                          user_name_cmtchild =
+                                            child.childNodes[0].childNodes[0].innerText;
+                                          user_cmtchild_id =
+                                            child.childNodes[0].childNodes[0].href.split('/')[6];
                                         } else if (child.nodeName == 'DIV') {
-                                          for (let l = 0; i < child.childNodes[0].childNodes.length; l++) {
-                                            cotent_cmtchild += child.childNodes[0].childNodes[l].innerText;
+                                          for (
+                                            let l = 0;
+                                            i < child.childNodes[0].childNodes.length;
+                                            l++
+                                          ) {
+                                            cotent_cmtchild +=
+                                              child.childNodes[0].childNodes[l].innerText;
                                           }
                                         }
                                       }
@@ -769,24 +826,28 @@ module.exports = async function getdata(page, cmt_lengths) {
                                     if (element.nodeName == 'DIV' && index == 2) {
                                       if (children22[2].childNodes[0].childNodes.length > 1) {
                                         count_like_cmtchild2 =
-                                          children22[2].childNodes[0].childNodes[1].textContent == ''
+                                          children22[2].childNodes[0].childNodes[1].textContent ==
+                                          ''
                                             ? 1
                                             : children22[1].childNodes[0].childNodes[1].textContent;
                                       }
 
                                       imgComment_cmt =
-                                        children22[2].childNodes[0].childNodes[1].childNodes[0].childNodes[0]
-                                          .childNodes[0].childNodes.length > 2
-                                          ? children22[2].childNodes[0].childNodes[1].childNodes[0].childNodes[0]
-                                              .childNodes[0].childNodes[0].childNodes[0].childNodes[0].currentSrc
+                                        children22[2].childNodes[0].childNodes[1].childNodes[0]
+                                          .childNodes[0].childNodes[0].childNodes.length > 2
+                                          ? children22[2].childNodes[0].childNodes[1].childNodes[0]
+                                              .childNodes[0].childNodes[0].childNodes[0]
+                                              .childNodes[0].childNodes[0].currentSrc
                                           : '';
                                     } else {
                                       // đếm like khi không có hình
                                       if (children22[1].childNodes[0].childNodes[0].childNodes[1]) {
                                         count_like_cmtchild2 =
-                                          children22[1].childNodes[0].childNodes[0].childNodes[1].textContent == ''
+                                          children22[1].childNodes[0].childNodes[0].childNodes[1]
+                                            .textContent == ''
                                             ? 1
-                                            : children22[1].childNodes[0].childNodes[0].childNodes[1].textContent;
+                                            : children22[1].childNodes[0].childNodes[0]
+                                                .childNodes[1].textContent;
                                       }
                                     }
                                     // kiểm tra comments child 2 cũ thì làm dưới
@@ -795,25 +856,34 @@ module.exports = async function getdata(page, cmt_lengths) {
                                     if (children22.length > 2) {
                                       if (children22[1].childNodes[0].childNodes.length > 1) {
                                         count_like_cmtchild2 =
-                                          children22[1].childNodes[0].childNodes[1].textContent == ''
+                                          children22[1].childNodes[0].childNodes[1].textContent ==
+                                          ''
                                             ? 1
                                             : children22[1].childNodes[0].childNodes[1].textContent;
                                       }
-                                      imgComment_cmt = children22[1].childNodes[0].childNodes[0].childNodes[0]
-                                        .childNodes[0].childNodes[0]
-                                        ? children22[1].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                                            .childNodes[0].childNodes[0].currentSrc
+                                      imgComment_cmt = children22[1].childNodes[0].childNodes[0]
+                                        .childNodes[0].childNodes[0].childNodes[0]
+                                        ? children22[1].childNodes[0].childNodes[0].childNodes[0]
+                                            .childNodes[0].childNodes[0].childNodes[0].currentSrc
                                         : '';
                                       // lấy thông tin khi có hình
                                       children22[0].childNodes[0].childNodes[0].childNodes[0].childNodes.forEach(
                                         (child, index) => {
                                           if (child.nodeName == 'SPAN' && index == 0) {
-                                            user_cmtchild_href = child.childNodes[0].childNodes[0].href;
-                                            user_name_cmtchild = child.childNodes[0].childNodes[0].innerText;
-                                            user_cmtchild_id = child.childNodes[0].childNodes[0].href.split('/')[6];
+                                            user_cmtchild_href =
+                                              child.childNodes[0].childNodes[0].href;
+                                            user_name_cmtchild =
+                                              child.childNodes[0].childNodes[0].innerText;
+                                            user_cmtchild_id =
+                                              child.childNodes[0].childNodes[0].href.split('/')[6];
                                           } else if (child.nodeName == 'DIV') {
-                                            for (let l = 0; l < child.childNodes[0].childNodes.length; l++) {
-                                              cotent_cmtchild += child.childNodes[0].childNodes[l].innerText;
+                                            for (
+                                              let l = 0;
+                                              l < child.childNodes[0].childNodes.length;
+                                              l++
+                                            ) {
+                                              cotent_cmtchild +=
+                                                child.childNodes[0].childNodes[l].innerText;
                                             }
                                           }
                                         }
@@ -821,23 +891,36 @@ module.exports = async function getdata(page, cmt_lengths) {
                                     } else {
                                       // đếm like khi không có hình
 
-                                      if (children22[0].childNodes[0].childNodes[0].childNodes.length > 1) {
+                                      if (
+                                        children22[0].childNodes[0].childNodes[0].childNodes
+                                          .length > 1
+                                      ) {
                                         console.log('children22', children22);
                                         count_like_cmtchild2 =
-                                          children22[0].childNodes[0].childNodes[0].childNodes[1].textContent == ''
+                                          children22[0].childNodes[0].childNodes[0].childNodes[1]
+                                            .textContent == ''
                                             ? 1
-                                            : children22[0].childNodes[0].childNodes[0].childNodes[1].textContent;
+                                            : children22[0].childNodes[0].childNodes[0]
+                                                .childNodes[1].textContent;
                                       }
                                       // lấy thông tin cmt child 2
                                       children22[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes.forEach(
                                         (child, index) => {
                                           if (child.nodeName == 'SPAN' && index == 0) {
-                                            user_cmtchild_href = child.childNodes[0].childNodes[0].href;
-                                            user_name_cmtchild = child.childNodes[0].childNodes[0].innerText;
-                                            user_cmtchild_id = child.childNodes[0].childNodes[0].href.split('/')[6];
+                                            user_cmtchild_href =
+                                              child.childNodes[0].childNodes[0].href;
+                                            user_name_cmtchild =
+                                              child.childNodes[0].childNodes[0].innerText;
+                                            user_cmtchild_id =
+                                              child.childNodes[0].childNodes[0].href.split('/')[6];
                                           } else if (child.nodeName == 'DIV') {
-                                            for (var l = 0; l < child.childNodes[0].childNodes.length; l++) {
-                                              cotent_cmtchild += child.childNodes[0].childNodes[l].innerText;
+                                            for (
+                                              var l = 0;
+                                              l < child.childNodes[0].childNodes.length;
+                                              l++
+                                            ) {
+                                              cotent_cmtchild +=
+                                                child.childNodes[0].childNodes[l].innerText;
                                             }
                                           }
                                         }
@@ -876,69 +959,82 @@ module.exports = async function getdata(page, cmt_lengths) {
                   });
                 }
               } else {
-                console.log('cmt _1 ', elementss.childNodes[0].childNodes[0].childNodes[1].childNodes);
+                console.log(
+                  'cmt _1 ',
+                  elementss.childNodes[0].childNodes[0].childNodes[1].childNodes
+                );
                 // cũ nè
-                if (elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[0].childNodes[0]) {
+                if (
+                  elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[0].childNodes[0]
+                ) {
                   divcommment =
-                    elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes[0]
-                      .childNodes[0].childNodes;
+                    elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[0].childNodes[0]
+                      .childNodes[0].childNodes[0].childNodes;
                   if (elementss.childNodes[0].childNodes[0].childNodes[1].childNodes.length > 2) {
                     if (
-                      elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[1].childNodes[0].childNodes
-                        .length > 1
+                      elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[1]
+                        .childNodes[0].childNodes.length > 1
                     ) {
                       count_like_cmt =
-                        elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[1].childNodes[0].childNodes[1]
-                          .textContent == ''
+                        elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[1]
+                          .childNodes[0].childNodes[1].textContent == ''
                           ? 1
-                          : elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[1].childNodes[0]
-                              .childNodes[1].textContent;
+                          : elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[1]
+                              .childNodes[0].childNodes[1].textContent;
                     }
-                    imgComment = elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[1].childNodes[0]
-                      .childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                      ? elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[1].childNodes[0].childNodes[0]
-                          .childNodes[0].childNodes[0].childNodes[0].childNodes[0].currentSrc
+                    imgComment = elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[1]
+                      .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                      ? elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[1]
+                          .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                          .childNodes[0].currentSrc
                       : '';
                   }
                   if (
-                    elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes[0]
-                      .childNodes.length == 2
+                    elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[0].childNodes[0]
+                      .childNodes[0].childNodes.length == 2
                   ) {
                     count_like_cmt =
-                      elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes[0]
-                        .childNodes[1].textContent == ''
+                      elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[0]
+                        .childNodes[0].childNodes[0].childNodes[1].textContent == ''
                         ? 1
-                        : elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes[0]
-                            .childNodes[1].textContent;
+                        : elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[0]
+                            .childNodes[0].childNodes[0].childNodes[1].textContent;
                   }
                 } else {
                   // cmt mới
                   divcommment =
-                    elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[1].childNodes[0].childNodes[0]
-                      .childNodes[0].childNodes;
-                  if (elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[2].nodeName == 'DIV') {
+                    elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[1].childNodes[0]
+                      .childNodes[0].childNodes[0].childNodes;
+                  if (
+                    elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[2].nodeName ==
+                    'DIV'
+                  ) {
                     imgComment =
-                      elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[2].childNodes[0].childNodes[0]
-                        .childNodes[0].childNodes[0].childNodes[0].childNodes[0].currentSrc;
-                    if (elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[2].childNodes[0].childNodes[1]) {
+                      elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[2]
+                        .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                        .childNodes[0].currentSrc;
+                    if (
+                      elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[2]
+                        .childNodes[0].childNodes[1]
+                    ) {
                       count_like_cmt =
-                        elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[2].childNodes[0].childNodes[1]
-                          .textContent == ''
+                        elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[2]
+                          .childNodes[0].childNodes[1].textContent == ''
                           ? 1
-                          : elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[2].childNodes[0]
-                              .childNodes[1].textContent;
+                          : elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[2]
+                              .childNodes[0].childNodes[1].textContent;
                     }
                   } else {
                     if (
-                      elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[1].childNodes[0].childNodes[0]
-                        .childNodes[1]
+                      elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[1]
+                        .childNodes[0].childNodes[0].childNodes[1]
                     ) {
                       count_like_cmt =
-                        elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[1].childNodes[0].childNodes[0]
-                          .childNodes[1].textContent == ''
+                        elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[1]
+                          .childNodes[0].childNodes[0].childNodes[1].textContent == ''
                           ? 1
-                          : elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[1].childNodes[0]
-                              .childNodes[0].childNodes[1].textContent;
+                          : elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[1]
+                              .childNodes[0].childNodes[0].childNodes[1].textContent;
                     }
                   }
                 }
@@ -1052,7 +1148,9 @@ module.exports = async function getdata(page, cmt_lengths) {
                     console.log(m);
                     resultvideos.push(m);
                   } catch (d) {
-                    console.log('\u26A0\uFE0FFailed to extract data. Maybe this script is no longer effective.');
+                    console.log(
+                      '\u26A0\uFE0FFailed to extract data. Maybe this script is no longer effective.'
+                    );
                   }
                 })
                 .catch((a) => {
