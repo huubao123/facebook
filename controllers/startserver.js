@@ -130,16 +130,12 @@ schedule.process(async (job, done) => {
       let day = d.getDay() > 6 ? 6 : d.getDay();
       schedule = {
         repeat: { cron: `${minute} ${hour} * * ${day}` },
-        jobId: jobId,
       };
       await week.add({ data: datas.data.data }, schedule);
     } else if (schedules == 3) {
       const d = new Date(detail.data.data.published_start);
       let hour = d.getHours() > 23 ? 23 : d.getHours();
       let date = d.getDate() > 28 ? 28 : d.getDate();
-      if (date > 28) {
-        date = 28;
-      }
       schedule = {
         repeat: { cron: `0 ${hour} ${date} * *` },
       };
