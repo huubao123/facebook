@@ -20,20 +20,31 @@ module.exports = async function (req, res, next) {
       };
       await queue.add({ data: req.body, jobId: jobId }, schedule);
     } else if (req.body.schedule == 1) {
+      const d = new Date(req.body.published_start);
+      let hour = d.getHours() > 23 ? 23 : d.getHours();
+      let minute = d.getMinutes() > 59 ? 59 : d.getMinutes();
       schedule = {
-        repeat: { cron: '0 17 * * *' },
+        repeat: { cron: `${minute} ${hour} * * *` },
         jobId: jobId,
       };
+
       await day.add({ data: req.body, jobId: jobId }, schedule);
     } else if (req.body.schedule == 2) {
+      const d = new Date(req.body.published_start);
+      let hour = d.getHours() > 23 ? 23 : d.getHours();
+      let minute = d.getMinutes() > 59 ? 59 : d.getMinutes();
+      let day = d.getDay() > 6 ? 6 : d.getDay();
       schedule = {
-        repeat: { cron: '0 0 * * 1' },
+        repeat: { cron: `${minute} ${hour} * * ${day}` },
         jobId: jobId,
       };
       await week.add({ data: req.body, jobId: jobId }, schedule);
     } else if (req.body.schedule == 3) {
+      const d = new Date(req.body.published_start);
+      let hour = d.getHours() > 23 ? 23 : d.getHours();
+      let date = d.getDate() > 28 ? 28 : d.getDate();
       schedule = {
-        repeat: { cron: '0 0 1 * *' },
+        repeat: { cron: `0 ${hour} ${date} * *` },
         jobId: jobId,
       };
       await mount.add({ data: req.body, jobId: jobId }, schedule);
