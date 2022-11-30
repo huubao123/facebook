@@ -9,6 +9,7 @@ const post_filter_no_Schema = mongoose.Schema({
   create_at: Date,
   status: String,
   filter: Boolean,
+  length_comments: Number,
 });
 
 const Post_filter_no = mongoose.model('Post_filter_no', post_filter_no_Schema);

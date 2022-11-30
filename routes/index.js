@@ -34,7 +34,7 @@ router.post('/add', video);
 router.get('/crawl', startserver);
 router.post('/auto', async function (req, res, next) {
   console.log(req.body);
-  if (!req.body.auto_crawl) {
+  if (req.body.status === true) {
     await update.add(
       {},
       {
@@ -46,7 +46,6 @@ router.post('/auto', async function (req, res, next) {
     await update.clean(0, 'active');
     await update.clean(0, 'completed');
     await update.clean(0, 'delayed');
-    await update.clean(0, 'failed');
   }
   res.send('ok');
 });
