@@ -28,21 +28,21 @@ module.exports = async function (req, res, next) {
       }
     });
     const currentTime = new Date().getTime();
-    const processAt = new Date(req.body.datetime).getTime();
+    const processAt = new Date(req.body.data.datetime).getTime();
     const delay = processAt - currentTime;
     let schedule = {};
-    if (!req.body.published_start) {
+    if (!req.body.data.published_start) {
       res.status(404).send('thiếu published_start');
       return;
     }
-    if (req.body.schedule == 0) {
+    if (req.body.data.schedule == 0) {
       schedule = {
         delay: delay,
         jobId: jobId,
       };
       await queue.add({ data: req.body, jobId: jobId }, schedule);
-    } else if (req.body.schedule == 1) {
-      const d = new Date(req.body.published_start);
+    } else if (req.body.data.schedule == 1) {
+      const d = new Date(req.body.data.published_start);
       let hour = d.getHours() > 23 ? 23 : d.getHours();
       let minute = d.getMinutes() > 59 ? 59 : d.getMinutes();
       schedule = {
@@ -51,8 +51,8 @@ module.exports = async function (req, res, next) {
       };
 
       await day.add({ data: req.body, jobId: jobId }, schedule);
-    } else if (req.body.schedule == 2) {
-      const d = new Date(req.body.published_start);
+    } else if (req.body.data.schedule == 2) {
+      const d = new Date(req.body.data.published_start);
       let hour = d.getHours() > 23 ? 23 : d.getHours();
       let minute = d.getMinutes() > 59 ? 59 : d.getMinutes();
       let day = d.getDay() > 6 ? 6 : d.getDay();
@@ -61,8 +61,8 @@ module.exports = async function (req, res, next) {
         jobId: jobId,
       };
       await week.add({ data: req.body, jobId: jobId }, schedule);
-    } else if (req.body.schedule == 3) {
-      const d = new Date(req.body.published_start);
+    } else if (req.body.data.schedule == 3) {
+      const d = new Date(req.body.data.published_start);
       let hour = d.getHours() > 23 ? 23 : d.getHours();
       let date = d.getDate() > 28 ? 28 : d.getDate();
       schedule = {
