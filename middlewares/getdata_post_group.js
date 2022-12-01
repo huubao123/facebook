@@ -45,8 +45,8 @@ module.exports = async function getdata(page, cmt_lengths) {
     let iscomment = true;
     let iscate = true;
     let contens = '';
+    let post = document.querySelectorAll('[role="main"]')[2];
     try {
-      let post = document.querySelectorAll('[role="main"]')[2];
       if (!post) {
         let post1 =
           document.querySelectorAll('[role="article"]')[0].childNodes[0].childNodes[0].childNodes[0]
@@ -108,6 +108,12 @@ module.exports = async function getdata(page, cmt_lengths) {
         }
       }
     } catch (e) {
+      let div = document.querySelectorAll('div');
+      div.forEach(async (item) => {
+        if (item.childNodes.length > 13) {
+          contens = item.childNodes[7].childNodes[0];
+        }
+      });
       ismain = false;
       console.log('érroe main');
     }
