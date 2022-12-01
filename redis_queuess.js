@@ -105,6 +105,8 @@ update.process(async (job, done) => {
     const delay = processAt - currentTime;
     let schedule = {};
     if (schedules == 0) {
+      await queue.getJob(element.short_description.split('/')[4]);
+      await job.remove();
       schedule = {
         jobId: element.short_description.split('/')[4],
         delay: delay,
