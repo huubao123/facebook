@@ -407,11 +407,13 @@ module.exports = async function main(req) {
                     : parseInt(item.countLike.toString().split(' ')[0].replace('K', '000'))
                   : 0,
                 user_id: item.userIDComment,
+                date: item.date,
                 user_name: item.usernameComment,
                 imgComment: item.imageComment ? item.imageComment : '',
                 children: item.children
                   ? item.children.map((child) => ({
                       content: child.contentComment,
+                      date: child.date,
                       count_like: child.countLike
                         ? child.countLike.toString().split(' ')[0].indexOf(',') > -1
                           ? parseInt(child.countLike.toString().split(' ')[0].replace('K', '00').replace(',', ''))
