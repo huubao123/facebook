@@ -116,6 +116,9 @@ module.exports = async function main(req) {
       devtools: true,
       executablePath: process.env.executablePath,
     });
+    const context = browser.defaultBrowserContext();
+    //        URL                  An array of permissions
+    context.overridePermissions('https://www.facebook.com', ['geolocation', 'notifications']);
     const page = await browser.newPage();
     await page.setDefaultNavigationTimeout(60000);
     const pages = await browser.pages();

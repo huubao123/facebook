@@ -19,6 +19,7 @@ module.exports = async function getdata(page, cmt_lengths) {
       user_id =
       post_id =
       cotent_cmt =
+      date_cmt = 
       user_cmt_id =
       user_name_cmt =
       user_cmt_href =
@@ -28,12 +29,13 @@ module.exports = async function getdata(page, cmt_lengths) {
       user_cmtchild_href =
       cotent_cmt_text =
       cotent_cmtchild_text =
+      date_cmtchild =
       imgComment =
         '');
     let count_comments_config = 0;
     let token = require('DTSGInitialData').token;
     let count_like_cmt = (count_like_cmtchild = count_like_cmtchild2 = 0);
-    //
+    
     // document.querySelectorAll('div').forEach((e) => {
     //   if (e.hasAttribute('aria-describedby')) {
     //     post = e[0];
@@ -429,6 +431,7 @@ module.exports = async function getdata(page, cmt_lengths) {
           element.childNodes.forEach((elementss) => {
             try {
               if (elementss.childNodes[0].childNodes.length == 2) {
+                date_cmt = (elementss.childNodes[0].querySelectorAll('a[role="link"]')[elementss.childNodes[0].querySelectorAll('a[role="link"]').length -1].innerText)
                 if (
                   elementss.childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes[0]
                     .children[0].childNodes[0].childNodes[0].childNodes &&
@@ -563,6 +566,9 @@ module.exports = async function getdata(page, cmt_lengths) {
                     elementss.childNodes[1].childNodes[0].childNodes.forEach((cmt_old) => {
                       if (cmt_old.nodeName == 'UL') {
                         for (let m = 0; m < cmt_old.childNodes.length; m++) {
+                          date_cmtchild = ('cmt ne',cmt_old.childNodes[
+                            m
+                          ].childNodes[0].childNodes[1])
                           try {
                             cmt_old.childNodes[
                               m
@@ -617,6 +623,7 @@ module.exports = async function getdata(page, cmt_lengths) {
                               usernameComment: user_name_cmtchild,
                               userIDComment: user_cmtchild_id,
                               contentComment: cotent_cmtchild,
+                              date : date_cmtchild,
                               imageComment: imgComment_cmt == '' ? null : imgComment_cmt,
                               countLike: count_like_cmtchild,
                             });
@@ -626,6 +633,7 @@ module.exports = async function getdata(page, cmt_lengths) {
                               user_cmtchild_id =
                               cotent_cmtchild =
                               imgComment_cmt =
+                              date_cmtchild =
                                 '';
                             count_like_cmtchild = 0;
                           } catch (e) {
@@ -669,6 +677,8 @@ module.exports = async function getdata(page, cmt_lengths) {
                                   .childNodes[0].childNodes;
                           }
                           // cmtchild1 mới  cũ có hình ảnh
+                          date_cmtchild = (elementsss.childNodes[m].childNodes[0].querySelectorAll('a[role="link"]')[elementsss.childNodes[m].childNodes[0].querySelectorAll('a[role="link"]').length -1].innerText)
+
                           if (
                             children_div[0].parentNode.parentNode.parentNode.parentNode.parentNode
                               .childNodes.length == 3
@@ -776,6 +786,8 @@ module.exports = async function getdata(page, cmt_lengths) {
                           children.push({
                             usernameComment: user_name_cmtchild,
                             userIDComment: user_cmtchild_id,
+                            date: date_cmtchild,
+
                             contentComment: cotent_cmtchild,
                             imageComment: imgComment_cmt == '' ? null : imgComment_cmt,
                             countLike: count_like_cmtchild,
@@ -785,6 +797,7 @@ module.exports = async function getdata(page, cmt_lengths) {
                             user_name_cmtchild =
                             user_cmtchild_id =
                             cotent_cmtchild =
+                            date_cmtchild = 
                             imgComment_cmt =
                               '';
                           count_like_cmtchild = 0;
@@ -797,6 +810,8 @@ module.exports = async function getdata(page, cmt_lengths) {
                               elementsss.childNodes[m].childNodes[1].childNodes[0].childNodes;
                             console.log(children2);
                             for (let n = 0; n < children2.length; n++) {
+                              date_cmtchild = (children2[0].querySelectorAll('a[role="link"]')[children2[0].querySelectorAll('a[role="link"]').length -1].innerText)
+
                               try {
                                 children22 =
                                   children2[n].childNodes[0].childNodes[
@@ -939,6 +954,7 @@ module.exports = async function getdata(page, cmt_lengths) {
                                   usernameComment: user_name_cmtchild,
                                   userIDComment: user_cmtchild_id,
                                   contentComment: cotent_cmtchild,
+                                  date : date_cmtchild,
                                   imageComment: imgComment_cmt == '' ? null : imgComment_cmt,
                                   countLike: count_like_cmtchild2,
                                 });
@@ -948,6 +964,7 @@ module.exports = async function getdata(page, cmt_lengths) {
                                   user_cmtchild_id =
                                   cotent_cmtchild =
                                   imgComment_cmt =
+                                  date_cmtchild = 
                                     '';
                                 count_like_cmtchild2 = 0;
                               } catch (err) {
@@ -969,6 +986,8 @@ module.exports = async function getdata(page, cmt_lengths) {
                   'cmt _1 ',
                   elementss.childNodes[0].childNodes[0].childNodes[1].childNodes
                 );
+                date_cmt =(elementss.childNodes[0].childNodes[0].childNodes[1].querySelectorAll('[role="link"]')[elementss.childNodes[0].childNodes[0].childNodes[1].querySelectorAll('[role="link"]').length -1].innerText)
+
                 // cũ nè
                 if (
                   elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[0].childNodes[0]
@@ -1075,13 +1094,14 @@ module.exports = async function getdata(page, cmt_lengths) {
                 contentComment: cotent_cmt,
                 usernameComment: user_name_cmt,
                 userIDComment: user_cmt_id,
+                date : date_cmt,
                 //user_cmt_href: user_cmt_href,
                 imageComment: imgComment == '' ? null : imgComment,
                 countLike: count_like_cmt,
                 children: children,
               });
               count_comments_config += 1;
-              cotent_cmt = user_cmt_id = user_name_cmt = user_cmt_href = imgComment = '';
+             date_cmt = cotent_cmt = user_cmt_id = user_name_cmt = user_cmt_href = imgComment = '';
               count_like_cmt = 0;
               children = [];
             } catch (error) {
@@ -1092,6 +1112,7 @@ module.exports = async function getdata(page, cmt_lengths) {
           });
         }
       });
+      console.log(comments)
       post_id = posthref.split('/')[6];
       let resultvideos = [];
       try {
@@ -1215,6 +1236,7 @@ module.exports = async function getdata(page, cmt_lengths) {
           shares =
           post_id =
           time =
+          date_cmt = 
             '');
       video = [];
       comments = [];
