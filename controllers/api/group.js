@@ -52,12 +52,28 @@ async function autoScroll(page, lengthss, like, comment, share) {
         let totalHeight = 0;
         let distance = 500;
         let timer = setInterval(async () => {
+          let post = document.querySelectorAll('[role="feed"]')[0].childNodes;
           let post_length = document.querySelectorAll('[role="feed"]')[0].childNodes.length;
           console.log(lengthss, like, comment, share);
           console.log(post_length);
           let scrollHeight = document.body.scrollHeight;
           window.scrollBy(0, distance);
           totalHeight += distance;
+          for (let i = 1; i < post_length; i++) {
+            let lengths =
+              post[i].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                .childNodes[0].childNodes[0].childNodes[7] !== undefined
+                ? post[i].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                    .childNodes[0].childNodes[0].childNodes[0].childNodes[7].childNodes[0].childNodes[0].childNodes
+                : post[i].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                    .childNodes[0].childNodes[0].childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes;
+            console.log(lengths);
+            lengths[2].querySelectorAll('div').forEach(async (element) => {
+              if (element.innerText.indexOf('Xem thêm') !== -1) {
+                await element.click();
+              }
+            });
+          }
 
           if (
             window.performance.memory.jsHeapSizeLimit - window.performance.memory.jsHeapSizeLimit / 10 <
@@ -286,7 +302,7 @@ module.exports = async function main(req) {
     });
 
     await autoScroll(page, lengths, like, comment, share);
-
+    return;
     await getlink(page, conten_length, like, comment, share).then(async function (result) {
       let proces = 0;
       await browser.close();
