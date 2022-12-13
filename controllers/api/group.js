@@ -671,9 +671,9 @@ async function getlink(page, conten_length, like, comment, share) {
             post[i].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
               .childNodes[0].childNodes[0].childNodes[7] !== undefined
               ? post[i].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                  .childNodes[0].childNodes[0].childNodes[0].childNodes[7].childNodes[0].childNodes
+                  .childNodes[0].childNodes[0].childNodes[0].childNodes[7].childNodes[0].childNodes[0].childNodes
               : post[i].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                  .childNodes[0].childNodes[0].childNodes[0].childNodes[1].childNodes[0].childNodes;
+                  .childNodes[0].childNodes[0].childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes;
           lengths[2].childNodes.forEach((element, index) => {
             if (element.className == '') {
               element.childNodes[0].childNodes.forEach(function (node) {
