@@ -1,6 +1,6 @@
 const Queue = require('bull');
 const axios = require('axios');
-const queue = new Queue('group', { redis: { port: 6379, host: '127.0.0.1' } });
+const queue = new Queue('queue', { redis: { port: 6379, host: '127.0.0.1' } });
 const pagequeue = new Queue('page', { redis: { port: 6379, host: '127.0.0.1' } });
 const page1queue = new Queue('page1', { redis: { port: 6379, host: '127.0.0.1' } });
 const schedule = new Queue('schedule', { redis: { port: 6379, host: '127.0.0.1' } });
@@ -14,7 +14,7 @@ const group = require('././controllers/api/group');
 const group1 = require('././controllers/api/group1');
 const dayjs = require('dayjs');
 const headers = {
-  Authorization: '6WBZVw57bKtA6jicQDh2aS1a6H8rsGvQ',
+  Authorization: 'J12sMWQnZSYCZtPGPWzImcbIMyO8K3yb',
 };
 
 queue.process(async (job, done) => {
@@ -82,9 +82,7 @@ update.process(async (job, done) => {
         data: {
           data: {
             link: element.short_description ? element.short_description : '',
-            lengths: detail.data.data.formData.custom_fields.count
-              ? detail.data.data.formData.custom_fields.count
-              : 1,
+            lengths: detail.data.data.formData.custom_fields.count ? detail.data.data.formData.custom_fields.count : 1,
             length_comment: detail.data.data.formData.custom_fields.filter.length_comment
               ? detail.data.data.formData.custom_fields.filter.length_comment
               : 1,
@@ -120,16 +118,11 @@ update.process(async (job, done) => {
           jobId: element.short_description.split('/')[4],
           delay: delay,
         };
-        await queue.add(
-          { data: datas.data.data, jobId: element.short_description.split('/')[4] },
-          schedule
-        );
+        await queue.add({ data: datas.data.data, jobId: element.short_description.split('/')[4] }, schedule);
       } else if (schedules == 1) {
         const repeatableJobs = await day.getRepeatableJobs();
 
-        const foundJob = repeatableJobs.find(
-          (job) => job.id === element.short_description.split('/')[4]
-        );
+        const foundJob = repeatableJobs.find((job) => job.id === element.short_description.split('/')[4]);
         if (foundJob) {
           await day.removeRepeatableByKey(foundJob.key);
         }
@@ -142,16 +135,11 @@ update.process(async (job, done) => {
           repeat: { cron: `${minute} ${hour} * * *` },
         };
 
-        await day.add(
-          { data: datas.data.data, jobId: element.short_description.split('/')[4] },
-          schedule
-        );
+        await day.add({ data: datas.data.data, jobId: element.short_description.split('/')[4] }, schedule);
       } else if (schedules == 2) {
         const repeatableJobs = await week.getRepeatableJobs();
 
-        const foundJob = repeatableJobs.find(
-          (job) => job.id === element.short_description.split('/')[4]
-        );
+        const foundJob = repeatableJobs.find((job) => job.id === element.short_description.split('/')[4]);
         if (foundJob) {
           await week.removeRepeatableByKey(foundJob.key);
         }
@@ -164,16 +152,11 @@ update.process(async (job, done) => {
           jobId: element.short_description.split('/')[4],
           repeat: { cron: `${minute} ${hour} * * ${day}` },
         };
-        await week.add(
-          { data: datas.data.data, jobId: element.short_description.split('/')[4] },
-          schedule
-        );
+        await week.add({ data: datas.data.data, jobId: element.short_description.split('/')[4] }, schedule);
       } else if (schedules == 3) {
         const repeatableJobs = await mount.getRepeatableJobs();
 
-        const foundJob = repeatableJobs.find(
-          (job) => job.id === element.short_description.split('/')[4]
-        );
+        const foundJob = repeatableJobs.find((job) => job.id === element.short_description.split('/')[4]);
         if (foundJob) {
           await mount.removeRepeatableByKey(foundJob.key);
         }
@@ -184,10 +167,7 @@ update.process(async (job, done) => {
           jobId: element.short_description.split('/')[4],
           repeat: { cron: `0 ${hour} ${date} * *` },
         };
-        await mount.add(
-          { data: datas.data.data, jobId: element.short_description.split('/')[4] },
-          schedule
-        );
+        await mount.add({ data: datas.data.data, jobId: element.short_description.split('/')[4] }, schedule);
       }
     }
   });

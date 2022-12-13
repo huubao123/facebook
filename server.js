@@ -34,7 +34,7 @@ const { BullAdapter } = require('@bull-board/api/bullAdapter');
 const { BullMQAdapter } = require('@bull-board/api/bullMQAdapter');
 const db = require('./data');
 const { ExpressAdapter } = require('@bull-board/express');
-const group = new Queue('group', {
+const group = new Queue('queue', {
   redis: { port: 6379, host: '127.0.0.1' },
 }); // if you have a special connection to redis.
 const page = new Queue('page', {
