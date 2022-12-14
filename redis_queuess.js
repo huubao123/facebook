@@ -10,6 +10,7 @@ const test = new Queue('test', { redis: { port: 6379, host: '127.0.0.1' } });
 const day = new Queue('day', { redis: { port: 6379, host: '127.0.0.1' } });
 const mount = new Queue('mount', { redis: { port: 6379, host: '127.0.0.1' } });
 const week = new Queue('week', { redis: { port: 6379, host: '127.0.0.1' } });
+const del = new Queue('del', { redis: { port: 6379, host: '127.0.0.1' } });
 
 const private_queue = new Queue('private_queue', { redis: { port: 6379, host: '127.0.0.1' } });
 const private_day = new Queue('private_day', { redis: { port: 6379, host: '127.0.0.1' } });
@@ -74,6 +75,31 @@ private_week.process(async (job, done) => {
 });
 private_mount.process(async (job, done) => {
   await private(job);
+  done();
+});
+del.process(async (job, done) => {
+  let post = '';
+  try {
+    post = await axios({
+      method: 'get',
+      url: `https://mgs-api-v2.internal.mangoads.com.vn/api/v1/posts?limit=100000000&page=1&search[type:is]=device-crawl-1&sort=created_at&search_type=and`,
+      headers: headers,
+    });
+  } catch (e) {
+    return done(e);
+  }
+
+  post.data.data?.forEach(async (element) => {
+    if (element.is_active == 0) {
+      try {
+        await deletejob(element.short_description.split('/')[4]);
+        let p = await private_day.getJob(element.short_description.split('/')[4]);
+        let nop = await day.getJob(element.short_description.split('/')[4]);
+        await p?.remove();
+        await nop?.remove();
+      } catch (e) {}
+    }
+  });
   done();
 });
 update.process(async (job, done) => {
