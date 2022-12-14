@@ -10,6 +10,13 @@ const test = new Queue('test', { redis: { port: 6379, host: '127.0.0.1' } });
 const day = new Queue('day', { redis: { port: 6379, host: '127.0.0.1' } });
 const mount = new Queue('mount', { redis: { port: 6379, host: '127.0.0.1' } });
 const week = new Queue('week', { redis: { port: 6379, host: '127.0.0.1' } });
+
+const private_queue = new Queue('private_queue', { redis: { port: 6379, host: '127.0.0.1' } });
+const private_day = new Queue('private_day', { redis: { port: 6379, host: '127.0.0.1' } });
+const private_week = new Queue('private_week', { redis: { port: 6379, host: '127.0.0.1' } });
+const private_mount = new Queue('private_mount', { redis: { port: 6379, host: '127.0.0.1' } });
+const deletejob = require('./middlewares/deletejob');
+
 const group = require('././controllers/api/group');
 const group1 = require('././controllers/api/group1');
 const dayjs = require('dayjs');
@@ -67,9 +74,9 @@ update.process(async (job, done) => {
   post.data.data?.forEach(async (element) => {
     let update = new Date(element.updated_at).getTime();
 
-    let today = new Date().getTime();
-    let pass = today - 15 * 60000;
-    if (pass < update && update < today) {
+    let today = dayjs().format('YYYY-MM-DD HH:mm:ss');
+    let pass = dayjs(new Date(today).getTime() - 15 * 60000).format('YYYY-MM-DD HH:mm:ss');
+    if (new Date(pass).getTime() < update && update < new Date(today).getTime()) {
       const detail = await axios({
         method: 'get',
         url: 'https://mgs-api-v2.internal.mangoads.com.vn/api/v1/posts/' + element.id,
@@ -111,63 +118,104 @@ update.process(async (job, done) => {
 
       const delay = processAt - currentTime;
       let schedule = {};
-      if (schedules == 0) {
-        await queue.getJob(element.short_description.split('/')[4]);
-        await job.remove();
-        schedule = {
-          jobId: element.short_description.split('/')[4],
-          delay: delay,
-        };
-        await queue.add({ data: datas.data.data, jobId: element.short_description.split('/')[4] }, schedule);
-      } else if (schedules == 1) {
-        const repeatableJobs = await day.getRepeatableJobs();
+      console.log(detail.data.data.categories.length);
+      if (detail.data.data.categories.length > 0) {
+        // group riêng tư
+        if (schedules == 0) {
+          try {
+            await deletejob(element.short_description.split('/')[4]);
+            let p = await private_day.getJob(element.short_description.split('/')[4]);
+            let nop = await day.getJob(element.short_description.split('/')[4]);
+            await p?.remove();
+            await nop?.remove();
+          } catch (e) {}
+          schedule = {
+            jobId: element.short_description.split('/')[4],
+            delay: delay,
+          };
+          await private_queue.add({ data: datas.data.data, jobId: element.short_description.split('/')[4] }, schedule);
+        } else if (schedules == 1) {
+          await deletejob(element.short_description.split('/')[4]);
+          const d = new Date(detail.data.data.published_start);
+          let hour = d.getHours() > 23 ? 23 : d.getHours();
+          let minute = d.getMinutes() > 59 ? 59 : d.getMinutes();
+          schedule = {
+            jobId: element.short_description.split('/')[4],
+            repeat: { cron: `${minute} ${hour} * * *` },
+          };
 
-        const foundJob = repeatableJobs.find((job) => job.id === element.short_description.split('/')[4]);
-        if (foundJob) {
-          await day.removeRepeatableByKey(foundJob.key);
+          await private_day.add({ data: datas.data.data, jobId: element.short_description.split('/')[4] }, schedule);
+        } else if (schedules == 2) {
+          await deletejob(element.short_description.split('/')[4]);
+
+          const d = new Date(detail.data.data.published_start);
+          let hour = d.getHours() > 23 ? 23 : d.getHours();
+          let minute = d.getMinutes() > 59 ? 59 : d.getMinutes();
+          let day = d.getDay() > 6 ? 6 : d.getDay();
+          schedule = {
+            jobId: element.short_description.split('/')[4],
+            repeat: { cron: `${minute} ${hour} * * ${day}` },
+          };
+          await private_week.add({ data: datas.data.data, jobId: element.short_description.split('/')[4] }, schedule);
+        } else if (schedules == 3) {
+          await deletejob(element.short_description.split('/')[4]);
+          const d = new Date(detail.data.data.published_start);
+          let hour = d.getHours() > 23 ? 23 : d.getHours();
+          let date = d.getDate() > 28 ? 28 : d.getDate();
+          schedule = {
+            jobId: element.short_description.split('/')[4],
+            repeat: { cron: `0 ${hour} ${date} * *` },
+          };
+          await private_mount.add({ data: datas.data.data, jobId: element.short_description.split('/')[4] }, schedule);
         }
+      } else {
+        // Group công khai
+        if (schedules == 0) {
+          try {
+            await deletejob(element.short_description.split('/')[4]);
+            let p = await private_day.getJob(element.short_description.split('/')[4]);
+            let nop = await day.getJob(element.short_description.split('/')[4]);
+            await p?.remove();
+            await nop?.remove();
+          } catch (e) {}
+          schedule = {
+            jobId: element.short_description.split('/')[4],
+            delay: delay,
+          };
+          await queue.add({ data: datas.data.data, jobId: element.short_description.split('/')[4] }, schedule);
+        } else if (schedules == 1) {
+          await deletejob(element.short_description.split('/')[4]);
+          const d = new Date(detail.data.data.published_start);
+          let hour = d.getHours() > 23 ? 23 : d.getHours();
+          let minute = d.getMinutes() > 59 ? 59 : d.getMinutes();
+          schedule = {
+            jobId: element.short_description.split('/')[4],
+            repeat: { cron: `${minute} ${hour} * * *` },
+          };
 
-        const d = new Date(detail.data.data.published_start);
-        let hour = d.getHours() > 23 ? 23 : d.getHours();
-        let minute = d.getMinutes() > 59 ? 59 : d.getMinutes();
-        schedule = {
-          jobId: element.short_description.split('/')[4],
-          repeat: { cron: `${minute} ${hour} * * *` },
-        };
-
-        await day.add({ data: datas.data.data, jobId: element.short_description.split('/')[4] }, schedule);
-      } else if (schedules == 2) {
-        const repeatableJobs = await week.getRepeatableJobs();
-
-        const foundJob = repeatableJobs.find((job) => job.id === element.short_description.split('/')[4]);
-        if (foundJob) {
-          await week.removeRepeatableByKey(foundJob.key);
+          await day.add({ data: datas.data.data, jobId: element.short_description.split('/')[4] }, schedule);
+        } else if (schedules == 2) {
+          await deletejob(element.short_description.split('/')[4]);
+          const d = new Date(detail.data.data.published_start);
+          let hour = d.getHours() > 23 ? 23 : d.getHours();
+          let minute = d.getMinutes() > 59 ? 59 : d.getMinutes();
+          let day = d.getDay() > 6 ? 6 : d.getDay();
+          schedule = {
+            jobId: element.short_description.split('/')[4],
+            repeat: { cron: `${minute} ${hour} * * ${day}` },
+          };
+          await week.add({ data: datas.data.data, jobId: element.short_description.split('/')[4] }, schedule);
+        } else if (schedules == 3) {
+          await deletejob(element.short_description.split('/')[4]);
+          const d = new Date(detail.data.data.published_start);
+          let hour = d.getHours() > 23 ? 23 : d.getHours();
+          let date = d.getDate() > 28 ? 28 : d.getDate();
+          schedule = {
+            jobId: element.short_description.split('/')[4],
+            repeat: { cron: `0 ${hour} ${date} * *` },
+          };
+          await mount.add({ data: datas.data.data, jobId: element.short_description.split('/')[4] }, schedule);
         }
-
-        const d = new Date(detail.data.data.published_start);
-        let hour = d.getHours() > 23 ? 23 : d.getHours();
-        let minute = d.getMinutes() > 59 ? 59 : d.getMinutes();
-        let day = d.getDay() > 6 ? 6 : d.getDay();
-        schedule = {
-          jobId: element.short_description.split('/')[4],
-          repeat: { cron: `${minute} ${hour} * * ${day}` },
-        };
-        await week.add({ data: datas.data.data, jobId: element.short_description.split('/')[4] }, schedule);
-      } else if (schedules == 3) {
-        const repeatableJobs = await mount.getRepeatableJobs();
-
-        const foundJob = repeatableJobs.find((job) => job.id === element.short_description.split('/')[4]);
-        if (foundJob) {
-          await mount.removeRepeatableByKey(foundJob.key);
-        }
-        const d = new Date(detail.data.data.published_start);
-        let hour = d.getHours() > 23 ? 23 : d.getHours();
-        let date = d.getDate() > 28 ? 28 : d.getDate();
-        schedule = {
-          jobId: element.short_description.split('/')[4],
-          repeat: { cron: `0 ${hour} ${date} * *` },
-        };
-        await mount.add({ data: datas.data.data, jobId: element.short_description.split('/')[4] }, schedule);
       }
     }
   });

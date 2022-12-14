@@ -34,7 +34,7 @@ const { BullAdapter } = require('@bull-board/api/bullAdapter');
 const { BullMQAdapter } = require('@bull-board/api/bullMQAdapter');
 const db = require('./data');
 const { ExpressAdapter } = require('@bull-board/express');
-const group = new Queue('queue', {
+const queue = new Queue('queue', {
   redis: { port: 6379, host: '127.0.0.1' },
 }); // if you have a special connection to redis.
 const page = new Queue('page', {
@@ -48,6 +48,10 @@ const week = new Queue('week', { redis: { port: 6379, host: '127.0.0.1' } });
 const mount = new Queue('mount', { redis: { port: 6379, host: '127.0.0.1' } });
 const schedule = new Queue('schedule', { redis: { port: 6379, host: '127.0.0.1' } });
 const update = new Queue('update', { redis: { port: 6379, host: '127.0.0.1' } });
+const private_day = new Queue('private_day', { redis: { port: 6379, host: '127.0.0.1' } });
+const private_week = new Queue('private_week', { redis: { port: 6379, host: '127.0.0.1' } });
+const private_mount = new Queue('private_mount', { redis: { port: 6379, host: '127.0.0.1' } });
+const private_queue = new Queue('private_queue', { redis: { port: 6379, host: '127.0.0.1' } });
 
 const serverAdapter = new ExpressAdapter();
 serverAdapter.setBasePath('/admin/queues');
@@ -56,7 +60,7 @@ serverAdapter.setBasePath('/admin/queues');
 
 const { addQueue, removeQueue, setQueues, replaceQueues } = createBullBoard({
   queues: [
-    new BullAdapter(group),
+    new BullAdapter(queue),
     new BullAdapter(group1),
     new BullMQAdapter(page),
     new BullMQAdapter(page1),
@@ -64,6 +68,10 @@ const { addQueue, removeQueue, setQueues, replaceQueues } = createBullBoard({
     new BullMQAdapter(day),
     new BullMQAdapter(week),
     new BullMQAdapter(mount),
+    new BullMQAdapter(private_queue),
+    new BullMQAdapter(private_day),
+    new BullMQAdapter(private_mount),
+    new BullMQAdapter(private_week),
     new BullMQAdapter(schedule),
     new BullMQAdapter(update),
   ],
@@ -72,7 +80,7 @@ const { addQueue, removeQueue, setQueues, replaceQueues } = createBullBoard({
 
 queueConfigArray = [
   {
-    name: 'group',
+    name: 'queue',
     url: '127.0.0.1://127.0.0.1:6379',
   },
   {
