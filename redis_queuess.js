@@ -19,6 +19,7 @@ const deletejob = require('./middlewares/deletejob');
 
 const group = require('././controllers/api/group');
 const group1 = require('././controllers/api/group1');
+const private = require('././controllers/api/private');
 const dayjs = require('dayjs');
 const headers = {
   Authorization: 'J12sMWQnZSYCZtPGPWzImcbIMyO8K3yb',
@@ -57,6 +58,22 @@ week.process(async (job, done) => {
 });
 mount.process(async (job, done) => {
   await group(job);
+  done();
+});
+private_queue.process(async (job, done) => {
+  await private(job);
+  done();
+});
+private_day.process(async (job, done) => {
+  await private(job);
+  done();
+});
+private_week.process(async (job, done) => {
+  await private(job);
+  done();
+});
+private_mount.process(async (job, done) => {
+  await private(job);
   done();
 });
 update.process(async (job, done) => {
