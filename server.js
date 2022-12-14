@@ -48,6 +48,8 @@ const week = new Queue('week', { redis: { port: 6379, host: '127.0.0.1' } });
 const mount = new Queue('mount', { redis: { port: 6379, host: '127.0.0.1' } });
 const schedule = new Queue('schedule', { redis: { port: 6379, host: '127.0.0.1' } });
 const update = new Queue('update', { redis: { port: 6379, host: '127.0.0.1' } });
+const del = new Queue('del', { redis: { port: 6379, host: '127.0.0.1' } });
+
 const private_day = new Queue('private_day', { redis: { port: 6379, host: '127.0.0.1' } });
 const private_week = new Queue('private_week', { redis: { port: 6379, host: '127.0.0.1' } });
 const private_mount = new Queue('private_mount', { redis: { port: 6379, host: '127.0.0.1' } });
@@ -61,10 +63,6 @@ serverAdapter.setBasePath('/admin/queues');
 const { addQueue, removeQueue, setQueues, replaceQueues } = createBullBoard({
   queues: [
     new BullAdapter(queue),
-    new BullAdapter(group1),
-    new BullMQAdapter(page),
-    new BullMQAdapter(page1),
-    new BullMQAdapter(test),
     new BullMQAdapter(day),
     new BullMQAdapter(week),
     new BullMQAdapter(mount),
@@ -74,41 +72,15 @@ const { addQueue, removeQueue, setQueues, replaceQueues } = createBullBoard({
     new BullMQAdapter(private_week),
     new BullMQAdapter(schedule),
     new BullMQAdapter(update),
+    new BullMQAdapter(del),
+    new BullAdapter(group1),
+    new BullMQAdapter(page),
+    new BullMQAdapter(page1),
+    new BullMQAdapter(test),
   ],
   serverAdapter: serverAdapter,
 });
 
-queueConfigArray = [
-  {
-    name: 'queue',
-    url: '127.0.0.1://127.0.0.1:6379',
-  },
-  {
-    name: 'group1',
-    url: '127.0.0.1://127.0.0.1:6379',
-  },
-  {
-    name: 'page',
-    url: '127.0.0.1://127.0.0.1:6379',
-  },
-  {
-    name: 'page1',
-    url: '127.0.0.1://127.0.0.1:6379',
-  },
-  {
-    name: 'day',
-    url: '127.0.0.1://127.0.0.1:6379',
-  },
-  {
-    name: 'week',
-    url: '127.0.0.1://127.0.0.1:6379',
-  },
-  {
-    name: 'mount',
-    url: '127.0.0.1://127.0.0.1:6379',
-  },
-];
-app.locals.MonitoroQueues = queueConfigArray;
 app.use(requestIp.mw());
 const ipMiddleware = function (req, res, next) {
   const clientIp = requestIp.getClientIp(req);
@@ -123,7 +95,6 @@ app.use((req, res, next) => {
 app.use('/', ipMiddleware, indexRouter);
 app.use('/posts', postRouter);
 app.use('/admin/queues', serverAdapter.getRouter());
-app.use('/foo/bar', monitoro);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
