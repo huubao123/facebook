@@ -302,7 +302,6 @@ module.exports = async function main(req) {
     });
 
     await autoScroll(page, lengths, like, comment, share);
-    return;
     await getlink(page, conten_length, like, comment, share).then(async function (result) {
       let proces = 0;
       await browser.close();
@@ -385,9 +384,6 @@ module.exports = async function main(req) {
               results = await loadmoremedia(page1, data);
             }
 
-            if (!results.ismain || !results.iscate || !results.iscontent || !results.isuser) {
-              return;
-            }
             let titles = '';
             let short_descriptions = '';
             let arrVid = null;
@@ -594,6 +590,7 @@ module.exports = async function main(req) {
                           group_page_id: group_id,
                           posttype: Posttype_id,
                           title: titles,
+                          length_comments: parseInt(cmt_length),
                           create_at: new Date(),
                           status: 'active',
                           filter: false,
@@ -616,6 +613,7 @@ module.exports = async function main(req) {
                             basic_fields: JSON.stringify(basic_fields),
                             custom_fields: JSON.stringify(custom_fields),
                             title: titles,
+                            length_comments: parseInt(cmt_length),
                             create_at: new Date(),
                             status: 'update',
                             filter: false,
@@ -681,13 +679,15 @@ async function getlink(page, conten_length, like, comment, share) {
                   for (let c = 0; c < node.childNodes.length; c++) {
                     content += node.childNodes[c].innerText
                       .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
-                      .replace(/^(\+\d{1,2}\s?)?1?\-?\.?\s?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/, '');
+                      .replace(/^(\+\d{1,2}\s?)?1?\-?\.?\s?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/, '')
+                      .replaceAll(/(https?:\/\/[^\s]+)/g, ' ');
                   }
                 } else {
                   for (let c = 0; c < node.childNodes[0].childNodes[0].childNodes.length; c++) {
                     content += node.childNodes[0].childNodes[0].childNodes[c].innerText
                       .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
-                      .replace(/^(\+\d{1,2}\s?)?1?\-?\.?\s?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/, '');
+                      .replace(/^(\+\d{1,2}\s?)?1?\-?\.?\s?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/, '')
+                      .replaceAll(/(https?:\/\/[^\s]+)/g, ' ');
                   }
                 }
               });
