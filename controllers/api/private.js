@@ -62,7 +62,8 @@ async function autoScroll(page, lengthss, like, comment, share) {
           totalHeight += distance;
 
           if (
-            window.performance.memory.jsHeapSizeLimit - window.performance.memory.jsHeapSizeLimit / 10 <
+            window.performance.memory.jsHeapSizeLimit -
+              window.performance.memory.jsHeapSizeLimit / 10 <
             window.performance.memory.totalJSHeapSize
           ) {
             clearInterval(timer);
@@ -221,7 +222,7 @@ module.exports = async function main(req) {
       if (ramdom == 1) {
         username = process.env.user_name_scrool1;
       } else {
-        username = process.env.user_name_scrool2;
+        username = process.env.user_name_scrool1;
       }
       await page.type('#email', username);
       await page.type('#pass', 'huubao123');
@@ -304,9 +305,9 @@ module.exports = async function main(req) {
       let ramdom = Math.floor(Math.random() * 2);
       let username = '';
       if (ramdom == 1) {
-        username = process.env.username_get_data1;
+        username = process.env.user_name_scrool1;
       } else {
-        username = process.env.username_get_data2;
+        username = process.env.user_name_scrool1;
       }
       await page1.type('#email', username);
       await page1.type('#pass', 'huubao123');
@@ -316,14 +317,20 @@ module.exports = async function main(req) {
       //await page1.waitForSelector('div', { hidden: true });
       for (let i = 0; i < result.length; i++) {
         try {
-          fs.appendFile('error.txt', JSON.stringify(result[i].post_link, null, 2) + '\r\n', (err) => {
-            if (err) throw err;
-          });
+          fs.appendFile(
+            'error.txt',
+            JSON.stringify(result[i].post_link, null, 2) + '\r\n',
+            (err) => {
+              if (err) throw err;
+            }
+          );
           console.log(result[i].post_link);
         } catch (e) {
           console.log(e);
         }
-        proces += (Math.round(Math.round((result.length * 80) / 100) / result.length) / result.length) * 100;
+        proces +=
+          (Math.round(Math.round((result.length * 80) / 100) / result.length) / result.length) *
+          100;
         console.log('Processing ' + parseInt(proces.toFixed(2)));
         await req.progress(parseInt(proces.toFixed(2)));
         try {
@@ -366,7 +373,6 @@ module.exports = async function main(req) {
           await autoScroll_post(page1);
           await private(page1, cmt_length).then(async function (data) {
             let results = data;
-            console.log(results);
             if (parseInt(data.imagemore) > 0) {
               results = await loadmoremedia(page1, data);
             }
@@ -381,7 +387,9 @@ module.exports = async function main(req) {
             let flagimage = true;
             let flagvideo = true;
             let Image_id = new Array();
-            let short_description = results.contentList ? results.contentList.replaceAll(/(<([^>]+)>)/gi, '') : '';
+            let short_description = results.contentList
+              ? results.contentList.replaceAll(/(<([^>]+)>)/gi, '')
+              : '';
             for (let i = 0; i < 100; i++) {
               let lengths = short_description.split(' ').length;
               short_descriptions += short_description.split(' ')[i] + ' ';
@@ -500,17 +508,31 @@ module.exports = async function main(req) {
               user_name: results.user ? results.user : 'undefined',
               count_like: results.countLike
                 ? results.countLike.toString().split(' ')[0].indexOf(',') > -1
-                  ? parseInt(results.countLike.toString().split(' ')[0].replace('K', '00').replace(',', ''))
+                  ? parseInt(
+                      results.countLike.toString().split(' ')[0].replace('K', '00').replace(',', '')
+                    )
                   : parseInt(results.countLike.toString().split(' ')[0].replace('K', '000'))
                 : 0,
               count_comment: results.countComment
                 ? results.countComment.toString().split(' ')[0].indexOf(',') > -1
-                  ? parseInt(results.countComment.toString().split(' ')[0].replace('K', '00').replace(',', ''))
+                  ? parseInt(
+                      results.countComment
+                        .toString()
+                        .split(' ')[0]
+                        .replace('K', '00')
+                        .replace(',', '')
+                    )
                   : parseInt(results.countComment.toString().split(' ')[0].replace('K', '000'))
                 : 0,
               count_share: results.countShare
                 ? results.countShare.toString().split(' ')[0].indexOf(',') > -1
-                  ? parseInt(results.countShare.toString().split(' ')[0].replace('K', '00').replace(',', ''))
+                  ? parseInt(
+                      results.countShare
+                        .toString()
+                        .split(' ')[0]
+                        .replace('K', '00')
+                        .replace(',', '')
+                    )
                   : parseInt(results.countShare.toString().split(' ')[0].replace('K', '000'))
                 : 0,
               featured_image: Image_id ? Image_id : '',
@@ -520,7 +542,13 @@ module.exports = async function main(req) {
                     content: item.contentComment,
                     count_like: item.countLike
                       ? item.countLike.toString().split(' ')[0].indexOf(',') > -1
-                        ? parseInt(item.countLike.toString().split(' ')[0].replace('K', '00').replace(',', ''))
+                        ? parseInt(
+                            item.countLike
+                              .toString()
+                              .split(' ')[0]
+                              .replace('K', '00')
+                              .replace(',', '')
+                          )
                         : parseInt(item.countLike.toString().split(' ')[0].replace('K', '000'))
                       : 0,
                     user_id: item.userIDComment,
@@ -532,8 +560,16 @@ module.exports = async function main(req) {
                           content: child.contentComment,
                           count_like: child.countLike
                             ? child.countLike.toString().split(' ')[0].indexOf(',') > -1
-                              ? parseInt(child.countLike.toString().split(' ')[0].replace('K', '00').replace(',', ''))
-                              : parseInt(child.countLike.toString().split(' ')[0].replace('K', '000'))
+                              ? parseInt(
+                                  child.countLike
+                                    .toString()
+                                    .split(' ')[0]
+                                    .replace('K', '00')
+                                    .replace(',', '')
+                                )
+                              : parseInt(
+                                  child.countLike.toString().split(' ')[0].replace('K', '000')
+                                )
                             : 0,
                           user_id: child.userIDComment,
                           user_name: child.usernameComment,
@@ -654,12 +690,14 @@ async function getlink(page, conten_length, like, comment, share) {
           let count_like = (count_comment = count_share = count_content = 0);
           let content = '';
           let lengths =
-            post[i].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-              .childNodes[0].childNodes[0].childNodes[7] !== undefined
-              ? post[i].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                  .childNodes[0].childNodes[0].childNodes[0].childNodes[7].childNodes[0].childNodes[0].childNodes
-              : post[i].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                  .childNodes[0].childNodes[0].childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes;
+            post[i].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+              .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[7] !== undefined
+              ? post[i].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                  .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[7]
+                  .childNodes[0].childNodes[0].childNodes
+              : post[i].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+                  .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[1]
+                  .childNodes[0].childNodes[0].childNodes;
           lengths[2].childNodes.forEach((element, index) => {
             if (element.className == '') {
               element.childNodes[0].childNodes.forEach(function (node) {
@@ -667,13 +705,19 @@ async function getlink(page, conten_length, like, comment, share) {
                   for (let c = 0; c < node.childNodes.length; c++) {
                     content += node.childNodes[c].innerText
                       .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
-                      .replace(/^(\+\d{1,2}\s?)?1?\-?\.?\s?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/, '');
+                      .replace(
+                        /^(\+\d{1,2}\s?)?1?\-?\.?\s?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/,
+                        ''
+                      );
                   }
                 } else {
                   for (let c = 0; c < node.childNodes[0].childNodes[0].childNodes.length; c++) {
                     content += node.childNodes[0].childNodes[0].childNodes[c].innerText
                       .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
-                      .replace(/^(\+\d{1,2}\s?)?1?\-?\.?\s?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/, '');
+                      .replace(
+                        /^(\+\d{1,2}\s?)?1?\-?\.?\s?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/,
+                        ''
+                      );
                   }
                 }
               });
@@ -686,29 +730,43 @@ async function getlink(page, conten_length, like, comment, share) {
           }
           div = div_commment_yes.querySelectorAll('a[role="link"]');
           let likecomshares =
-            div_commment_yes.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes;
+            div_commment_yes.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+              .childNodes;
           likecomshares.forEach((element, index) => {
             if (index == 0) {
               count_like = element.childNodes
                 ? element.childNodes[1].textContent.split(' ')[0].indexOf(',') > -1
-                  ? element.childNodes[1].textContent.split(' ')[0].replace('K', '00').replace(',', '')
+                  ? element.childNodes[1].textContent
+                      .split(' ')[0]
+                      .replace('K', '00')
+                      .replace(',', '')
                   : element.childNodes[1].textContent.split(' ')[0].replace('K', '000')
                 : 0;
             }
             if (index == 1) {
               count_comment = element.childNodes[1]
                 ? element.childNodes[1].textContent.split(' ')[0].indexOf(',') > -1
-                  ? element.childNodes[1].textContent.split(' ')[0].replace('K', '00').replace(',', '')
+                  ? element.childNodes[1].textContent
+                      .split(' ')[0]
+                      .replace('K', '00')
+                      .replace(',', '')
                   : element.childNodes[1].textContent.split(' ')[0].replace('K', '000')
                 : 0;
               count_share = element.childNodes[2]
                 ? element.childNodes[2].textContent.split(' ')[0].indexOf(',') > -1
-                  ? element.childNodes[2].textContent.split(' ')[0].replace('K', '00').replace(',', '')
+                  ? element.childNodes[2].textContent
+                      .split(' ')[0]
+                      .replace('K', '00')
+                      .replace(',', '')
                   : element.childNodes[2].textContent.split(' ')[0].replace('K', '000')
                 : 0;
             }
           });
-          if (parseInt(count_like) < like || parseInt(count_comment) < comment || content.length < conten_length) {
+          if (
+            parseInt(count_like) < like ||
+            parseInt(count_comment) < comment ||
+            content.length < conten_length
+          ) {
             console.log(asd);
           }
           if (!div) {
