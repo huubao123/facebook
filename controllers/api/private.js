@@ -376,10 +376,6 @@ module.exports = async function main(req) {
             if (parseInt(data.imagemore) > 0) {
               results = await loadmoremedia(page1, data);
             }
-
-            if (!results.ismain || !results.iscate || !results.iscontent || !results.isuser) {
-              return;
-            }
             let titles = '';
             let short_descriptions = '';
             let arrVid = null;
@@ -669,7 +665,7 @@ module.exports = async function main(req) {
           console.log('lỗi error');
         }
       }
-      // await browser2.close();
+      await browser2.close();
     });
   } catch (err) {
     console.log('lỗi server', err);

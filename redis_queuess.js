@@ -132,7 +132,9 @@ update.process(async (job, done) => {
         data: {
           data: {
             link: element.short_description ? element.short_description : '',
-            lengths: detail.data.data.formData.custom_fields.count ? detail.data.data.formData.custom_fields.count : 1,
+            lengths: detail.data.data.formData.custom_fields.count
+              ? detail.data.data.formData.custom_fields.count
+              : 1,
             length_comment: detail.data.data.formData.custom_fields.filter.length_comment
               ? detail.data.data.formData.custom_fields.filter.length_comment
               : 1,
@@ -161,7 +163,6 @@ update.process(async (job, done) => {
 
       const delay = processAt - currentTime;
       let schedule = {};
-      console.log(detail.data.data.categories.length);
       if (detail.data.data.categories.length > 0) {
         // group riêng tư
         if (schedules == 0) {
@@ -176,7 +177,10 @@ update.process(async (job, done) => {
             jobId: element.short_description.split('/')[4],
             delay: delay,
           };
-          await private_queue.add({ data: datas.data.data, jobId: element.short_description.split('/')[4] }, schedule);
+          await private_queue.add(
+            { data: datas.data.data, jobId: element.short_description.split('/')[4] },
+            schedule
+          );
         } else if (schedules == 1) {
           await deletejob(element.short_description.split('/')[4]);
           const d = new Date(detail.data.data.published_start);
@@ -187,7 +191,10 @@ update.process(async (job, done) => {
             repeat: { cron: `${minute} ${hour} * * *` },
           };
 
-          await private_day.add({ data: datas.data.data, jobId: element.short_description.split('/')[4] }, schedule);
+          await private_day.add(
+            { data: datas.data.data, jobId: element.short_description.split('/')[4] },
+            schedule
+          );
         } else if (schedules == 2) {
           await deletejob(element.short_description.split('/')[4]);
 
@@ -199,7 +206,10 @@ update.process(async (job, done) => {
             jobId: element.short_description.split('/')[4],
             repeat: { cron: `${minute} ${hour} * * ${day}` },
           };
-          await private_week.add({ data: datas.data.data, jobId: element.short_description.split('/')[4] }, schedule);
+          await private_week.add(
+            { data: datas.data.data, jobId: element.short_description.split('/')[4] },
+            schedule
+          );
         } else if (schedules == 3) {
           await deletejob(element.short_description.split('/')[4]);
           const d = new Date(detail.data.data.published_start);
@@ -209,7 +219,10 @@ update.process(async (job, done) => {
             jobId: element.short_description.split('/')[4],
             repeat: { cron: `0 ${hour} ${date} * *` },
           };
-          await private_mount.add({ data: datas.data.data, jobId: element.short_description.split('/')[4] }, schedule);
+          await private_mount.add(
+            { data: datas.data.data, jobId: element.short_description.split('/')[4] },
+            schedule
+          );
         }
       } else {
         // Group công khai
@@ -225,7 +238,10 @@ update.process(async (job, done) => {
             jobId: element.short_description.split('/')[4],
             delay: delay,
           };
-          await queue.add({ data: datas.data.data, jobId: element.short_description.split('/')[4] }, schedule);
+          await queue.add(
+            { data: datas.data.data, jobId: element.short_description.split('/')[4] },
+            schedule
+          );
         } else if (schedules == 1) {
           await deletejob(element.short_description.split('/')[4]);
           const d = new Date(detail.data.data.published_start);
@@ -236,7 +252,10 @@ update.process(async (job, done) => {
             repeat: { cron: `${minute} ${hour} * * *` },
           };
 
-          await day.add({ data: datas.data.data, jobId: element.short_description.split('/')[4] }, schedule);
+          await day.add(
+            { data: datas.data.data, jobId: element.short_description.split('/')[4] },
+            schedule
+          );
         } else if (schedules == 2) {
           await deletejob(element.short_description.split('/')[4]);
           const d = new Date(detail.data.data.published_start);
@@ -247,7 +266,10 @@ update.process(async (job, done) => {
             jobId: element.short_description.split('/')[4],
             repeat: { cron: `${minute} ${hour} * * ${day}` },
           };
-          await week.add({ data: datas.data.data, jobId: element.short_description.split('/')[4] }, schedule);
+          await week.add(
+            { data: datas.data.data, jobId: element.short_description.split('/')[4] },
+            schedule
+          );
         } else if (schedules == 3) {
           await deletejob(element.short_description.split('/')[4]);
           const d = new Date(detail.data.data.published_start);
@@ -257,7 +279,10 @@ update.process(async (job, done) => {
             jobId: element.short_description.split('/')[4],
             repeat: { cron: `0 ${hour} ${date} * *` },
           };
-          await mount.add({ data: datas.data.data, jobId: element.short_description.split('/')[4] }, schedule);
+          await mount.add(
+            { data: datas.data.data, jobId: element.short_description.split('/')[4] },
+            schedule
+          );
         }
       }
     }
