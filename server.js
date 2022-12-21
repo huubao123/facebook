@@ -13,6 +13,7 @@ const requestIp = require('request-ip');
 // view engine setup
 require('./redis_queuess');
 // require('./testdata');
+// require('./youtube');
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 app.use(cors());
@@ -54,6 +55,12 @@ const private_day = new Queue('private_day', { redis: { port: 6379, host: '127.0
 const private_week = new Queue('private_week', { redis: { port: 6379, host: '127.0.0.1' } });
 const private_mount = new Queue('private_mount', { redis: { port: 6379, host: '127.0.0.1' } });
 const private_queue = new Queue('private_queue', { redis: { port: 6379, host: '127.0.0.1' } });
+const youtube = new Queue('youtube', { redis: { port: 6379, host: '127.0.0.1' } });
+const youtube_queue = new Queue('youtube_queue', { redis: { port: 6379, host: '127.0.0.1' } });
+const youtube_day = new Queue('youtube_day', { redis: { port: 6379, host: '127.0.0.1' } });
+const youtube_week = new Queue('youtube_week', { redis: { port: 6379, host: '127.0.0.1' } });
+const youtube_mount = new Queue('youtube_mount', { redis: { port: 6379, host: '127.0.0.1' } });
+const api = new Queue('api', { redis: { port: 6379, host: '127.0.0.1' } });
 
 const serverAdapter = new ExpressAdapter();
 serverAdapter.setBasePath('/admin/queues');
@@ -70,6 +77,11 @@ const { addQueue, removeQueue, setQueues, replaceQueues } = createBullBoard({
     new BullMQAdapter(private_day),
     new BullMQAdapter(private_mount),
     new BullMQAdapter(private_week),
+    new BullMQAdapter(youtube_queue),
+    new BullMQAdapter(youtube_day),
+    new BullMQAdapter(youtube_week),
+    new BullMQAdapter(youtube_mount),
+    new BullMQAdapter(api),
     new BullMQAdapter(schedule),
     new BullMQAdapter(update),
     new BullMQAdapter(del),

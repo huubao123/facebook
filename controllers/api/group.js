@@ -57,7 +57,11 @@ async function autoScroll(page, lengthss, like, comment, share) {
           console.log(lengthss, like, comment, share);
           console.log(post_length);
           let scrollHeight = document.body.scrollHeight;
-          window.scrollBy(0, distance);
+          window.scrollBy({
+            top: distance,
+            left: 100,
+            behavior: 'smooth',
+          });
           totalHeight += distance;
           for (let i = 1; i < post_length - 3; i++) {
             try {
