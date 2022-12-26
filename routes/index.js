@@ -18,6 +18,7 @@ const schedule = new Queue('schedule', { redis: { port: 6379, host: '127.0.0.1' 
 const update = new Queue('update', { redis: { port: 6379, host: '127.0.0.1' } });
 const del = new Queue('del', { redis: { port: 6379, host: '127.0.0.1' } });
 const api = new Queue('api', { redis: { port: 6379, host: '127.0.0.1' } });
+const api1 = new Queue('api1', { redis: { port: 6379, host: '127.0.0.1' } });
 
 const redis = require('redis');
 let redisClient = redis.createClient({
@@ -29,7 +30,7 @@ let redisClient = redis.createClient({
 });
 redisClient.connect();
 router.get('/', async function (req, res, next) {
-  res.json({ aaa: 'aaaa' });
+  res.send('ok');
 });
 
 router.post('/add', video);
@@ -38,6 +39,8 @@ router.post('/auto', async function (req, res, next) {
   if (req.body.status) {
     console.log(req.body.status);
     await api.add({}, { repeat: { cron: '0 0 * * *' } });
+    await api1.add({}, { repeat: { cron: '0 0 * * *' } });
+
     await update.add(
       {},
       {

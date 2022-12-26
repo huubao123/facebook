@@ -60,6 +60,11 @@ const youtube_queue = new Queue('youtube_queue', { redis: { port: 6379, host: '1
 const youtube_day = new Queue('youtube_day', { redis: { port: 6379, host: '127.0.0.1' } });
 const youtube_week = new Queue('youtube_week', { redis: { port: 6379, host: '127.0.0.1' } });
 const youtube_mount = new Queue('youtube_mount', { redis: { port: 6379, host: '127.0.0.1' } });
+const queue_page = new Queue('queue_page', { redis: { port: 6379, host: '127.0.0.1' } });
+const day_page = new Queue('day_page', { redis: { port: 6379, host: '127.0.0.1' } });
+const mount_page = new Queue('mount_page', { redis: { port: 6379, host: '127.0.0.1' } });
+const week_page = new Queue('week_page', { redis: { port: 6379, host: '127.0.0.1' } });
+
 const api = new Queue('api', { redis: { port: 6379, host: '127.0.0.1' } });
 
 const serverAdapter = new ExpressAdapter();
@@ -81,6 +86,11 @@ const { addQueue, removeQueue, setQueues, replaceQueues } = createBullBoard({
     new BullMQAdapter(youtube_day),
     new BullMQAdapter(youtube_week),
     new BullMQAdapter(youtube_mount),
+    new BullMQAdapter(queue_page),
+    new BullMQAdapter(day_page),
+    new BullMQAdapter(week_page),
+    new BullMQAdapter(mount_page),
+
     new BullMQAdapter(api),
     new BullMQAdapter(schedule),
     new BullMQAdapter(update),

@@ -17,6 +17,10 @@ const youtube_queue = new Queue('youtube_queue', { redis: { port: 6379, host: '1
 const youtube_day = new Queue('youtube_day', { redis: { port: 6379, host: '127.0.0.1' } });
 const youtube_week = new Queue('youtube_week', { redis: { port: 6379, host: '127.0.0.1' } });
 const youtube_mount = new Queue('youtube_mount', { redis: { port: 6379, host: '127.0.0.1' } });
+const queue_page = new Queue('queue_page', { redis: { port: 6379, host: '127.0.0.1' } });
+const day_page = new Queue('day_page', { redis: { port: 6379, host: '127.0.0.1' } });
+const mount_page = new Queue('mount_page', { redis: { port: 6379, host: '127.0.0.1' } });
+const week_page = new Queue('week_page', { redis: { port: 6379, host: '127.0.0.1' } });
 
 module.exports = async function (id) {
   try {
@@ -82,6 +86,27 @@ module.exports = async function (id) {
     const foundJob = repeatableJobs.find((job) => job.id === id);
     if (foundJob) {
       await youtube_week.removeRepeatableByKey(foundJob.key);
+    }
+  } catch (e) {}
+  try {
+    const repeatableJobs = await day_page.getRepeatableJobs();
+    const foundJob = repeatableJobs.find((job) => job.id === id);
+    if (foundJob) {
+      await day_page.removeRepeatableByKey(foundJob.key);
+    }
+  } catch (e) {}
+  try {
+    const repeatableJobs = await week_page.getRepeatableJobs();
+    const foundJob = repeatableJobs.find((job) => job.id === id);
+    if (foundJob) {
+      await week_page.removeRepeatableByKey(foundJob.key);
+    }
+  } catch (e) {}
+  try {
+    const repeatableJobs = await mount_page.getRepeatableJobs();
+    const foundJob = repeatableJobs.find((job) => job.id === id);
+    if (foundJob) {
+      await mount_page.removeRepeatableByKey(foundJob.key);
     }
   } catch (e) {}
 };

@@ -10,6 +10,12 @@ const queue1 = new Queue('group1', { redis: { port: 6379, host: '127.0.0.1' } })
 const test = new Queue('test', { redis: { port: 6379, host: '127.0.0.1' } });
 const queue = new Queue('queue', { redis: { port: 6379, host: '127.0.0.1' } });
 const api = new Queue('api', { redis: { port: 6379, host: '127.0.0.1' } });
+const api1 = new Queue('api1', { redis: { port: 6379, host: '127.0.0.1' } });
+
+const queue_page = new Queue('queue_page', { redis: { port: 6379, host: '127.0.0.1' } });
+const day_page = new Queue('day_page', { redis: { port: 6379, host: '127.0.0.1' } });
+const mount_page = new Queue('mount_page', { redis: { port: 6379, host: '127.0.0.1' } });
+const week_page = new Queue('week_page', { redis: { port: 6379, host: '127.0.0.1' } });
 
 const day = new Queue('day', { redis: { port: 6379, host: '127.0.0.1' } });
 const mount = new Queue('mount', { redis: { port: 6379, host: '127.0.0.1' } });
@@ -29,6 +35,8 @@ const youtube_mount = new Queue('youtube_mount', { redis: { port: 6379, host: '1
 const deletejob = require('./middlewares/deletejob');
 const youtube_pro = require('./middlewares/youtube');
 const group = require('././controllers/api/group');
+const page = require('././controllers/api/page');
+
 const group1 = require('././controllers/api/group1');
 const private = require('././controllers/api/private');
 const dayjs = require('dayjs');
@@ -40,7 +48,22 @@ queue.process(async (job, done) => {
   await group(job);
   done();
 });
-
+queue_page.process(async (job, done) => {
+  await page(job);
+  done();
+});
+day_page.process(async (job, done) => {
+  await page(job);
+  done();
+});
+week_page.process(async (job, done) => {
+  await page(job);
+  done();
+});
+mount_page.process(async (job, done) => {
+  await page(job);
+  done();
+});
 test.process(async (job, done) => {
   job.progress(100);
   done();
@@ -122,9 +145,12 @@ del.process(async (job, done) => {
   post.data.data?.forEach(async (element) => {
     if (element.is_active == 0) {
       try {
-        await deletejob(element.short_description.split('/')[4]);
-        let p = await private_day.getJob(element.short_description.split('/')[4]);
-        let nop = await day.getJob(element.short_description.split('/')[4]);
+        let id = element.short_description.split('/')[4]
+          ? element.short_description.split('/')[4]
+          : element.short_description.split('search_query=')[1];
+        await deletejob(id);
+        let p = await private_day.getJob(id);
+        let nop = await day.getJob(id);
         await p?.remove();
         await nop?.remove();
       } catch (e) {}
@@ -141,7 +167,7 @@ update.process(async (job, done) => {
       headers: headers,
     });
   } catch (e) {
-    console.error(e);
+    console.log(e);
     return done(e);
   }
 
@@ -410,11 +436,142 @@ update.process(async (job, done) => {
           }
         }
       }
+    } else if (element.session_tags.type_crawl[0]?.title == 'Page facebook') {
+      let update = new Date(element.updated_at).getTime();
+      let today = dayjs().format('YYYY-MM-DD HH:mm:ss');
+      let pass = dayjs(new Date(today).getTime() - 60 * 60000).format('YYYY-MM-DD HH:mm:ss');
+      if (new Date(pass).getTime() < update && update < new Date(today).getTime()) {
+        const detail = await axios({
+          method: 'get',
+          url: 'https://mgs-api-v2.internal.mangoads.com.vn/api/v1/posts/' + element.id,
+          headers: headers,
+        });
+        let schedules = detail.data.data.formData.custom_fields.schedule
+          ? detail.data.data.formData.custom_fields.schedule
+          : 0;
+        const datas = {
+          data: {
+            data: {
+              link: element.short_description ? element.short_description : '',
+              lengths: detail.data.data.formData.custom_fields.count
+                ? detail.data.data.formData.custom_fields.count
+                : 1,
+              length_comment: detail.data.data.formData.custom_fields.filter.length_comment
+                ? detail.data.data.formData.custom_fields.filter.length_comment
+                : 1,
+              length_content: detail.data.data.formData.custom_fields.filter.length_content
+                ? detail.data.data.formData.custom_fields.filter.length_content
+                : 1,
+              like: detail.data.data.formData.custom_fields.filter.like
+                ? detail.data.data.formData.custom_fields.filter.like
+                : 1,
+              comment: detail.data.data.formData.custom_fields.filter.comment
+                ? detail.data.data.formData.custom_fields.filter.comment
+                : 1,
+              share: detail.data.data.formData.custom_fields.filter.share
+                ? detail.data.data.formData.custom_fields.filter.share
+                : 1,
+              post_type: detail.data.data.formData.custom_fields.posttype[0].key
+                ? detail.data.data.formData.custom_fields.posttype[0].key
+                : '',
+            },
+          },
+        };
+        const currentTime = new Date().getTime();
+        const processAt = detail.data.data.formData.custom_fields.datetime
+          ? new Date(detail.data.data.formData.custom_fields.datetime).getTime()
+          : new Date().getTime();
+
+        const delay = processAt - currentTime;
+        let schedule = {};
+        console.log(element.short_description);
+        // Group công khai
+        if (parseInt(schedules) === 0) {
+          try {
+            await deletejob(element.short_description.split('/')[3]);
+          } catch (e) {}
+          schedule = {
+            jobId: element.short_description.split('/')[3],
+            delay: delay,
+          };
+          await queue_page.add({ data: datas.data.data, jobId: element.short_description.split('/')[3] }, schedule);
+        } else if (parseInt(schedules) === 1) {
+          await deletejob(element.short_description.split('/')[3]);
+          const d = new Date(detail.data.data.published_start);
+          let hour = d.getHours() > 23 ? 23 : d.getHours();
+          let minute = d.getMinutes() > 59 ? 59 : d.getMinutes();
+          schedule = {
+            jobId: element.short_description.split('/')[3],
+            repeat: { cron: `${minute} ${hour} * * *` },
+          };
+          try {
+            console.log(datas.data.data, element.short_description.split('/')[3]);
+            await new Promise((r) => setTimeout(r, 4000));
+
+            await day_page.add({ data: datas.data.data, jobId: element.short_description.split('/')[3] }, schedule);
+          } catch (e) {
+            console.log(e);
+          }
+        } else if (parseInt(schedules) === 2) {
+          await deletejob(element.short_description.split('/')[3]);
+          const d = new Date(detail.data.data.published_start);
+          let hour = d.getHours() > 23 ? 23 : d.getHours();
+          let minute = d.getMinutes() > 59 ? 59 : d.getMinutes();
+          let day = d.getDay() > 6 ? 6 : d.getDay();
+          schedule = {
+            jobId: element.short_description.split('/')[3],
+            repeat: { cron: `${minute} ${hour} * * ${day}` },
+          };
+          await week_page.add({ data: datas.data.data, jobId: element.short_description.split('/')[3] }, schedule);
+        } else if (parseInt(schedules) === 3) {
+          await deletejob(element.short_description.split('/')[3]);
+          const d = new Date(detail.data.data.published_start);
+          let hour = d.getHours() > 23 ? 23 : d.getHours();
+          let date = d.getDate() > 28 ? 28 : d.getDate();
+          schedule = {
+            jobId: element.short_description.split('/')[3],
+            repeat: { cron: `0 ${hour} ${date} * *` },
+          };
+          await mount_page.add({ data: datas.data.data, jobId: element.short_description.split('/')[3] }, schedule);
+        }
+      }
     }
   });
   done();
 });
 api.process(async (job, done) => {
+  const head = {
+    Authorization: 'e5szHrsAFsaE7dpaVeWykEOMGgkU4thG',
+  };
+  try {
+    let array1 = [10, 20, 50, 100];
+    for (const element of array1) {
+      console.log(element);
+      let getdata = await axios({
+        method: 'get',
+        url: `https://deal-sourcing-mgs-api.mangoads.com.vn/api/v1/posts?limit=${element}&page=1&search[type:is]=company&sort=created_at&search_type=and&search[is_active:in]=1`,
+        headers: head,
+      });
+      for (let j = 0; j < getdata.data.meta.last_page; j++) {
+        try {
+          await new Promise((r) => setTimeout(r, 4000));
+          let getdata = await axios({
+            method: 'get',
+            url: `https://deal-sourcing-mgs-api.mangoads.com.vn/api/v1/posts?limit=${element}&page=${
+              j + 1
+            }&search[type:is]=company&sort=created_at&search_type=and&search[is_active:in]=1`,
+            headers: head,
+          });
+          console.log(getdata.data.meta.current_page);
+        } catch (e) {}
+      }
+    }
+  } catch (e) {
+    console.log(e);
+  }
+  done();
+});
+api1.process(async (job, done) => {
   const head = {
     Authorization: 'e5szHrsAFsaE7dpaVeWykEOMGgkU4thG',
   };

@@ -256,6 +256,7 @@ module.exports = async function main(req) {
         waitUntil: 'load',
       });
       //aaa
+      await page.waitForSelector('h1', { visible: true });
       await page.waitForFunction('document.querySelector("h1")');
     } catch (e) {
       console.log(e);
@@ -531,7 +532,7 @@ module.exports = async function main(req) {
                 : 0,
               featured_image: Image_id ? Image_id : '',
               comments: results.commentList
-                ? results.commentList.map((item) => ({
+                ? results.commentList.map(async (item) => ({
                     date: item.date,
                     content: item.contentComment,
                     count_like: item.countLike
@@ -541,9 +542,10 @@ module.exports = async function main(req) {
                       : 0,
                     user_id: item.userIDComment,
                     user_name: item.usernameComment,
-                    imgComment: item.imageComment ? item.imageComment : '',
+
+                    imgComment: item.imageComment ? await downloadImage(item.imageComment, post_type) : '',
                     children: item.children
-                      ? item.children.map((child) => ({
+                      ? item.children.map(async (child) => ({
                           date: child.date,
                           content: child.contentComment,
                           count_like: child.countLike
@@ -553,7 +555,7 @@ module.exports = async function main(req) {
                             : 0,
                           user_id: child.userIDComment,
                           user_name: child.usernameComment,
-                          imageComment: child.imageComment ? child.imageComment : '',
+                          imgComment: child.imageComment ? await downloadImage(child.imageComment, post_type) : '',
                         }))
                       : [],
                   }))
