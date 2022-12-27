@@ -1,6 +1,8 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 const crypto = require('crypto');
+const Queue = require('bull');
+
 const initializeApp = require('firebase/app');
 const getDatabase = require('firebase/database').getDatabase;
 const set = require('firebase/database').set;
@@ -15,6 +17,7 @@ require('dotenv').config();
 const downloadImage = require('../../middlewares/downloadimage');
 const Post = require('../../models/post');
 const Post_filter_no = require('../../models/post_filter_no');
+const image = new Queue('image', { redis: { port: 6379, host: '127.0.0.1' } });
 
 const Trash = require('../../models/trash');
 const Group = require('../../models/group');
@@ -414,7 +417,12 @@ module.exports = async function main(req) {
               for (let i = 0; i < results.commentList.length; i++) {
                 if (results.commentList[i].imageComment && results.commentList[i].imageComment != '') {
                   const imageid = crypto.randomBytes(10).toString('hex');
-                  downloadImage(results.commentList[i].imageComment, post_type, imageid);
+                  let datas = {
+                    link: results.commentList[i].imageComment,
+                    posttype: post_type,
+                    imageid: imageid,
+                  };
+                  image.add({ data: datas });
                   results.commentList[i].imageComment = `images/${post_type}/${imageid}.jpeg`;
                 }
                 if (results.commentList[i].children.length > 0) {
@@ -424,7 +432,12 @@ module.exports = async function main(req) {
                       results.commentList[i].children[j].imageComment !== ''
                     ) {
                       const imageid = crypto.randomBytes(10).toString('hex');
-                      downloadImage(results.commentList[i].children[j].imageComment, post_type, imageid);
+                      let datas = {
+                        link: results.commentList[i].children[j].imageComment,
+                        posttype: post_type,
+                        imageid: imageid,
+                      };
+                      image.add({ data: datas });
                       results.commentList[i].children[j].imageComment = `images/${post_type}/${imageid}.jpeg`;
                     }
                   }
