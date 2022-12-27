@@ -423,7 +423,10 @@ module.exports = async function main(req) {
                     imageid: imageid,
                   };
                   image.add({ data: datas });
-                  results.commentList[i].imageComment = `images/${post_type}/${imageid}.jpeg`;
+                  let result = await fetch(url);
+                  result = await result.blob();
+                  let type = result.type.split('/')[1];
+                  results.commentList[i].imageComment = `images/${post_type}/${imageid}.${type}`;
                 }
                 if (results.commentList[i].children.length > 0) {
                   for (let j = 0; j < results.commentList[i].children.length; j++) {
@@ -438,7 +441,10 @@ module.exports = async function main(req) {
                         imageid: imageid,
                       };
                       image.add({ data: datas });
-                      results.commentList[i].children[j].imageComment = `images/${post_type}/${imageid}.jpeg`;
+                      let result = await fetch(url);
+                      result = await result.blob();
+                      let type = result.type.split('/')[1];
+                      results.commentList[i].children[j].imageComment = `images/${post_type}/${imageid}.${type}`;
                     }
                   }
                 }
@@ -583,7 +589,6 @@ module.exports = async function main(req) {
                   }))
                 : [],
             };
-            return;
             //await bigquery(basic_fields, custom_fields);
             try {
               let trash = await Trash.find();
