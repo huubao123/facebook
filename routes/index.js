@@ -7,6 +7,8 @@ const Group = require('.././models/group');
 const video = require('../controllers/sitemap');
 const fs = require('fs');
 const path = require('path');
+const testFolder = './public/images/';
+
 const crawl_group = require('../controllers/api/crawl/group');
 const Queue = require('bull');
 const crypto = require('crypto');
@@ -32,7 +34,22 @@ redisClient.connect();
 router.get('/', async function (req, res, next) {
   res.send('ok');
 });
+router.get('/images/:posttype/:id', async (req, res) => {
+  fs.readdir(`${testFolder}${req.params.posttype}/`, (err, files) => {
+    if (err) console.log(err);
+    files.forEach((file) => {
+      if (file.split('.')[0] == req.params.id.split('.')[0]) {
+        try {
+          res.sendFile(process.cwd() + '/public/images/' + req.params.posttype + '/' + file);
+        } catch (err) {
+          console.log(err);
+        }
 
+        return;
+      }
+    });
+  });
+});
 router.post('/add', video);
 router.get('/crawl', startserver);
 router.post('/auto', async function (req, res, next) {
