@@ -12,7 +12,6 @@ const app = express();
 const requestIp = require('request-ip');
 // view engine setup
 require('./redis_queuess');
-// require('./testdata');
 // require('./youtube');
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
@@ -34,6 +33,8 @@ const { createBullBoard } = require('@bull-board/api');
 const { BullAdapter } = require('@bull-board/api/bullAdapter');
 const { BullMQAdapter } = require('@bull-board/api/bullMQAdapter');
 const db = require('./data');
+// require('./testdraf');
+
 const { ExpressAdapter } = require('@bull-board/express');
 const queue = new Queue('queue', {
   redis: { port: 6379, host: '127.0.0.1' },

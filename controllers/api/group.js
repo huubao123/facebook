@@ -248,9 +248,6 @@ module.exports = async function main(req) {
       await page.keyboard.press('Enter');
 
       await new Promise((r) => setTimeout(r, 4000));
-      //await page.waitForSelector('div', { hidden: true });
-      // await page.waitForSelector('#pagelet_composer');
-      // let content2 = await page.$$('#pagelet_composer');
 
       await page.goto(url, {
         waitUntil: 'load',
@@ -413,36 +410,28 @@ module.exports = async function main(req) {
                 break;
               }
             }
-            // if (results.videos.length > 2) {
-            //   arrVid = await Promise.all(
-            //     results.videos.map(async (video) => {
-            //       let resultss = await fetch(video);
-            //       resultss = await result.blob();
-            //       if (resultss.size / 1024 / 1024 > 1) {
-            //         return null;
-            //       }
-            //    let resultAddVid = await createMedia({
-            //         data: [
-            //           {
-            //             alt: result[i].post_link.split('/')[6]
-            //               ? result[i].post_link.split('/')[6]
-            //               : '',
-            //             title: result[i].post_link.split('/')[6]
-            //               ? result[i].post_link.split('/')[6]
-            //               : '',
-            //             file: result,
-            //           },
-            //         ],
-            //       });
-            //       if (resultAddVid) {
-            //         return { link_video: resultAddVid.data.data[0].path };
-            //       } else {
-            //         flagvideo = false;
-            //         return;
-            //       }
-            //     })
-            //   );
-            // }
+            if (results.commentList.length > 0) {
+              for (let i = 0; i < results.commentList.length; i++) {
+                if (results.commentList[i].imageComment && results.commentList[i].imageComment != '') {
+                  const imageid = crypto.randomBytes(10).toString('hex');
+                  downloadImage(results.commentList[i].imageComment, post_type, imageid);
+                  results.commentList[i].imageComment = `images/${post_type}/${imageid}.jpeg`;
+                }
+                if (results.commentList[i].children.length > 0) {
+                  for (let j = 0; j < results.commentList[i].children.length; j++) {
+                    if (
+                      results.commentList[i].children[j].imageComment &&
+                      results.commentList[i].children[j].imageComment !== ''
+                    ) {
+                      const imageid = crypto.randomBytes(10).toString('hex');
+                      downloadImage(results.commentList[i].children[j].imageComment, post_type, imageid);
+                      results.commentList[i].children[j].imageComment = `images/${post_type}/${imageid}.jpeg`;
+                    }
+                  }
+                }
+              }
+            }
+
             // if (results.imageList.length > 0) {
             //   arrImage = await Promise.all(
             //     results.imageList.map(async (image) => {
@@ -485,6 +474,28 @@ module.exports = async function main(req) {
                 Image_id.push(result_id_image);
               }
             }
+            // if (results.commentList.length > 0) {
+            //   for (let i = 0; i < results.commentList.length; i++) {
+            //     if (results.commentList[i].imageComment) {
+            //       results.commentList[i].imageComment = await downloadImage(
+            //         results.commentList[i].imageComment,
+            //         post_type
+            //       );
+            //     }
+            //     if (results.commentList[i].children.length > 0) {
+            //       for (let j = 0; j < results.commentList[i].children.length; j++) {
+            //         if (results.commentList[i].children[j].imageComment) {
+            //           results.commentList[i].children[j].imageComment = await downloadImage(
+            //             results.commentList[i].children[j].imageComment,
+            //             post_type
+            //           );
+            //         }
+            //       }
+            //     }
+            //   }
+            // }
+
+            console.log(results.commentList);
             let basic_fields = {
               title: titles,
               short_description: short_descriptions,
@@ -508,6 +519,7 @@ module.exports = async function main(req) {
                 meta_description: 'New Post Facebook',
               },
             };
+
             let custom_fields = {
               video: results.videos,
               date: results.date ? results.date : '',
@@ -532,8 +544,7 @@ module.exports = async function main(req) {
                 : 0,
               featured_image: Image_id ? Image_id : '',
               comments: results.commentList
-                ? results.commentList.map(async (item) => ({
-                    date: item.date,
+                ? results.commentList.map((item) => ({
                     content: item.contentComment,
                     count_like: item.countLike
                       ? item.countLike.toString().split(' ')[0].indexOf(',') > -1
@@ -542,11 +553,9 @@ module.exports = async function main(req) {
                       : 0,
                     user_id: item.userIDComment,
                     user_name: item.usernameComment,
-
-                    imgComment: item.imageComment ? await downloadImage(item.imageComment, post_type) : '',
+                    imgComment: item.imageComment ? item.imageComment : '',
                     children: item.children
-                      ? item.children.map(async (child) => ({
-                          date: child.date,
+                      ? item.children.map((child) => ({
                           content: child.contentComment,
                           count_like: child.countLike
                             ? child.countLike.toString().split(' ')[0].indexOf(',') > -1
@@ -555,12 +564,13 @@ module.exports = async function main(req) {
                             : 0,
                           user_id: child.userIDComment,
                           user_name: child.usernameComment,
-                          imgComment: child.imageComment ? await downloadImage(child.imageComment, post_type) : '',
+                          imgComment: child.imageComment ? child.imageComment : '',
                         }))
                       : [],
                   }))
                 : [],
             };
+            return;
             //await bigquery(basic_fields, custom_fields);
             try {
               let trash = await Trash.find();

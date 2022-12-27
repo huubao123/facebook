@@ -11,6 +11,7 @@ const test = new Queue('test', { redis: { port: 6379, host: '127.0.0.1' } });
 const queue = new Queue('queue', { redis: { port: 6379, host: '127.0.0.1' } });
 const api = new Queue('api', { redis: { port: 6379, host: '127.0.0.1' } });
 const api1 = new Queue('api1', { redis: { port: 6379, host: '127.0.0.1' } });
+const image = new Queue('image', { redis: { port: 6379, host: '127.0.0.1' } });
 
 const queue_page = new Queue('queue_page', { redis: { port: 6379, host: '127.0.0.1' } });
 const day_page = new Queue('day_page', { redis: { port: 6379, host: '127.0.0.1' } });
@@ -40,8 +41,10 @@ const page = require('././controllers/api/page');
 const group1 = require('././controllers/api/group1');
 const private = require('././controllers/api/private');
 const dayjs = require('dayjs');
+const downloadImage = require('./middlewares/downloadimage');
+const downloadimage = require('./middlewares/downloadimage');
 const headers = {
-  Authorization: 'J12sMWQnZSYCZtPGPWzImcbIMyO8K3yb',
+  Authorization: '4HaAMLk0p4pLHosvdGUzkw4qsMLs0DLY',
 };
 
 queue.process(async (job, done) => {
@@ -539,67 +542,71 @@ update.process(async (job, done) => {
   });
   done();
 });
-api.process(async (job, done) => {
-  const head = {
-    Authorization: 'e5szHrsAFsaE7dpaVeWykEOMGgkU4thG',
-  };
-  try {
-    let array1 = [10, 20, 50, 100];
-    for (const element of array1) {
-      console.log(element);
-      let getdata = await axios({
-        method: 'get',
-        url: `https://deal-sourcing-mgs-api.mangoads.com.vn/api/v1/posts?limit=${element}&page=1&search[type:is]=company&sort=created_at&search_type=and&search[is_active:in]=1`,
-        headers: head,
-      });
-      for (let j = 0; j < getdata.data.meta.last_page; j++) {
-        try {
-          await new Promise((r) => setTimeout(r, 4000));
-          let getdata = await axios({
-            method: 'get',
-            url: `https://deal-sourcing-mgs-api.mangoads.com.vn/api/v1/posts?limit=${element}&page=${
-              j + 1
-            }&search[type:is]=company&sort=created_at&search_type=and&search[is_active:in]=1`,
-            headers: head,
-          });
-          console.log(getdata.data.meta.current_page);
-        } catch (e) {}
-      }
-    }
-  } catch (e) {
-    console.log(e);
-  }
-  done();
-});
-api1.process(async (job, done) => {
-  const head = {
-    Authorization: 'e5szHrsAFsaE7dpaVeWykEOMGgkU4thG',
-  };
-  try {
-    let array1 = [10, 20, 50, 100];
-    for (const element of array1) {
-      console.log(element);
-      let getdata = await axios({
-        method: 'get',
-        url: `https://deal-sourcing-mgs-api.mangoads.com.vn/api/v1/posts?limit=${element}&page=1&search[type:is]=company&sort=created_at&search_type=and&search[is_active:in]=1`,
-        headers: head,
-      });
-      for (let j = 0; j < getdata.data.meta.last_page; j++) {
-        try {
-          await new Promise((r) => setTimeout(r, 4000));
-          let getdata = await axios({
-            method: 'get',
-            url: `https://deal-sourcing-mgs-api.mangoads.com.vn/api/v1/posts?limit=${element}&page=${
-              j + 1
-            }&search[type:is]=company&sort=created_at&search_type=and&search[is_active:in]=1`,
-            headers: head,
-          });
-          console.log(getdata.data.meta.current_page);
-        } catch (e) {}
-      }
-    }
-  } catch (e) {
-    console.log(e);
-  }
+// api.process(async (job, done) => {
+//   const head = {
+//     Authorization: 'e5szHrsAFsaE7dpaVeWykEOMGgkU4thG',
+//   };
+//   try {
+//     let array1 = [10, 20, 50, 100];
+//     for (const element of array1) {
+//       console.log(element);
+//       let getdata = await axios({
+//         method: 'get',
+//         url: `https://deal-sourcing-mgs-api.mangoads.com.vn/api/v1/posts?limit=${element}&page=1&search[type:is]=company&sort=created_at&search_type=and&search[is_active:in]=1`,
+//         headers: head,
+//       });
+//       for (let j = 0; j < getdata.data.meta.last_page; j++) {
+//         try {
+//           await new Promise((r) => setTimeout(r, 4000));
+//           let getdata = await axios({
+//             method: 'get',
+//             url: `https://deal-sourcing-mgs-api.mangoads.com.vn/api/v1/posts?limit=${element}&page=${
+//               j + 1
+//             }&search[type:is]=company&sort=created_at&search_type=and&search[is_active:in]=1`,
+//             headers: head,
+//           });
+//           console.log(getdata.data.meta.current_page);
+//         } catch (e) {}
+//       }
+//     }
+//   } catch (e) {
+//     console.log(e);
+//   }
+//   done();
+// });
+// api1.process(async (job, done) => {
+//   const head = {
+//     Authorization: 'e5szHrsAFsaE7dpaVeWykEOMGgkU4thG',
+//   };
+//   try {
+//     let array1 = [10, 20, 50, 100];
+//     for (const element of array1) {
+//       console.log(element);
+//       let getdata = await axios({
+//         method: 'get',
+//         url: `https://deal-sourcing-mgs-api.mangoads.com.vn/api/v1/posts?limit=${element}&page=1&search[type:is]=company&sort=created_at&search_type=and&search[is_active:in]=1`,
+//         headers: head,
+//       });
+//       for (let j = 0; j < getdata.data.meta.last_page; j++) {
+//         try {
+//           await new Promise((r) => setTimeout(r, 4000));
+//           let getdata = await axios({
+//             method: 'get',
+//             url: `https://deal-sourcing-mgs-api.mangoads.com.vn/api/v1/posts?limit=${element}&page=${
+//               j + 1
+//             }&search[type:is]=company&sort=created_at&search_type=and&search[is_active:in]=1`,
+//             headers: head,
+//           });
+//           console.log(getdata.data.meta.current_page);
+//         } catch (e) {}
+//       }
+//     }
+//   } catch (e) {
+//     console.log(e);
+//   }
+//   done();
+// });
+image.process(async (job, done) => {
+  await downloadimage(job.data.data.link, job.data.data.posttype, job.data.data.imageid);
   done();
 });

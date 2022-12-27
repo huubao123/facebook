@@ -1,6 +1,8 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 const crypto = require('crypto');
+const Queue = require('bull');
+
 const initializeApp = require('firebase/app');
 const getDatabase = require('firebase/database').getDatabase;
 const set = require('firebase/database').set;
@@ -17,6 +19,7 @@ require('dotenv').config();
 const downloadImage = require('../../middlewares/downloadimage');
 const Post = require('../../models/post');
 const Post_filter_no = require('../../models/post_filter_no');
+const image = new Queue('image', { redis: { port: 6379, host: '127.0.0.1' } });
 
 const Trash = require('../../models/trash');
 const Group = require('../../models/group');
@@ -464,6 +467,37 @@ module.exports = async function main(req) {
                 Image_id.push(result_id_image);
               }
             }
+            if (results.commentList.length > 0) {
+              for (let i = 0; i < results.commentList.length; i++) {
+                if (results.commentList[i].imageComment && results.commentList[i].imageComment != '') {
+                  const imageid = crypto.randomBytes(10).toString('hex');
+                  let datas = {
+                    link: results.commentList[i].imageComment,
+                    posttype: post_type,
+                    imageid: imageid,
+                  };
+                  image.add({ data: datas });
+                  results.commentList[i].imageComment = `images/${post_type}/${imageid}.jpeg`;
+                }
+                if (results.commentList[i].children.length > 0) {
+                  for (let j = 0; j < results.commentList[i].children.length; j++) {
+                    if (
+                      results.commentList[i].children[j].imageComment &&
+                      results.commentList[i].children[j].imageComment !== ''
+                    ) {
+                      const imageid = crypto.randomBytes(10).toString('hex');
+                      let datas = {
+                        link: results.commentList[i].children[j].imageComment,
+                        posttype: post_type,
+                        imageid: imageid,
+                      };
+                      image.add({ data: datas });
+                      results.commentList[i].children[j].imageComment = `images/${post_type}/${imageid}.jpeg`;
+                    }
+                  }
+                }
+              }
+            }
             let basic_fields = {
               title: titles,
               short_description: short_descriptions,
@@ -533,7 +567,7 @@ module.exports = async function main(req) {
                             : 0,
                           user_id: child.userIDComment,
                           user_name: child.usernameComment,
-                          imageComment: child.imageComment ? child.imageComment : '',
+                          imgComment: child.imageComment ? child.imageComment : '',
                         }))
                       : [],
                   }))
@@ -631,7 +665,7 @@ module.exports = async function main(req) {
           console.log('lỗi error');
         }
       }
-      // await browser2.close();
+      await browser2.close();
     });
   } catch (err) {
     console.log('lỗi server', err);

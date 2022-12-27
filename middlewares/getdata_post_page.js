@@ -388,16 +388,6 @@ module.exports = async function getdata(page, cmt_lengths) {
                             .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
                             .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
                             .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
-                          cotent_cmt_text += elementsss.childNodes[0].childNodes[l].innerText
-                            .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
-                            .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
-                            .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
-                        }
-                        if (cotent_cmt_text.length < cmt_lengths) {
-                          cotent_cmt_text = '';
-                          console.log(abc);
-                        } else {
-                          cotent_cmt_text = '';
                         }
                       }
                     }
@@ -465,16 +455,6 @@ module.exports = async function getdata(page, cmt_lengths) {
                           .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
                           .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
                           .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
-                        cotent_cmt_text += cmt.childNodes[0].childNodes[l].innerText
-                          .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
-                          .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
-                          .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
-                      }
-                      if (cotent_cmt_text.length < cmt_lengths) {
-                        cotent_cmt_text = '';
-                        console.log(abc);
-                      } else {
-                        cotent_cmt_text = '';
                       }
                     }
                   });
@@ -520,16 +500,6 @@ module.exports = async function getdata(page, cmt_lengths) {
                             .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
                             .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
                             .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
-                          cotent_cmt_text += child.childNodes[0].childNodes[l].innerText
-                            .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
-                            .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
-                            .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
-                        }
-                        if (cotent_cmt_text.length < cmt_lengths) {
-                          cotent_cmt_text = '';
-                          console.log(abc);
-                        } else {
-                          cotent_cmt_text = '';
                         }
                       } else if (child.nodeName == 'A') {
                         console.log('child', child);
@@ -571,16 +541,6 @@ module.exports = async function getdata(page, cmt_lengths) {
                                       .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
                                       .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
                                       .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
-                                    cotent_cmtchild_text += child.childNodes[0].childNodes[l].innerText
-                                      .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
-                                      .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
-                                      .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
-                                  }
-                                  if (cotent_cmtchild_text.length < cmt_lengths) {
-                                    cotent_cmtchild_text = '';
-                                    console.log(abc);
-                                  } else {
-                                    cotent_cmtchild_text = '';
                                   }
                                 }
                               }
@@ -757,16 +717,6 @@ module.exports = async function getdata(page, cmt_lengths) {
                                     .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
                                     .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
                                     .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
-                                  cotent_cmtchild_text += child.childNodes[0].childNodes[l].innerText
-                                    .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
-                                    .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
-                                    .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
-                                }
-                                if (cotent_cmtchild_text.length < cmt_lengths) {
-                                  cotent_cmtchild_text = '';
-                                  console.log(abc);
-                                } else {
-                                  cotent_cmtchild_text = '';
                                 }
                               }
                             });
@@ -789,16 +739,6 @@ module.exports = async function getdata(page, cmt_lengths) {
                                     .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
                                     .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
                                     .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
-                                  cotent_cmtchild_text += child.childNodes[0].childNodes[l].innerText
-                                    .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
-                                    .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
-                                    .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
-                                }
-                                if (cotent_cmtchild_text.length < cmt_lengths) {
-                                  cotent_cmtchild_text = '';
-                                  console.log(abc);
-                                } else {
-                                  cotent_cmtchild_text = '';
                                 }
                               }
                             });
@@ -855,16 +795,6 @@ module.exports = async function getdata(page, cmt_lengths) {
                                               .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
                                               .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
                                               .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
-                                            cotent_cmtchild_text += child.childNodes[0].childNodes[l].innerText
-                                              .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
-                                              .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
-                                              .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
-                                          }
-                                          if (cotent_cmtchild_text.length < cmt_lengths) {
-                                            cotent_cmtchild_text = '';
-                                            console.log(abc);
-                                          } else {
-                                            cotent_cmtchild_text = '';
                                           }
                                         }
                                       }
@@ -929,16 +859,6 @@ module.exports = async function getdata(page, cmt_lengths) {
                                                 .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
                                                 .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
                                                 .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
-                                              cotent_cmtchild_text += child.childNodes[0].childNodes[l].innerText
-                                                .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
-                                                .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
-                                                .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
-                                            }
-                                            if (cotent_cmtchild_text.length < cmt_lengths) {
-                                              cotent_cmtchild_text = '';
-                                              console.log(abc);
-                                            } else {
-                                              cotent_cmtchild_text = '';
                                             }
                                           }
                                         }
@@ -973,16 +893,6 @@ module.exports = async function getdata(page, cmt_lengths) {
                                                 .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
                                                 .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
                                                 .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
-                                              cotent_cmtchild_text += child.childNodes[0].childNodes[l].innerText
-                                                .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
-                                                .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
-                                                .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
-                                            }
-                                            if (cotent_cmtchild_text.length < cmt_lengths) {
-                                              cotent_cmtchild_text = '';
-                                              console.log(abc);
-                                            } else {
-                                              cotent_cmtchild_text = '';
                                             }
                                           }
                                         }
@@ -1101,16 +1011,6 @@ module.exports = async function getdata(page, cmt_lengths) {
                           .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
                           .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
                           .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
-                        cotent_cmt_text += element.childNodes[0].childNodes[l].innerText
-                          .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
-                          .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
-                          .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
-                      }
-                      if (cotent_cmt_text.length < cmt_lengths) {
-                        cotent_cmt_text = '';
-                        console.log(abc);
-                      } else {
-                        cotent_cmt_text = '';
                       }
                     }
                   });
@@ -1133,16 +1033,6 @@ module.exports = async function getdata(page, cmt_lengths) {
                           .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
                           .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
                           .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
-                        cotent_cmt_text += element.childNodes[0].childNodes[l].innerText
-                          .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
-                          .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
-                          .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
-                      }
-                      if (cotent_cmt_text.length < cmt_lengths) {
-                        cotent_cmt_text = '';
-                        console.log(abc);
-                      } else {
-                        cotent_cmt_text = '';
                       }
                     }
                   });

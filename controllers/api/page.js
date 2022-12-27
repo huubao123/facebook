@@ -31,17 +31,21 @@ const firebaseConfig = {
 // TODO: Replace the following with your app's Firebase project configuration
 // See: https://firebase.google.com/docs/web/learn-more#config-object
 
-async function autoScroll(page, lengthss, like, comment, share) {
+async function autoScroll(page, lengthss, like, comment, share, url) {
   const getdata = await page.evaluate(
-    async (lengthss, like, comment, share) => {
+    async (lengthss, like, comment, share, url) => {
       const data = await new Promise((resolve, reject) => {
         let totalHeight = 0;
-        let distance = 500;
+        let distance = 1000;
+        let length_feed = 0;
         let timer = setInterval(async () => {
           console.log(lengthss, like, comment, share);
-          let length_post = 0;
           let scrollHeight = document.body.scrollHeight;
-          window.scrollBy(0, distance);
+          window.scrollBy({
+            top: distance,
+            left: 100,
+            behavior: 'smooth',
+          });
           totalHeight += distance;
 
           if (
@@ -51,17 +55,38 @@ async function autoScroll(page, lengthss, like, comment, share) {
             clearInterval(timer);
             resolve();
           }
-          document.querySelectorAll('div').forEach((el) => {
-            el.childNodes.forEach((eel) => {
-              if (eel.nodeName == '#comment') {
-                eel.remove();
+          let post = document.querySelectorAll('div');
+          let newpost = Array.prototype.slice.call(post).filter((el) => el.childNodes.length === 15);
+          try {
+            newpost.forEach(async (el) => {
+              el.childNodes[7].childNodes[0].childNodes[0].childNodes[2]
+                .querySelectorAll('[role="button"]')
+                .forEach(async (button) => {
+                  if (button.innerText.indexOf('Xem thêm') > -1) {
+                    button.click();
+                  }
+                });
+            });
+          } catch (e) {
+            console.log('lỗi 1');
+          }
+          try {
+            document.querySelectorAll('[role="link"]').forEach(async (link) => {
+              if (link.href.indexOf(`${url}/posts`) > -1) {
+                length_feed += 1;
               }
             });
-          });
-          //let length_feeds = document.querySelectorAll('[data-pagelet="ProfileTimeline""]')[0];
-          let length_feed =
-            document.querySelectorAll('[role="main"]')[0].childNodes[3].childNodes[1].childNodes[0].childNodes[1]
-              .childNodes[1].childNodes.length;
+          } catch (e) {
+            console.log('lỗi 2');
+          }
+
+          console.log(length_feed);
+          if (length_feed - 5 >= 10) {
+            clearInterval(timer);
+            resolve();
+          } else {
+            length_feed = 0;
+          }
           // document.querySelectorAll('[role="feed"]')[length_feed.length - 1].childNodes.forEach((item) => {
           //   if (item.className !== '' && item.nodeName == 'DIV') {
           //     length_post += 1;
@@ -75,10 +100,7 @@ async function autoScroll(page, lengthss, like, comment, share) {
           }
 
           //console.log(length_post);
-          if (length_feed - 5 >= lengthss) {
-            clearInterval(timer);
-            resolve();
-          }
+
           // if (post_length - 5 > _length) {
           //   clearInterval(timer);
           //   resolve();
@@ -93,7 +115,8 @@ async function autoScroll(page, lengthss, like, comment, share) {
     lengthss,
     like,
     comment,
-    share
+    share,
+    url
   );
   return 1;
 }
@@ -101,14 +124,14 @@ module.exports = async function main(req) {
   try {
     await req.progress(10);
     const url = req.data.data.link;
-    const lengths = req.data.data.count == '' ? 0 : req.data.data.count;
+    const lengths = req.data.data.lengths == '' ? 0 : req.data.data.lengths;
     const cmt_length = req.data.data.length_comment == '' ? 0 : req.data.data.length_comment;
     const conten_length = req.data.data.length_content == '' ? 0 : req.data.data.length_content;
     const name = url.split('/')[3] == 'groups' ? url.split('/')[4] : url.split('/')[3];
     const like = req.data.data.like ? req.data.data.like : 0;
     const comment = req.data.data.comment ? req.data.data.comment : 0;
     const share = req.data.data.share ? req.data.data.share : 0;
-    const post_type = req.data.data.posttype ? req.data.data.posttype : '';
+    const post_type = req.data.data.post_type ? req.data.data.post_type : '';
     const craw_id = crypto.randomBytes(16).toString('hex');
     let page_id = '';
     let Posttype_id = '';
@@ -247,14 +270,13 @@ module.exports = async function main(req) {
       if (ramdom == 1) {
         username = process.env.user_name_scrool1;
       } else {
-        username = process.env.user_name_scrool2;
+        username = process.env.user_name_scrool1;
       }
       await page.type('#email', username);
       await page.type('#pass', 'huubao123');
       await page.keyboard.press('Enter');
 
-      //await new Promise((r) => setTimeout(r, 4000));
-      await page.waitForSelector('div', { hidden: true });
+      await new Promise((r) => setTimeout(r, 4000));
       // await page.waitForSelector('#pagelet_composer');
       // let content2 = await page.$$('#pagelet_composer');
 
@@ -262,14 +284,14 @@ module.exports = async function main(req) {
         waitUntil: 'load',
       });
       //aaa
-      await page.waitForFunction('document.querySelector("h1")');
+      await page.waitForSelector('h2', { visible: true });
     } catch (e) {
       console.log(e);
     }
     const result = await page.evaluate(() => {
-      return document.querySelectorAll('h1')[1]
-        ? document.querySelectorAll('h1')[1].textContent
-        : document.querySelectorAll('h1')[0].textContent;
+      return document.querySelectorAll('h2')[1]
+        ? document.querySelectorAll('h2')[1].textContent
+        : document.querySelectorAll('h2')[0].textContent;
     });
     Page.findOne({ url: url }, async function (err, page) {
       if (page) {
@@ -314,8 +336,6 @@ module.exports = async function main(req) {
       }
     });
 
-    await page.waitForSelector('h2', { visible: true });
-
     // const postListRefss = ref(databases, 'Group/' + name.replace(/[#:.,$]/g, ''));
     // await set(postListRefss, {
     //   name: result,
@@ -323,453 +343,402 @@ module.exports = async function main(req) {
     //   create_at: Date.now(),
     // });
 
-    await autoScroll(page, lengths, like, comment, share);
-    // await page.evaluate(() => {
-    //   document.querySelectorAll('a[role="link"][href="#"]').forEach(async (element) => {
-    //     await element.focus();
-    //     console.log('b');
-    //   });
-    // });
-
-    await getlink(page, conten_length, like, comment, share).then(async function (result) {
+    await autoScroll(page, lengths, like, comment, share, url);
+    await getlink(page, conten_length, like, comment, share, url).then(async function (result) {
       fs.writeFile('item1.txt', JSON.stringify(result, null, 2), (err) => {
         if (err) throw err;
         console.log('The file has been saved!');
       });
-      // const craw_link_jobId = ref(database, 'ListLink_jobId/' + req.data.jobId + '/');
-      // await set(craw_link_jobId, {
-      //   name: result,
-      //   craw_id: req.data.jobId,
-      //   url: req.data.data.link,
-      //   lengths: req.data.data.count == '' ? 0 : req.data.data.count,
-      //   cmt_length: req.data.data.length_comment == '' ? 0 : req.data.data.length_comment,
-      //   conten_length: req.data.data.length_content == '' ? 0 : req.data.data.length_content,
-      //   like: req.data.data.like ? req.data.data.like : 0,
-      //   comment: req.data.data.comment ? req.data.data.comment : 0,
-      //   share: req.data.data.share ? req.data.data.share : 0,
-      //   post_type: req.data.data.posttype ? req.data.data.posttype : '',
-      // });
-      // const craw_link_crawid = ref(database, 'ListLink_crawid/' + craw_id + '/');
-      // await set(craw_link_crawid, {
-      //   name: result,
-      //   craw_id: req.data.jobId,
-      //   url: req.data.data.link,
-      //   lengths: req.data.data.count == '' ? 0 : req.data.data.count,
-      //   cmt_length: req.data.data.length_comment == '' ? 0 : req.data.data.length_comment,
-      //   conten_length: req.data.data.length_content == '' ? 0 : req.data.data.length_content,
-      //   like: req.data.data.like ? req.data.data.like : 0,
-      //   comment: req.data.data.comment ? req.data.data.comment : 0,
-      //   share: req.data.data.share ? req.data.data.share : 0,
-      //   post_type: req.data.data.posttype ? req.data.data.posttype : '',
-      // });
 
-      // let process = 0;
-      // await browser.close();
-      // const page1 = await browser2.newPage();
-      // await page1.setDefaultNavigationTimeout(60000);
-      // const pages = await browser.pages();
-      // if (pages.length > 1) {
-      //   await pages[0].close();
-      // }
-      // await page1.goto('https://www.facebook.com', {
-      //   waitUntil: 'load',
-      // });
-      // let ramdom = Math.floor(Math.random() * 2);
-      // let username = '';
-      // if (ramdom == 1) {
-      //   username = process.env.username_get_data1;
-      // } else {
-      //   username = process.env.username_get_data2;
-      // }
-      // await page1.type('#email', username);
-      // await page1.type('#pass', 'huubao123');
-      // await page1.keyboard.press('Enter');
+      await browser.close();
+      const page1 = await browser2.newPage();
+      const pages = await browser2.pages();
+      if (pages.length > 1) {
+        await pages[0].close();
+      }
+      await page1.goto('https://www.facebook.com', {
+        waitUntil: 'load',
+      });
+      let ramdom = Math.floor(Math.random() * 2);
+      let username = '';
+      if (ramdom == 1) {
+        username = process.env.username_get_data1;
+      } else {
+        username = process.env.username_get_data2;
+      }
+      await page1.type('#email', username);
+      await page1.type('#pass', 'huubao123');
+      await page1.keyboard.press('Enter');
 
-      // //await new Promise((r) => setTimeout(r, 4000));
-      // await page1.waitForSelector('div', { hidden: true });
-      // for (let i = 0; i < result.length; i++) {
-      //   process += (Math.round(Math.round((result.length * 80) / 100) / result.length) / result.length) * 100;
-      //   console.log('Processing ' + parseInt(process.toFixed(2)));
-      //   await req.progress(parseInt(process.toFixed(2)));
-      //   try {
-      //     await page1.goto(result[i].post_link, {
-      //       waitUntil: 'networkidle2',
-      //     });
-      //     try {
-      //       await page1.evaluate(async () => {
-      //         let div = document.querySelectorAll('[role = "button"]');
-      //         for (let i = 0; i < div.length; i++) {
-      //           if (
-      //             div[i].innerText.indexOf('Phù hợp nhất') !== -1 ||
-      //             div[i].innerText.indexOf('Mới nhất') !== -1 ||
-      //             div[i].innerText.indexOf('Tất cả bình luận') !== -1
-      //           ) {
-      //             await div[i].scrollIntoView();
-      //             break;
-      //           }
-      //         }
-      //       });
-      //     } catch (err) {}
-      //     await page1.evaluate(async () => {
-      //       let div = document.querySelectorAll('[role = "button"]');
-      //       for (let i = 0; i < div.length; i++) {
-      //         if (div[i].innerText.indexOf('Phù hợp nhất') !== -1 || div[i].innerText.indexOf('Mới nhất') !== -1) {
-      //           await div[i].click();
-      //           break;
-      //         }
-      //       }
-      //     });
-      //     await page1.evaluate(async () => {
-      //       let div = document.querySelectorAll('[role="menuitem"]');
-      //       for (let i = 0; i < div.length; i++) {
-      //         if (div[i].innerText.indexOf('Tất cả bình luận') !== -1) {
-      //           await div[i].click();
-      //           break;
-      //         }
-      //       }
-      //     });
-      //     await autoScroll_post(page1);
-      //     await getdata(page1, cmt_length).then(async function (data) {
-      //       fs.writeFile('item111.txt', JSON.stringify(data, null, 2), (err) => {
-      //         if (err) throw err;
-      //         console.log('The file has been saved!');
-      //       });
-      //       let results = data;
-      //       if (parseInt(data.imagemore) > 0) {
-      //         results = await loadmoremedia(page1, data);
-      //       }
-      //       if (!results.ismain || !results.iscate || !results.iscontent || !results.isuser) {
-      //         // const error = ref(
-      //         //   databases,
-      //         //   'Error/' + name.replace(/[#:.,$]/g, '') + '/' + result[i].post_link.split('/')[5]
-      //         // );
-      //         // await set(error, {
-      //         //   name: result[i].post_link,
-      //         //   ismain: results.ismain,
-      //         //   iscate: results.iscate,
-      //         //   isuser: results.isuser,
-      //         //   iscontent: results.iscontent,
-      //         // });
-      //         return;
-      //       }
-      //       // const postListRef = ref(
-      //       //   database,
-      //       //   'post_type/' + post_type + '/' + name.replace(/[#:.,$]/g, '') + '/' + result[i].post_link.split('/')[5]
-      //       // );
-      //       let titles = '';
-      //       let short_descriptions = '';
-      //       // let arrVid = null;
-      //       // let arrImage = null;
-      //       // let flagimage = true;
-      //       // let flagvideo = true;
-      //       let short_description = results.contentList ? results.contentList.replaceAll(/(<([^>]+)>)/gi, '') : '';
-      //       for (let i = 0; i < 100; i++) {
-      //         let lengths = short_description.split(' ').length;
-      //         short_descriptions += short_description.split(' ')[i] + ' ';
-      //         if (lengths - 1 === i) {
-      //           break;
-      //         }
-      //       }
-      //       for (let i = 0; i < 100; i++) {
-      //         let lengths = short_description.length;
-      //         titles += short_description[i];
-      //         if (lengths - 1 === i) {
-      //           break;
-      //         }
-      //       }
-      //       // if (results.videos.length > 2) {
-      //       //   arrVid = await Promise.all(
-      //       //     results.videos.map(async (video) => {
-      //       //       let resultss = await fetch(video);
-      //       //       resultss = await result.blob();
-      //       //       if (resultss.size / 1024 / 1024 > 1) {
-      //       //         return null;
-      //       //       }
-      //       //       let resultAddVid = await createMedia({
-      //       //         data: [
-      //       //           {
-      //       //             alt: result[i].post_link.split('/')[6]
-      //       //               ? result[i].post_link.split('/')[6]
-      //       //               : '',
-      //       //             title: result[i].post_link.split('/')[6]
-      //       //               ? result[i].post_link.split('/')[6]
-      //       //               : '',
-      //       //             file: result,
-      //       //           },
-      //       //         ],
-      //       //       });
-      //       //       if (resultAddVid) {
-      //       //         return { link_video: resultAddVid.data.data[0].path };
-      //       //       } else {
-      //       //         flagvideo = false;
-      //       //         return;
-      //       //       }
-      //       //     })
-      //       //   );
-      //       // }
-      //       // if (results.imageList.length > 0) {
-      //       //   arrImage = await Promise.all(
-      //       //     results.imageList.map(async (image) => {
-      //       //       let result = await fetch(image);
-      //       //       result = await result.blob();
-      //       //       let resultAddImage = await createMedia({
-      //       //         data: [
-      //       //           {
-      //       //             alt: result[i].post_link.split('/')[6]
-      //       //               ? result[i].post_link.split('/')[6]
-      //       //               : '',
-      //       //             title: result[i].post_link.split('/')[6]
-      //       //               ? result[i].post_link.split('/')[6]
-      //       //               : '',
-      //       //             file: result,
-      //       //           },
-      //       //         ],
-      //       //       });
-      //       //       if (resultAddImage) {
-      //       //         return resultAddImage.data.data[0];
-      //       //       } else {
-      //       //         flagimage = false;
-      //       //         return null;
-      //       //       }
-      //       //     })
-      //       //   );
-      //       // }
-      //       // if (arrImage && arrImage.length > 0) {
-      //       //   for (let j = 0; j < arrImage.length; j++) {
-      //       //     if (arrImage[j] === undefined) {
-      //       //       arrImage = undefined;
-      //       //       break;
-      //       //     }
-      //       //   }
-      //       // }
-      //       // let arrImages = arrImage && arrImage.length !== 0 ? arrImage[0].id : null;
-      //       let basic_fields = {
-      //         title: titles,
-      //         short_description: short_descriptions,
-      //         long_description: results.contentList
-      //           ? results.contentList.replaceAll('https://l.facebook.com/l.php?', '')
-      //           : '',
-      //         slug: '',
-      //         featured_image: results.linkImgs[0] ? results.linkImgs[0] : '',
-      //         session_tags: {
-      //           tags: [],
-      //         },
-      //         categorialue: [],
-      //         key: '',
-      //         name: '',
-      //         type: post_type,
-      //         attributes: [],
-      //         is_active: 1,
-      //         status: 'publish',
-      //         seo_tags: {
-      //           meta_title: 'New Post Facebook',
-      //           meta_description: 'New Post Facebook',
-      //         },
-      //       };
-      //       let custom_fields = {
-      //         video: results.videos,
-      //         date: results.date ? results.date : '',
-      //         post_id: results.idPost ? results.idPost : '',
-      //         post_link: result[i].post_link ? result[i].post_link : '',
-      //         user_id: results.user_id ? results.user_id : 'undefined',
-      //         user_name: results.user ? results.user : 'undefined',
-      //         count_like: results.countLike
-      //           ? results.countLike.toString().split(' ')[0].indexOf(',') > -1
-      //             ? parseInt(results.countLike.toString().split(' ')[0].replace('K', '00').replace(',', ''))
-      //             : parseInt(results.countLike.toString().split(' ')[0].replace('K', '000'))
-      //           : 0,
-      //         count_comment: results.countComment
-      //           ? results.countComment.toString().split(' ')[0].indexOf(',') > -1
-      //             ? parseInt(results.countComment.toString().split(' ')[0].replace('K', '00').replace(',', ''))
-      //             : parseInt(results.countComment.toString().split(' ')[0].replace('K', '000'))
-      //           : 0,
-      //         count_share: results.countShare
-      //           ? results.countShare.toString().split(' ')[0].indexOf(',') > -1
-      //             ? parseInt(results.countShare.toString().split(' ')[0].replace('K', '00').replace(',', ''))
-      //             : parseInt(results.countShare.toString().split(' ')[0].replace('K', '000'))
-      //           : 0,
-      //         featured_image: results.linkImgs ? results.linkImgs : '',
-      //         comments: results.commentList
-      //           ? results.commentList.map((item) => ({
-      //               content: item.contentComment,
-      //               count_like: item.countLike
-      //                 ? item.countLike.toString().split(' ')[0].indexOf(',') > -1
-      //                   ? parseInt(item.countLike.toString().split(' ')[0].replace('K', '00').replace(',', ''))
-      //                   : parseInt(item.countLike.toString().split(' ')[0].replace('K', '000'))
-      //                 : 0,
-      //               user_id: item.userIDComment,
-      //               user_name: item.usernameComment,
-      //               imgComment: item.imageComment ? item.imageComment : '',
-      //               children: item.children
-      //                 ? item.children.map((child) => ({
-      //                     content: child.contentComment,
-      //                     count_like: child.countLike
-      //                       ? child.countLike.toString().split(' ')[0].indexOf(',') > -1
-      //                         ? parseInt(child.countLike.toString().split(' ')[0].replace('K', '00').replace(',', ''))
-      //                         : parseInt(child.countLike.toString().split(' ')[0].replace('K', '000'))
-      //                       : 0,
-      //                     user_id: child.userIDComment,
-      //                     user_name: child.usernameComment,
-      //                     imageComment: child.imageComment ? child.imageComment : '',
-      //                   }))
-      //                 : [],
-      //             }))
-      //           : [],
-      //       };
-      //       //await bigquery(basic_fields, custom_fields);
-      //       try {
-      //         let post = new Post({
-      //           basic_fields: JSON.stringify(basic_fields, null, 2),
-      //           custom_fields: JSON.stringify(custom_fields, null, 2),
-      //           group_id: group_id,
-      //           posttype: Posttype_id,
-      //         });
-      //         let postdetail = new Post_detail({
-      //           group_id: group_id,
-      //           posttype: Posttype_id,
-      //           title: titles,
-      //           short_description: short_descriptions,
-      //           long_description: results.contentList
-      //             ? results.contentList.replaceAll('https://l.facebook.com/l.php?', '')
-      //             : '',
-      //           slug: '',
-      //           featured_image: results.linkImgs[0] ? results.linkImgs[0] : '',
-      //           session_tags: {
-      //             tags: [],
-      //           },
-      //           categorialue: [],
-      //           key: '',
-      //           name: '',
-      //           type: post_type,
-      //           attributes: [],
-      //           is_active: 1,
-      //           status: 'publish',
-      //           seo_tags: {
-      //             meta_title: 'New Post Facebook',
-      //             meta_description: 'New Post Facebook',
-      //           },
-      //           video: results.videos,
-      //           date: results.date ? results.date : '',
-      //           post_id: results.idPost ? results.idPost : '',
-      //           post_link: result[i].post_link ? result[i].post_link : '',
-      //           user_id: results.user_id ? results.user_id : 'undefined',
-      //           user_name: results.user ? results.user : 'undefined',
-      //           count_like: results.countLike
-      //             ? results.countLike.toString().split(' ')[0].indexOf(',') > -1
-      //               ? parseInt(results.countLike.toString().split(' ')[0].replace('K', '00').replace(',', ''))
-      //               : parseInt(results.countLike.toString().split(' ')[0].replace('K', '000'))
-      //             : 0,
-      //           count_comment: results.countComment
-      //             ? results.countComment.toString().split(' ')[0].indexOf(',') > -1
-      //               ? parseInt(results.countComment.toString().split(' ')[0].replace('K', '00').replace(',', ''))
-      //               : parseInt(results.countComment.toString().split(' ')[0].replace('K', '000'))
-      //             : 0,
-      //           count_share: results.countShare
-      //             ? results.countShare.toString().split(' ')[0].indexOf(',') > -1
-      //               ? parseInt(results.countShare.toString().split(' ')[0].replace('K', '00').replace(',', ''))
-      //               : parseInt(results.countShare.toString().split(' ')[0].replace('K', '000'))
-      //             : 0,
-      //           featured_image: results.linkImgs ? results.linkImgs : '',
-      //           comments: results.commentList
-      //             ? results.commentList.map((item) => ({
-      //                 content: item.contentComment,
-      //                 count_like: item.countLike
-      //                   ? item.countLike.toString().split(' ')[0].indexOf(',') > -1
-      //                     ? parseInt(item.countLike.toString().split(' ')[0].replace('K', '00').replace(',', ''))
-      //                     : parseInt(item.countLike.toString().split(' ')[0].replace('K', '000'))
-      //                   : 0,
-      //                 user_id: item.userIDComment,
-      //                 user_name: item.usernameComment,
-      //                 imgComment: item.imageComment ? item.imageComment : '',
-      //                 children: item.children
-      //                   ? item.children.map((child) => ({
-      //                       content: child.contentComment,
-      //                       count_like: child.countLike
-      //                         ? child.countLike.toString().split(' ')[0].indexOf(',') > -1
-      //                           ? parseInt(child.countLike.toString().split(' ')[0].replace('K', '00').replace(',', ''))
-      //                           : parseInt(child.countLike.toString().split(' ')[0].replace('K', '000'))
-      //                         : 0,
-      //                       user_id: child.userIDComment,
-      //                       user_name: child.usernameComment,
-      //                       imageComment: child.imageComment ? child.imageComment : '',
-      //                     }))
-      //                   : [],
-      //               }))
-      //             : [],
-      //         });
+      await new Promise((r) => setTimeout(r, 4000));
+      for (let i = 0; i < 1; i++) {
+        try {
+          await page1.goto(result[i].post_link, {
+            waitUntil: 'networkidle2',
+          });
+          try {
+            await page1.evaluate(async () => {
+              let div = document.querySelectorAll('[role = "button"]');
+              for (let i = 0; i < div.length; i++) {
+                if (
+                  div[i].innerText.indexOf('Phù hợp nhất') !== -1 ||
+                  div[i].innerText.indexOf('Mới nhất') !== -1 ||
+                  div[i].innerText.indexOf('Tất cả bình luận') !== -1
+                ) {
+                  await div[i].scrollIntoView();
+                  break;
+                }
+              }
+            });
+          } catch (err) {}
+          await page1.evaluate(async () => {
+            let div = document.querySelectorAll('[role = "button"]');
+            for (let i = 0; i < div.length; i++) {
+              if (div[i].innerText.indexOf('Phù hợp nhất') !== -1 || div[i].innerText.indexOf('Mới nhất') !== -1) {
+                await div[i].click();
+                break;
+              }
+            }
+          });
+          await page1.evaluate(async () => {
+            let div = document.querySelectorAll('[role="menuitem"]');
+            for (let i = 0; i < div.length; i++) {
+              if (div[i].innerText.indexOf('Tất cả bình luận') !== -1) {
+                await div[i].click();
+                break;
+              }
+            }
+          });
+          await autoScroll_post(page1);
 
-      //         await post.save();
-      //         await postdetail.save();
-      //       } catch (e) {
-      //         console.log(e);
-      //       }
+          await getdata(page1, cmt_length).then(async function (data) {
+            fs.writeFile('item111.txt', JSON.stringify(data, null, 2), (err) => {
+              if (err) throw err;
+              console.log('The file has been saved!');
+            });
+            let results = data;
+            if (parseInt(data.imagemore) > 0) {
+              results = await loadmoremedia(page1, data);
+            }
 
-      //       // await set(postListRef, {
-      //       //   basic_fields: basic_fields,
-      //       //   custom_fields: custom_fields,
-      //       // });
-      //       // const postListRefss = ref(
-      //       //   database,
-      //       //   '/Listpost/' + name.replace(/[#:.,$]/g, '') + '/' + url.split('/')[6]
-      //       // );
+            // const postListRef = ref(
+            //   database,
+            //   'post_type/' + post_type + '/' + name.replace(/[#:.,$]/g, '') + '/' + result[i].post_link.split('/')[5]
+            // );
+            let titles = '';
+            let short_descriptions = '';
+            // let arrVid = null;
+            // let arrImage = null;
+            // let flagimage = true;
+            // let flagvideo = true;
+            let short_description = results.contentList ? results.contentList.replaceAll(/(<([^>]+)>)/gi, '') : '';
+            for (let i = 0; i < 100; i++) {
+              let lengths = short_description.split(' ').length;
+              short_descriptions += short_description.split(' ')[i] + ' ';
+              if (lengths - 1 === i) {
+                break;
+              }
+            }
+            for (let i = 0; i < 100; i++) {
+              let lengths = short_description.length;
+              titles += short_description[i];
+              if (lengths - 1 === i) {
+                break;
+              }
+            }
+            // if (results.videos.length > 2) {
+            //   arrVid = await Promise.all(
+            //     results.videos.map(async (video) => {
+            //       let resultss = await fetch(video);
+            //       resultss = await result.blob();
+            //       if (resultss.size / 1024 / 1024 > 1) {
+            //         return null;
+            //       }
+            //       let resultAddVid = await createMedia({
+            //         data: [
+            //           {
+            //             alt: result[i].post_link.split('/')[6]
+            //               ? result[i].post_link.split('/')[6]
+            //               : '',
+            //             title: result[i].post_link.split('/')[6]
+            //               ? result[i].post_link.split('/')[6]
+            //               : '',
+            //             file: result,
+            //           },
+            //         ],
+            //       });
+            //       if (resultAddVid) {
+            //         return { link_video: resultAddVid.data.data[0].path };
+            //       } else {
+            //         flagvideo = false;
+            //         return;
+            //       }
+            //     })
+            //   );
+            // }
+            // if (results.imageList.length > 0) {
+            //   arrImage = await Promise.all(
+            //     results.imageList.map(async (image) => {
+            //       let result = await fetch(image);
+            //       result = await result.blob();
+            //       let resultAddImage = await createMedia({
+            //         data: [
+            //           {
+            //             alt: result[i].post_link.split('/')[6]
+            //               ? result[i].post_link.split('/')[6]
+            //               : '',
+            //             title: result[i].post_link.split('/')[6]
+            //               ? result[i].post_link.split('/')[6]
+            //               : '',
+            //             file: result,
+            //           },
+            //         ],
+            //       });
+            //       if (resultAddImage) {
+            //         return resultAddImage.data.data[0];
+            //       } else {
+            //         flagimage = false;
+            //         return null;
+            //       }
+            //     })
+            //   );
+            // }
+            // if (arrImage && arrImage.length > 0) {
+            //   for (let j = 0; j < arrImage.length; j++) {
+            //     if (arrImage[j] === undefined) {
+            //       arrImage = undefined;
+            //       break;
+            //     }
+            //   }
+            // }
+            // let arrImages = arrImage && arrImage.length !== 0 ? arrImage[0].id : null;
+            let basic_fields = {
+              title: titles,
+              short_description: short_descriptions,
+              long_description: results.contentList
+                ? results.contentList.replaceAll('https://l.facebook.com/l.php?', '')
+                : '',
+              slug: '',
+              featured_image: results.linkImgs[0] ? results.linkImgs[0] : '',
+              session_tags: {
+                tags: [],
+              },
+              categorialue: [],
+              key: '',
+              name: '',
+              type: post_type,
+              attributes: [],
+              is_active: 1,
+              status: 'publish',
+              seo_tags: {
+                meta_title: 'New Post Facebook',
+                meta_description: 'New Post Facebook',
+              },
+            };
+            let custom_fields = {
+              video: results.videos,
+              date: results.date ? results.date : '',
+              post_id: results.idPost ? results.idPost : '',
+              post_link: result[i].post_link ? result[i].post_link : '',
+              user_id: results.user_id ? results.user_id : 'undefined',
+              user_name: results.user ? results.user : 'undefined',
+              count_like: results.countLike
+                ? results.countLike.toString().split(' ')[0].indexOf(',') > -1
+                  ? parseInt(results.countLike.toString().split(' ')[0].replace('K', '00').replace(',', ''))
+                  : parseInt(results.countLike.toString().split(' ')[0].replace('K', '000'))
+                : 0,
+              count_comment: results.countComment
+                ? results.countComment.toString().split(' ')[0].indexOf(',') > -1
+                  ? parseInt(results.countComment.toString().split(' ')[0].replace('K', '00').replace(',', ''))
+                  : parseInt(results.countComment.toString().split(' ')[0].replace('K', '000'))
+                : 0,
+              count_share: results.countShare
+                ? results.countShare.toString().split(' ')[0].indexOf(',') > -1
+                  ? parseInt(results.countShare.toString().split(' ')[0].replace('K', '00').replace(',', ''))
+                  : parseInt(results.countShare.toString().split(' ')[0].replace('K', '000'))
+                : 0,
+              featured_image: results.linkImgs ? results.linkImgs : '',
+              comments: results.commentList
+                ? results.commentList.map((item) => ({
+                    content: item.contentComment,
+                    count_like: item.countLike
+                      ? item.countLike.toString().split(' ')[0].indexOf(',') > -1
+                        ? parseInt(item.countLike.toString().split(' ')[0].replace('K', '00').replace(',', ''))
+                        : parseInt(item.countLike.toString().split(' ')[0].replace('K', '000'))
+                      : 0,
+                    user_id: item.userIDComment,
+                    user_name: item.usernameComment,
+                    imgComment: item.imageComment ? item.imageComment : '',
+                    children: item.children
+                      ? item.children.map((child) => ({
+                          content: child.contentComment,
+                          count_like: child.countLike
+                            ? child.countLike.toString().split(' ')[0].indexOf(',') > -1
+                              ? parseInt(child.countLike.toString().split(' ')[0].replace('K', '00').replace(',', ''))
+                              : parseInt(child.countLike.toString().split(' ')[0].replace('K', '000'))
+                            : 0,
+                          user_id: child.userIDComment,
+                          user_name: child.usernameComment,
+                          imageComment: child.imageComment ? child.imageComment : '',
+                        }))
+                      : [],
+                  }))
+                : [],
+            };
+            //await bigquery(basic_fields, custom_fields);
+            try {
+              let post = new Post({
+                basic_fields: JSON.stringify(basic_fields, null, 2),
+                custom_fields: JSON.stringify(custom_fields, null, 2),
+                group_id: group_id,
+                posttype: Posttype_id,
+              });
+              let postdetail = new Post_detail({
+                group_id: group_id,
+                posttype: Posttype_id,
+                title: titles,
+                short_description: short_descriptions,
+                long_description: results.contentList
+                  ? results.contentList.replaceAll('https://l.facebook.com/l.php?', '')
+                  : '',
+                slug: '',
+                featured_image: results.linkImgs[0] ? results.linkImgs[0] : '',
+                session_tags: {
+                  tags: [],
+                },
+                categorialue: [],
+                key: '',
+                name: '',
+                type: post_type,
+                attributes: [],
+                is_active: 1,
+                status: 'publish',
+                seo_tags: {
+                  meta_title: 'New Post Facebook',
+                  meta_description: 'New Post Facebook',
+                },
+                video: results.videos,
+                date: results.date ? results.date : '',
+                post_id: results.idPost ? results.idPost : '',
+                post_link: result[i].post_link ? result[i].post_link : '',
+                user_id: results.user_id ? results.user_id : 'undefined',
+                user_name: results.user ? results.user : 'undefined',
+                count_like: results.countLike
+                  ? results.countLike.toString().split(' ')[0].indexOf(',') > -1
+                    ? parseInt(results.countLike.toString().split(' ')[0].replace('K', '00').replace(',', ''))
+                    : parseInt(results.countLike.toString().split(' ')[0].replace('K', '000'))
+                  : 0,
+                count_comment: results.countComment
+                  ? results.countComment.toString().split(' ')[0].indexOf(',') > -1
+                    ? parseInt(results.countComment.toString().split(' ')[0].replace('K', '00').replace(',', ''))
+                    : parseInt(results.countComment.toString().split(' ')[0].replace('K', '000'))
+                  : 0,
+                count_share: results.countShare
+                  ? results.countShare.toString().split(' ')[0].indexOf(',') > -1
+                    ? parseInt(results.countShare.toString().split(' ')[0].replace('K', '00').replace(',', ''))
+                    : parseInt(results.countShare.toString().split(' ')[0].replace('K', '000'))
+                  : 0,
+                featured_image: results.linkImgs ? results.linkImgs : '',
+                comments: results.commentList
+                  ? results.commentList.map((item) => ({
+                      content: item.contentComment,
+                      count_like: item.countLike
+                        ? item.countLike.toString().split(' ')[0].indexOf(',') > -1
+                          ? parseInt(item.countLike.toString().split(' ')[0].replace('K', '00').replace(',', ''))
+                          : parseInt(item.countLike.toString().split(' ')[0].replace('K', '000'))
+                        : 0,
+                      user_id: item.userIDComment,
+                      user_name: item.usernameComment,
+                      imgComment: item.imageComment ? item.imageComment : '',
+                      children: item.children
+                        ? item.children.map((child) => ({
+                            content: child.contentComment,
+                            count_like: child.countLike
+                              ? child.countLike.toString().split(' ')[0].indexOf(',') > -1
+                                ? parseInt(child.countLike.toString().split(' ')[0].replace('K', '00').replace(',', ''))
+                                : parseInt(child.countLike.toString().split(' ')[0].replace('K', '000'))
+                              : 0,
+                            user_id: child.userIDComment,
+                            user_name: child.usernameComment,
+                            imageComment: child.imageComment ? child.imageComment : '',
+                          }))
+                        : [],
+                    }))
+                  : [],
+              });
 
-      //       // await set(postListRefss, {
-      //       //   user: results.user,
-      //       //   videos: results.videos,
-      //       //   contentList: results.contentList,
-      //       //   countComment: results.countComment,
-      //       //   countLike: results.countLike,
-      //       //   countShare: results.countShare,
-      //       //   user_id: results.user_id,
-      //       //   idPost: result[i].post_link.split('/')[5],
-      //       //   linkPost: result[i].post_link,
-      //       //   linkImgs: results.linkImgs,
-      //       //   commentList: results.commentList,
-      //       //   token: results.token,
-      //       //   count_comments_config: results.count_comments_config,
-      //       //   statusbar: 'active',
-      //       //   create_at: Date.now(),
-      //       // });
-      //       // const postListRefs = ref(
-      //       //   database,
-      //       //   '/craw_list/' + name.replace(/[#:.,$]/g, '') + '/' + craw_id
-      //       // );
-      //       // const newPostRef = push(postListRefs);
-      //       // await set(newPostRef, {
-      //       //   id: i,
-      //       //   post_link: result[i].post_link,
-      //       //   statusbar: 'active',
-      //       //   countComment: results.countComment,
-      //       //   countLike: results.countLike,
-      //       //   countShare: results.countShare,
-      //       //   count_comments_config: results.count_comments_config,
-      //       //   create_at: Date.now(),
-      //       // });
-      //     });
-      //   } catch (e) {
-      //     console.log(e);
-      //     console.log('lỗi error');
+              await post.save();
+              await postdetail.save();
+            } catch (e) {
+              console.log(e);
+            }
 
-      //     // const postListRefss = ref(
-      //     //   database,
-      //     //   '/Listpost_error/' + name.replace(/[#:.,$]/g, '') + '/' + url.split('/')[6]
-      //     // );
-      //     // await set(postListRefss, {
-      //     //   post_link: url,
-      //     //   error: 'error' + e,
-      //     // });
-      //     // const postListRefs = ref(
-      //     //   database,
-      //     //   '/craw_list/' + name.replace(/[#:.,$]/g, '') + '/' + craw_id
-      //     // );
-      //     // const newPostRef = push(postListRefs);
-      //     // await set(newPostRef, {
-      //     //   id: i,
-      //     //   post_link: result[i].post_link,
-      //     //   statusbar: 'error' + e,
-      //     // });
-      //   }
-      // }
+            // await set(postListRef, {
+            //   basic_fields: basic_fields,
+            //   custom_fields: custom_fields,
+            // });
+            // const postListRefss = ref(
+            //   database,
+            //   '/Listpost/' + name.replace(/[#:.,$]/g, '') + '/' + url.split('/')[6]
+            // );
+
+            // await set(postListRefss, {
+            //   user: results.user,
+            //   videos: results.videos,
+            //   contentList: results.contentList,
+            //   countComment: results.countComment,
+            //   countLike: results.countLike,
+            //   countShare: results.countShare,
+            //   user_id: results.user_id,
+            //   idPost: result[i].post_link.split('/')[5],
+            //   linkPost: result[i].post_link,
+            //   linkImgs: results.linkImgs,
+            //   commentList: results.commentList,
+            //   token: results.token,
+            //   count_comments_config: results.count_comments_config,
+            //   statusbar: 'active',
+            //   create_at: Date.now(),
+            // });
+            // const postListRefs = ref(
+            //   database,
+            //   '/craw_list/' + name.replace(/[#:.,$]/g, '') + '/' + craw_id
+            // );
+            // const newPostRef = push(postListRefs);
+            // await set(newPostRef, {
+            //   id: i,
+            //   post_link: result[i].post_link,
+            //   statusbar: 'active',
+            //   countComment: results.countComment,
+            //   countLike: results.countLike,
+            //   countShare: results.countShare,
+            //   count_comments_config: results.count_comments_config,
+            //   create_at: Date.now(),
+            // });
+          });
+        } catch (e) {
+          console.log(e);
+          console.log('lỗi error');
+
+          // const postListRefss = ref(
+          //   database,
+          //   '/Listpost_error/' + name.replace(/[#:.,$]/g, '') + '/' + url.split('/')[6]
+          // );
+          // await set(postListRefss, {
+          //   post_link: url,
+          //   error: 'error' + e,
+          // });
+          // const postListRefs = ref(
+          //   database,
+          //   '/craw_list/' + name.replace(/[#:.,$]/g, '') + '/' + craw_id
+          // );
+          // const newPostRef = push(postListRefs);
+          // await set(newPostRef, {
+          //   id: i,
+          //   post_link: result[i].post_link,
+          //   statusbar: 'error' + e,
+          // });
+        }
+      }
 
       // // await browser2.close();
     });
@@ -778,305 +747,117 @@ module.exports = async function main(req) {
   }
 };
 
-async function getlink(page, conten_length, like, comment, share) {
+async function getlink(page, conten_length, like, comment, share, url) {
   const dimension = await page.evaluate(
-    async (conten_length, like, comment, share) => {
-      let length_feed = document.querySelectorAll('[role="feed"]');
-      let post = document.querySelectorAll('[role="feed"]')[length_feed.length - 1].childNodes;
-      let data_link = [];
-      if (length_feed.length > 1) {
-        document.querySelectorAll('[role="feed"]')[0].childNodes.forEach((element, index) => {
-          if (index === 1) {
-            try {
-              let posts_href = '';
+    async (conten_length, like, comment, share, url) => {
+      let post = document.querySelectorAll('div');
+      async function filternumber(str) {
+        let newString = '';
+        if (str.indexOf('\n') > -1) {
+          newString = await str.split('\n')[0];
+          if (newString.indexOf(',') > -1) {
+            newString = newString.replace('K', '00').replace(',', '');
+          } else {
+            newString = newString.replace('K', '000');
+          }
+        } else {
+          newString = await str.split(' ')[0];
+          if (str.indexOf(',') > -1) {
+            newString = newString.replace('K', '00').replace(',', '');
+          } else {
+            newString = newString.replace('K', '000');
+          }
+        }
+        return newString;
+      }
 
-              let count_like = (count_comment = count_share = count_content = 0);
-              let content = '';
-              let lengths =
-                element.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                  .childNodes[0].childNodes[0].childNodes[0].childNodes[7] !== undefined
-                  ? element.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                      .childNodes[0].childNodes[0].childNodes[0].childNodes[7].childNodes[0].childNodes
-                  : element.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                      .childNodes[0].childNodes[0].childNodes[0].childNodes[1].childNodes[0].childNodes;
-              lengths[2].childNodes.forEach((element, index) => {
-                if (element.className == '') {
-                  element.childNodes[0].childNodes.forEach(function (node) {
-                    if (node.nodeName == 'SPAN') {
-                      for (let c = 0; c < node.childNodes.length; c++) {
-                        content += node.childNodes[c].innerHTML
-                          .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
-                          .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
-                          .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
-                      }
-                    } else {
-                      for (let c = 0; c < node.childNodes[0].childNodes[0].childNodes.length; c++) {
-                        content += node.childNodes[0].childNodes[0].childNodes[c].innerHTML
-                          .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
-                          .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
-                          .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
-                      }
-                    }
-                  });
-                }
-              });
-              if (lengths.length == 5) {
-                div_commment_yes = lengths[4].childNodes[0];
-              } else {
-                div_commment_yes = lengths[3].childNodes[0];
-              }
-              div = div_commment_yes.querySelectorAll('a[role="link"]');
-              let likecomshares =
-                div_commment_yes.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes;
-              likecomshares.forEach((element, i) => {
-                if (i == 0) {
-                  count_like = element.childNodes
-                    ? element.childNodes[1].textContent.split(' ')[0].indexOf(',') > -1
-                      ? element.childNodes[1].textContent.split(' ')[0].replace('K', '00').replace(',', '')
-                      : element.childNodes[1].textContent.split(' ')[0].replace('K', '000')
-                    : 0;
-                }
-                if (i == 1) {
-                  count_comment = element.childNodes[1]
-                    ? element.childNodes[1].textContent.split(' ')[0].indexOf(',') > -1
-                      ? element.childNodes[1].textContent.split(' ')[0].replace('K', '00').replace(',', '')
-                      : element.childNodes[1].textContent.split(' ')[0].replace('K', '000')
-                    : 0;
-                  count_share = element.childNodes[2]
-                    ? element.childNodes[2].textContent.split(' ')[0].indexOf(',') > -1
-                      ? element.childNodes[2].textContent.split(' ')[0].replace('K', '00').replace(',', '')
-                      : element.childNodes[2].textContent.split(' ')[0].replace('K', '000')
-                    : 0;
-                }
-              });
-              if (
-                parseInt(count_like) < like ||
-                parseInt(count_comment) < comment ||
-                parseInt(count_share) < share ||
-                content.length < conten_length
-              ) {
-                console.log(parseInt(count_like), parseInt(count_comment), parseInt(count_share), content.length);
-                console.log(asd);
-              }
-              console.log(parseInt(count_like), parseInt(count_comment), parseInt(count_share), content.length);
-              if (!div) {
-                console.log(daa);
-              } else {
-                for (let k = 0; k < div.length; k++) {
-                  if (div[k].href?.indexOf('posts') !== -1) {
-                    for (let j = 0; j < 7; j++) {
-                      posts_href += div[k].href.split('/')[j] + '/';
-                    }
-                    break;
-                  }
-                }
-                data_link.push({
-                  id: data_link.length ? data_link.length + 1 : 1,
-                  post_link: posts_href == '' ? asd : posts_href.split('?comment_id')[0],
-                });
-              }
-            } catch (e) {
-              console.log(e);
-            }
+      let newpost = Array.prototype.slice.call(post).filter((el) => el.childNodes.length === 15);
+      console.log(newpost);
+      let data_link = [];
+      newpost.forEach(async (el) => {
+        let likes = '';
+        let comments = '';
+        let shares = '';
+        let contents = '';
+        let href = '';
+        likes =
+          el.childNodes[7].childNodes[0].childNodes[0].childNodes[
+            el.childNodes[7].childNodes[0].childNodes[0].childNodes.length - 1
+          ].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+            .childNodes[1].innerText;
+        if (
+          el.childNodes[7].childNodes[0].childNodes[0].childNodes[
+            el.childNodes[7].childNodes[0].childNodes[0].childNodes.length - 1
+          ].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[1].childNodes
+            .length == 3
+        ) {
+          comments =
+            el.childNodes[7].childNodes[0].childNodes[0].childNodes[
+              el.childNodes[7].childNodes[0].childNodes[0].childNodes.length - 1
+            ].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[1].childNodes[1].innerText.split(
+              ' '
+            )[0];
+          shares =
+            el.childNodes[7].childNodes[0].childNodes[0].childNodes[
+              el.childNodes[7].childNodes[0].childNodes[0].childNodes.length - 1
+            ].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[1].childNodes[2].innerText.split(
+              ' '
+            )[0];
+        } else {
+          if (
+            el.childNodes[7].childNodes[0].childNodes[0].childNodes[
+              el.childNodes[7].childNodes[0].childNodes[0].childNodes.length - 1
+            ].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[1]
+              .childNodes[0].innerText.length > 1
+          ) {
+            comments =
+              el.childNodes[7].childNodes[0].childNodes[0].childNodes[
+                el.childNodes[7].childNodes[0].childNodes[0].childNodes.length - 1
+              ].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[1].childNodes[0].innerText.split(
+                ' '
+              )[0];
+
+            shares =
+              el.childNodes[7].childNodes[0].childNodes[0].childNodes[
+                el.childNodes[7].childNodes[0].childNodes[0].childNodes.length - 1
+              ].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[1].childNodes[1].innerText.split(
+                ' '
+              )[0];
+          }
+        }
+        likes = (await filternumber(likes)) ? await filternumber(likes) : 0;
+
+        comments = (await filternumber(comments)) ? await filternumber(comments) : 0;
+        shares = (await filternumber(shares)) ? await filternumber(shares) : 0;
+        contents = el.childNodes[7].childNodes[0].childNodes[0].childNodes[2].innerText.split(' ').length;
+        el.querySelectorAll('[role="link"]').forEach(async (link) => {
+          if (link.href.indexOf(`${url}/posts`) > -1) {
+            href = link.href.split('?comment_id')[0];
           }
         });
-        let post = document.querySelectorAll('[role="feed"]')[length_feed.length - 1].childNodes;
-        for (let k = 1; k < post.length - 5; k++) {
-          try {
-            let posts_href = '';
-
-            let count_like = (count_comment = count_share = count_content = 0);
-            let content = '';
-            let lengths =
-              post[k].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                .childNodes[0].childNodes[0].childNodes[7] !== undefined
-                ? post[k].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                    .childNodes[0].childNodes[0].childNodes[0].childNodes[7].childNodes[0].childNodes
-                : post[k].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                    .childNodes[0].childNodes[0].childNodes[0].childNodes[1].childNodes[0].childNodes;
-            lengths[2].childNodes.forEach((element, index) => {
-              if (element.className == '') {
-                element.childNodes[0].childNodes.forEach(function (node) {
-                  if (node.nodeName == 'SPAN') {
-                    for (let c = 0; c < node.childNodes.length; c++) {
-                      content += node.childNodes[c].innerHTML
-                        .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
-                        .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
-                        .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
-                    }
-                  } else {
-                    for (let c = 0; c < node.childNodes[0].childNodes[0].childNodes.length; c++) {
-                      content += node.childNodes[0].childNodes[0].childNodes[c].innerHTML
-                        .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
-                        .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
-                        .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
-                    }
-                  }
-                });
-              }
-            });
-            if (lengths.length == 5) {
-              div_commment_yes = lengths[4].childNodes[0];
-            } else {
-              div_commment_yes = lengths[3].childNodes[0];
-            }
-            div = div_commment_yes.querySelectorAll('a[role="link"]');
-            let likecomshares =
-              div_commment_yes.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes;
-            likecomshares.forEach((element, i) => {
-              if (i == 0) {
-                count_like = element.childNodes
-                  ? element.childNodes[1].textContent.split(' ')[0].indexOf(',') > -1
-                    ? element.childNodes[1].textContent.split(' ')[0].replace('K', '00').replace(',', '')
-                    : element.childNodes[1].textContent.split(' ')[0].replace('K', '000')
-                  : 0;
-              }
-              if (i == 1) {
-                count_comment = element.childNodes[1]
-                  ? element.childNodes[1].textContent.split(' ')[0].indexOf(',') > -1
-                    ? element.childNodes[1].textContent.split(' ')[0].replace('K', '00').replace(',', '')
-                    : element.childNodes[1].textContent.split(' ')[0].replace('K', '000')
-                  : 0;
-                count_share = element.childNodes[2]
-                  ? element.childNodes[2].textContent.split(' ')[0].indexOf(',') > -1
-                    ? element.childNodes[2].textContent.split(' ')[0].replace('K', '00').replace(',', '')
-                    : element.childNodes[2].textContent.split(' ')[0].replace('K', '000')
-                  : 0;
-              }
-            });
-            if (
-              parseInt(count_like) < 1 ||
-              parseInt(count_comment) < 1 ||
-              parseInt(count_share) < 1 ||
-              content.length < 1
-            ) {
-              console.log(parseInt(count_like), parseInt(count_comment), parseInt(count_share), content.length);
-              console.log(asd);
-            }
-            console.log(parseInt(count_like), parseInt(count_comment), parseInt(count_share), content.length);
-            if (!div) {
-              console.log(daa);
-            } else {
-              for (let k = 0; k < div.length; k++) {
-                if (div[k].href?.indexOf('posts') !== -1) {
-                  for (let j = 0; j < 7; j++) {
-                    posts_href += div[k].href.split('/')[j] + '/';
-                  }
-                  break;
-                }
-              }
-              console.log('có làm này không');
-              data_link.push({
-                id: data_link.length ? data_link.length + 1 : 1,
-                post_link: posts_href == '' ? asd : posts_href.split('?comment_id')[0],
-              });
-            }
-          } catch (e) {
-            console.log(e);
-          }
+        if (
+          parseInt(likes) < like ||
+          parseInt(comments) < comments ||
+          parseInt(shares) < share ||
+          parseInt(contents) < conten_length
+        ) {
+          console.log('sss');
+        } else {
+          data_link.push({
+            id: data_link.length > 0 ? data_link.length : 0,
+            post_link: href,
+          });
         }
-      } else {
-        let post = document.querySelectorAll('[role="feed"]')[length_feed.length - 1].childNodes;
-        for (let k = 1; k < post.length - 5; k++) {
-          try {
-            let posts_href = '';
+      });
+      console.log(data_link);
 
-            let count_like = (count_comment = count_share = count_content = 0);
-            let content = '';
-            let lengths =
-              post[k].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                .childNodes[0].childNodes[0].childNodes[7] !== undefined
-                ? post[k].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                    .childNodes[0].childNodes[0].childNodes[0].childNodes[7].childNodes[0].childNodes
-                : post[k].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                    .childNodes[0].childNodes[0].childNodes[0].childNodes[1].childNodes[0].childNodes;
-            lengths[2].childNodes.forEach((element, index) => {
-              if (element.className == '') {
-                element.childNodes[0].childNodes.forEach(function (node) {
-                  if (node.nodeName == 'SPAN') {
-                    for (let c = 0; c < node.childNodes.length; c++) {
-                      content += node.childNodes[c].innerHTML
-                        .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
-                        .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
-                        .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
-                    }
-                  } else {
-                    for (let c = 0; c < node.childNodes[0].childNodes[0].childNodes.length; c++) {
-                      content += node.childNodes[0].childNodes[0].childNodes[c].innerHTML
-                        .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
-                        .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
-                        .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
-                    }
-                  }
-                });
-              }
-            });
-            if (lengths.length == 5) {
-              div_commment_yes = lengths[4].childNodes[0];
-            } else {
-              div_commment_yes = lengths[3].childNodes[0];
-            }
-            div = div_commment_yes.querySelectorAll('a[role="link"]');
-            let likecomshares =
-              div_commment_yes.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes;
-            likecomshares.forEach((element, i) => {
-              if (i == 0) {
-                count_like = element.childNodes
-                  ? element.childNodes[1].textContent.split(' ')[0].indexOf(',') > -1
-                    ? element.childNodes[1].textContent.split(' ')[0].replace('K', '00').replace(',', '')
-                    : element.childNodes[1].textContent.split(' ')[0].replace('K', '000')
-                  : 0;
-              }
-              if (i == 1) {
-                count_comment = element.childNodes[1]
-                  ? element.childNodes[1].textContent.split(' ')[0].indexOf(',') > -1
-                    ? element.childNodes[1].textContent.split(' ')[0].replace('K', '00').replace(',', '')
-                    : element.childNodes[1].textContent.split(' ')[0].replace('K', '000')
-                  : 0;
-                count_share = element.childNodes[2]
-                  ? element.childNodes[2].textContent.split(' ')[0].indexOf(',') > -1
-                    ? element.childNodes[2].textContent.split(' ')[0].replace('K', '00').replace(',', '')
-                    : element.childNodes[2].textContent.split(' ')[0].replace('K', '000')
-                  : 0;
-              }
-            });
-            if (
-              parseInt(count_like) < 1 ||
-              parseInt(count_comment) < 1 ||
-              parseInt(count_share) < 1 ||
-              content.length < 1
-            ) {
-              console.log(parseInt(count_like), parseInt(count_comment), parseInt(count_share), content.length);
-              console.log(asd);
-            }
-            console.log(parseInt(count_like), parseInt(count_comment), parseInt(count_share), content.length);
-            if (!div) {
-              console.log(daa);
-            } else {
-              for (let k = 0; k < div.length; k++) {
-                if (div[k].href?.indexOf('posts') !== -1) {
-                  for (let j = 0; j < 7; j++) {
-                    posts_href += div[k].href.split('/')[j] + '/';
-                  }
-                  break;
-                }
-              }
-              data_link.push({
-                id: data_link.length ? data_link.length + 1 : 1,
-                post_link: posts_href == '' ? asd : posts_href.split('?comment_id')[0],
-              });
-            }
-          } catch (e) {
-            console.log(e);
-          }
-        }
-      }
       return data_link;
     },
     conten_length,
     like,
     comment,
-    share
+    share,
+    url
   );
   return dimension;
 }
