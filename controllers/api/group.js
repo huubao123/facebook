@@ -564,6 +564,7 @@ module.exports = async function main(req) {
               featured_image: Image_id ? Image_id : '',
               comments: results.commentList
                 ? results.commentList.map((item) => ({
+                    date: item.date,
                     content: item.contentComment,
                     count_like: item.countLike
                       ? item.countLike.toString().split(' ')[0].indexOf(',') > -1
@@ -575,6 +576,7 @@ module.exports = async function main(req) {
                     imgComment: item.imageComment ? item.imageComment : '',
                     children: item.children
                       ? item.children.map((child) => ({
+                          date: children.date,
                           content: child.contentComment,
                           count_like: child.countLike
                             ? child.countLike.toString().split(' ')[0].indexOf(',') > -1
