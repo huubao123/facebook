@@ -477,7 +477,7 @@ module.exports = async function main(req) {
                     imageid: imageid,
                   };
                   image.add({ data: datas });
-                  results.commentList[i].imageComment = `images/${post_type}/${imageid}.jpeg`;
+                  results.commentList[i].imageComment = `images/${post_type}/${imageid}`;
                 }
                 if (results.commentList[i].children.length > 0) {
                   for (let j = 0; j < results.commentList[i].children.length; j++) {
@@ -492,7 +492,7 @@ module.exports = async function main(req) {
                         imageid: imageid,
                       };
                       image.add({ data: datas });
-                      results.commentList[i].children[j].imageComment = `images/${post_type}/${imageid}.jpeg`;
+                      results.commentList[i].children[j].imageComment = `images/${post_type}/${imageid}`;
                     }
                   }
                 }
