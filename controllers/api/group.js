@@ -509,7 +509,6 @@ module.exports = async function main(req) {
             //   }
             // }
 
-            console.log(results.commentList);
             let basic_fields = {
               title: titles,
               short_description: short_descriptions,
@@ -571,7 +570,7 @@ module.exports = async function main(req) {
                     imgComment: item.imageComment ? item.imageComment : '',
                     children: item.children
                       ? item.children.map((child) => ({
-                          date: children.date,
+                          date: child.date,
                           content: child.contentComment,
                           count_like: child.countLike
                             ? child.countLike.toString().split(' ')[0].indexOf(',') > -1
@@ -591,23 +590,7 @@ module.exports = async function main(req) {
               let trash = await Trash.find();
               let id = await trash[0].ids.find((id) => id == results.idPost);
               if (id) {
-                await Trash.findByIdAndUpdate(trash[0]._id, {
-                  $pull: { ids: results.idPost },
-                });
-                let posts = new Post_filter_no({
-                  basic_fields: JSON.stringify(basic_fields),
-                  custom_fields: JSON.stringify(custom_fields),
-                  post_link: result[i].post_link,
-                  group_page_id: group_id,
-                  posttype: Posttype_id,
-                  title: titles,
-                  create_at: new Date(),
-                  status: 'update',
-                  length_comments: parseInt(cmt_length),
-                  filter: false,
-                });
-                await posts.save();
-                console.log(posts._id);
+                console.log(id);
               } else {
                 Post_filter_no.findOne(
                   { post_link: result[i].post_link, posttype: Posttype_id },

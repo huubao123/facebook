@@ -19,6 +19,8 @@ module.exports = async function getdata(page, cmt_lengths) {
       user_id =
       post_id =
       cotent_cmt =
+      date_cmt =
+      date_cmtchild =
       user_cmt_id =
       user_name_cmt =
       user_cmt_href =
@@ -46,77 +48,14 @@ module.exports = async function getdata(page, cmt_lengths) {
     let iscate = true;
     let contens = '';
     try {
-      let post = document.querySelectorAll('[role="main"]')[2];
-      if (!post) {
-        let post1 =
-          document.querySelectorAll('[role="article"]')[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-            .childNodes[0];
-        if (post1.childNodes.length > 5) {
-          contens = post1.childNodes[7].childNodes[0];
-        } else {
-          contens = post1.childNodes[1].childNodes[0];
-        }
-      } else {
-        try {
-          if (
-            post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-              .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-              .childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-              .childNodes[0]
-          ) {
-            contens =
-              post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                .childNodes[0].childNodes[1].childNodes[0];
-          }
-        } catch (e) {
-          try {
-            if (
-              post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                .childNodes[0].childNodes[7].childNodes[0]
-            ) {
-              contens =
-                post.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                  .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                  .childNodes[0].childNodes[7].childNodes[0];
-            }
-          } catch (e) {
-            if (
-              document.querySelector('[aria-posinset="1"]').childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                .childNodes[0].childNodes[7]
-            ) {
-              contens =
-                document.querySelector('[aria-posinset="1"]').childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                  .childNodes[0].childNodes[7].childNodes[0];
-            } else {
-              contens =
-                document.querySelector('[aria-posinset="1"]').childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                  .childNodes[0].childNodes[1].childNodes[0];
-            }
-          }
-        }
-      }
+      let post = document.querySelectorAll('div');
+      let newpost = Array.prototype.slice.call(post).filter((el) => el.childNodes.length === 15);
+      contens = newpost[0].childNodes[7].childNodes[0].childNodes[0];
     } catch (e) {
       ismain = false;
     }
 
-    // if(contens = ''){
-    //   post.forEach((e)=>{
-    //     if(e.childNodes.length >13){
-    //         contens = e.childNodes[7].childNodes[0]
-    //     }
-    // })
-    // }
     try {
-      // contens.childNodes[1].childNodes[0].childNodes[1].childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes.forEach(
-      //   (ele) => {
-      //     if (ele.className == '') {
-      //       posthref = ele.childNodes[0].childNodes[0].href;
-      //       post_id = ele.childNodes[0].childNodes[0].href.split('/')[6];
-      //     }
-      //   }
-      // );
       try {
         if (
           contens.childNodes[1].childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
@@ -368,6 +307,10 @@ module.exports = async function getdata(page, cmt_lengths) {
           element.childNodes.forEach((elementss) => {
             try {
               if (elementss.childNodes[0].childNodes.length == 2) {
+                date_cmt =
+                  elementss.childNodes[0].querySelectorAll('a[role="link"]')[
+                    elementss.childNodes[0].querySelectorAll('a[role="link"]').length - 1
+                  ].innerText;
                 if (
                   elementss.childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes[0].children[0]
                     .childNodes[0].childNodes[0].childNodes &&
@@ -519,6 +462,7 @@ module.exports = async function getdata(page, cmt_lengths) {
                     elementss.childNodes[1].childNodes[0].childNodes.forEach((cmt_old) => {
                       if (cmt_old.nodeName == 'UL') {
                         for (let m = 0; m < cmt_old.childNodes.length; m++) {
+                          date_cmtchild = cmt_old.childNodes[m].childNodes[0].childNodes[1];
                           try {
                             cmt_old.childNodes[
                               m
@@ -582,6 +526,7 @@ module.exports = async function getdata(page, cmt_lengths) {
                               usernameComment: user_name_cmtchild,
                               userIDComment: user_cmtchild_id.split('&')[0].split('id=')[1],
                               contentComment: cotent_cmtchild,
+                              date: date_cmtchild,
                               imageComment: imgComment_cmt == '' ? null : imgComment_cmt,
                               countLike: count_like_cmtchild,
                             });
@@ -591,6 +536,7 @@ module.exports = async function getdata(page, cmt_lengths) {
                               user_cmtchild_id =
                               cotent_cmtchild =
                               imgComment_cmt =
+                              date_cmtchild =
                                 '';
                             count_like_cmtchild = 0;
                           } catch (e) {
@@ -632,6 +578,10 @@ module.exports = async function getdata(page, cmt_lengths) {
                           }
                           // cmtchild1 mới  cũ có hình ảnh
                           console.log('children_div', children_div);
+                          date_cmtchild =
+                            elementsss.childNodes[m].childNodes[0].querySelectorAll('a[role="link"]')[
+                              elementsss.childNodes[m].childNodes[0].querySelectorAll('a[role="link"]').length - 1
+                            ].innerText;
                           if (
                             children_div[0].parentNode.parentNode.parentNode.parentNode.parentNode.childNodes.length ==
                             3
@@ -748,6 +698,7 @@ module.exports = async function getdata(page, cmt_lengths) {
                             usernameComment: user_name_cmtchild,
                             userIDComment: user_cmtchild_id.split('&')[0].split('id=')[1],
                             contentComment: cotent_cmtchild,
+                            date: date_cmtchild,
                             imageComment: imgComment_cmt == '' ? null : imgComment_cmt,
                             countLike: count_like_cmtchild,
                           });
@@ -756,6 +707,7 @@ module.exports = async function getdata(page, cmt_lengths) {
                             user_name_cmtchild =
                             user_cmtchild_id =
                             cotent_cmtchild =
+                            date_cmtchild =
                             imgComment_cmt =
                               '';
                           count_like_cmtchild = 0;
@@ -767,6 +719,10 @@ module.exports = async function getdata(page, cmt_lengths) {
                             children2 = elementsss.childNodes[m].childNodes[1].childNodes[0].childNodes;
                             console.log(children2);
                             for (let n = 0; n < children2.length; n++) {
+                              date_cmtchild =
+                                children2[0].querySelectorAll('a[role="link"]')[
+                                  children2[0].querySelectorAll('a[role="link"]').length - 1
+                                ].innerText;
                               try {
                                 children22 =
                                   children2[n].childNodes[0].childNodes[
@@ -905,6 +861,7 @@ module.exports = async function getdata(page, cmt_lengths) {
                                   usernameComment: user_name_cmtchild,
                                   userIDComment: user_cmtchild_id.split('&')[0].split('id=')[1],
                                   contentComment: cotent_cmtchild,
+                                  date: date_cmtchild,
                                   imageComment: imgComment_cmt == '' ? null : imgComment_cmt,
                                   countLike: count_like_cmtchild2,
                                 });
@@ -913,6 +870,7 @@ module.exports = async function getdata(page, cmt_lengths) {
                                   user_name_cmtchild =
                                   user_cmtchild_id =
                                   cotent_cmtchild =
+                                  date_cmtchild =
                                   imgComment_cmt =
                                     '';
                                 count_like_cmtchild2 = 0;
@@ -932,6 +890,10 @@ module.exports = async function getdata(page, cmt_lengths) {
                 }
               } else {
                 console.log('cmt _1 ', elementss.childNodes[0].childNodes[0].childNodes[1].childNodes);
+                date_cmt =
+                  elementss.childNodes[0].childNodes[0].childNodes[1].querySelectorAll('[role="link"]')[
+                    elementss.childNodes[0].childNodes[0].childNodes[1].querySelectorAll('[role="link"]').length - 1
+                  ].innerText;
                 // cũ nè
                 if (elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[0].childNodes[0]) {
                   divcommment =
@@ -1046,9 +1008,10 @@ module.exports = async function getdata(page, cmt_lengths) {
                 imageComment: imgComment == '' ? null : imgComment,
                 countLike: count_like_cmt,
                 children: children,
+                date: date_cmt,
               });
               count_comments_config += 1;
-              cotent_cmt = user_cmt_id = user_name_cmt = user_cmt_href = imgComment = '';
+              date_cmt = cotent_cmt = user_cmt_id = user_name_cmt = user_cmt_href = imgComment = '';
               count_like_cmt = 0;
               children = [];
               console.log(comments);
@@ -1188,7 +1151,7 @@ module.exports = async function getdata(page, cmt_lengths) {
     } catch (error) {
       console.log(error);
     }
-
+    console.log(data);
     return data;
   }, cmt_lengths);
   return dimension;

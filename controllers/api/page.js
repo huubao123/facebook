@@ -1,35 +1,22 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 const crypto = require('crypto');
-const initializeApp = require('firebase/app');
-const getDatabase = require('firebase/database').getDatabase;
-const set = require('firebase/database').set;
-const ref = require('firebase/database').ref;
-const push = require('firebase/database').push;
 const loadmoremedia = require('../../middlewares/loadmore_media');
 const getdata = require('../../middlewares/getdata_post_page');
 const autoScroll_post = require('../../middlewares/autoscrollpost');
 const genSlug = require('../../middlewares/genslug');
 const Post = require('../../models/post');
-const Post_detail = require('../../models/post_detail');
-const Page = require('../../models/page');
-const Posttype = require('../../models/posttype');
-require('dotenv').config();
+const Post_filter_no = require('../../models/post_filter_no');
 
-//const bigquery = require('./bigquery');
-const axios = require('axios');
-const firebaseConfig = {
-  apiKey: 'AIzaSyA8SytL-Kim6L_CSNvYUmVTH2nf6d-cE6c',
-  authDomain: 'facebookpup-4fde6.firebaseapp.com',
-  databaseURL: 'https://facebookpup-4fde6-default-rtdb.asia-southeast1.firebasedatabase.app',
-  projectId: 'facebookpup-4fde6',
-  storageBucket: 'facebookpup-4fde6.appspot.com',
-  messagingSenderId: '207611940130',
-  appId: '1:207611940130:web:3cebdcc6c0a6f19e58297b',
-  measurementId: 'G-3LDE9KDMV2',
-};
-// TODO: Replace the following with your app's Firebase project configuration
-// See: https://firebase.google.com/docs/web/learn-more#config-object
+const Trash = require('../../models/trash');
+const Posttype = require('../../models/posttype');
+const Images = require('../../models/image');
+const Page = require('../../models/page');
+const Queue = require('bull');
+const image = new Queue('image', { redis: { port: 6379, host: '127.0.0.1' } });
+const downloadImage = require('../../middlewares/downloadimage');
+
+require('dotenv').config();
 
 async function autoScroll(page, lengthss, like, comment, share, url) {
   const getdata = await page.evaluate(
@@ -283,8 +270,7 @@ module.exports = async function main(req) {
       await page.goto(url, {
         waitUntil: 'load',
       });
-      //aaa
-      await page.waitForSelector('h2', { visible: true });
+      await new Promise((r) => setTimeout(r, 4000));
     } catch (e) {
       console.log(e);
     }
@@ -421,16 +407,8 @@ module.exports = async function main(req) {
               results = await loadmoremedia(page1, data);
             }
 
-            // const postListRef = ref(
-            //   database,
-            //   'post_type/' + post_type + '/' + name.replace(/[#:.,$]/g, '') + '/' + result[i].post_link.split('/')[5]
-            // );
             let titles = '';
             let short_descriptions = '';
-            // let arrVid = null;
-            // let arrImage = null;
-            // let flagimage = true;
-            // let flagvideo = true;
             let short_description = results.contentList ? results.contentList.replaceAll(/(<([^>]+)>)/gi, '') : '';
             for (let i = 0; i < 100; i++) {
               let lengths = short_description.split(' ').length;
@@ -446,72 +424,46 @@ module.exports = async function main(req) {
                 break;
               }
             }
-            // if (results.videos.length > 2) {
-            //   arrVid = await Promise.all(
-            //     results.videos.map(async (video) => {
-            //       let resultss = await fetch(video);
-            //       resultss = await result.blob();
-            //       if (resultss.size / 1024 / 1024 > 1) {
-            //         return null;
-            //       }
-            //       let resultAddVid = await createMedia({
-            //         data: [
-            //           {
-            //             alt: result[i].post_link.split('/')[6]
-            //               ? result[i].post_link.split('/')[6]
-            //               : '',
-            //             title: result[i].post_link.split('/')[6]
-            //               ? result[i].post_link.split('/')[6]
-            //               : '',
-            //             file: result,
-            //           },
-            //         ],
-            //       });
-            //       if (resultAddVid) {
-            //         return { link_video: resultAddVid.data.data[0].path };
-            //       } else {
-            //         flagvideo = false;
-            //         return;
-            //       }
-            //     })
-            //   );
-            // }
-            // if (results.imageList.length > 0) {
-            //   arrImage = await Promise.all(
-            //     results.imageList.map(async (image) => {
-            //       let result = await fetch(image);
-            //       result = await result.blob();
-            //       let resultAddImage = await createMedia({
-            //         data: [
-            //           {
-            //             alt: result[i].post_link.split('/')[6]
-            //               ? result[i].post_link.split('/')[6]
-            //               : '',
-            //             title: result[i].post_link.split('/')[6]
-            //               ? result[i].post_link.split('/')[6]
-            //               : '',
-            //             file: result,
-            //           },
-            //         ],
-            //       });
-            //       if (resultAddImage) {
-            //         return resultAddImage.data.data[0];
-            //       } else {
-            //         flagimage = false;
-            //         return null;
-            //       }
-            //     })
-            //   );
-            // }
-            // if (arrImage && arrImage.length > 0) {
-            //   for (let j = 0; j < arrImage.length; j++) {
-            //     if (arrImage[j] === undefined) {
-            //       arrImage = undefined;
-            //       break;
-            //     }
-            //   }
-            // }
-            // let arrImages = arrImage && arrImage.length !== 0 ? arrImage[0].id : null;
+            let Image_id = [];
+            if (results.linkImgs.length > 0) {
+              for (let i = 0; i < results.linkImgs.length; i++) {
+                let result_id_image = await downloadImage(results.linkImgs[i], post_type);
+                Image_id.push(result_id_image);
+              }
+            }
+            if (results.commentList.length > 0) {
+              for (let i = 0; i < results.commentList.length; i++) {
+                if (results.commentList[i].imageComment && results.commentList[i].imageComment != '') {
+                  const imageid = crypto.randomBytes(10).toString('hex');
+                  let datas = {
+                    link: results.commentList[i].imageComment,
+                    posttype: post_type,
+                    imageid: imageid,
+                  };
+                  image.add({ data: datas });
+                  results.commentList[i].imageComment = `images/${post_type}/${imageid}`;
+                }
+                if (results.commentList[i].children.length > 0) {
+                  for (let j = 0; j < results.commentList[i].children.length; j++) {
+                    if (
+                      results.commentList[i].children[j].imageComment &&
+                      results.commentList[i].children[j].imageComment !== ''
+                    ) {
+                      const imageid = crypto.randomBytes(10).toString('hex');
+                      let datas = {
+                        link: results.commentList[i].children[j].imageComment,
+                        posttype: post_type,
+                        imageid: imageid,
+                      };
+                      image.add({ data: datas });
+
+                      results.commentList[i].children[j].imageComment = `images/${post_type}/${imageid}`;
+                    }
+                  }
+                }
+              }
+            }
+
             let basic_fields = {
               title: titles,
               short_description: short_descriptions,
@@ -519,7 +471,7 @@ module.exports = async function main(req) {
                 ? results.contentList.replaceAll('https://l.facebook.com/l.php?', '')
                 : '',
               slug: '',
-              featured_image: results.linkImgs[0] ? results.linkImgs[0] : '',
+              featured_image: Image_id[0] ? Image_id[0] : [],
               session_tags: {
                 tags: [],
               },
@@ -557,9 +509,10 @@ module.exports = async function main(req) {
                   ? parseInt(results.countShare.toString().split(' ')[0].replace('K', '00').replace(',', ''))
                   : parseInt(results.countShare.toString().split(' ')[0].replace('K', '000'))
                 : 0,
-              featured_image: results.linkImgs ? results.linkImgs : '',
+              featured_image: Image_id[0] ? Image_id[0] : [],
               comments: results.commentList
                 ? results.commentList.map((item) => ({
+                    date: item.date ? item.date : '',
                     content: item.contentComment,
                     count_like: item.countLike
                       ? item.countLike.toString().split(' ')[0].indexOf(',') > -1
@@ -571,6 +524,7 @@ module.exports = async function main(req) {
                     imgComment: item.imageComment ? item.imageComment : '',
                     children: item.children
                       ? item.children.map((child) => ({
+                          date: child.date ? child.date : '',
                           content: child.contentComment,
                           count_like: child.countLike
                             ? child.countLike.toString().split(' ')[0].indexOf(',') > -1
@@ -585,158 +539,79 @@ module.exports = async function main(req) {
                   }))
                 : [],
             };
-            //await bigquery(basic_fields, custom_fields);
             try {
-              let post = new Post({
-                basic_fields: JSON.stringify(basic_fields, null, 2),
-                custom_fields: JSON.stringify(custom_fields, null, 2),
-                group_id: group_id,
-                posttype: Posttype_id,
-              });
-              let postdetail = new Post_detail({
-                group_id: group_id,
-                posttype: Posttype_id,
-                title: titles,
-                short_description: short_descriptions,
-                long_description: results.contentList
-                  ? results.contentList.replaceAll('https://l.facebook.com/l.php?', '')
-                  : '',
-                slug: '',
-                featured_image: results.linkImgs[0] ? results.linkImgs[0] : '',
-                session_tags: {
-                  tags: [],
-                },
-                categorialue: [],
-                key: '',
-                name: '',
-                type: post_type,
-                attributes: [],
-                is_active: 1,
-                status: 'publish',
-                seo_tags: {
-                  meta_title: 'New Post Facebook',
-                  meta_description: 'New Post Facebook',
-                },
-                video: results.videos,
-                date: results.date ? results.date : '',
-                post_id: results.idPost ? results.idPost : '',
-                post_link: result[i].post_link ? result[i].post_link : '',
-                user_id: results.user_id ? results.user_id : 'undefined',
-                user_name: results.user ? results.user : 'undefined',
-                count_like: results.countLike
-                  ? results.countLike.toString().split(' ')[0].indexOf(',') > -1
-                    ? parseInt(results.countLike.toString().split(' ')[0].replace('K', '00').replace(',', ''))
-                    : parseInt(results.countLike.toString().split(' ')[0].replace('K', '000'))
-                  : 0,
-                count_comment: results.countComment
-                  ? results.countComment.toString().split(' ')[0].indexOf(',') > -1
-                    ? parseInt(results.countComment.toString().split(' ')[0].replace('K', '00').replace(',', ''))
-                    : parseInt(results.countComment.toString().split(' ')[0].replace('K', '000'))
-                  : 0,
-                count_share: results.countShare
-                  ? results.countShare.toString().split(' ')[0].indexOf(',') > -1
-                    ? parseInt(results.countShare.toString().split(' ')[0].replace('K', '00').replace(',', ''))
-                    : parseInt(results.countShare.toString().split(' ')[0].replace('K', '000'))
-                  : 0,
-                featured_image: results.linkImgs ? results.linkImgs : '',
-                comments: results.commentList
-                  ? results.commentList.map((item) => ({
-                      content: item.contentComment,
-                      count_like: item.countLike
-                        ? item.countLike.toString().split(' ')[0].indexOf(',') > -1
-                          ? parseInt(item.countLike.toString().split(' ')[0].replace('K', '00').replace(',', ''))
-                          : parseInt(item.countLike.toString().split(' ')[0].replace('K', '000'))
-                        : 0,
-                      user_id: item.userIDComment,
-                      user_name: item.usernameComment,
-                      imgComment: item.imageComment ? item.imageComment : '',
-                      children: item.children
-                        ? item.children.map((child) => ({
-                            content: child.contentComment,
-                            count_like: child.countLike
-                              ? child.countLike.toString().split(' ')[0].indexOf(',') > -1
-                                ? parseInt(child.countLike.toString().split(' ')[0].replace('K', '00').replace(',', ''))
-                                : parseInt(child.countLike.toString().split(' ')[0].replace('K', '000'))
-                              : 0,
-                            user_id: child.userIDComment,
-                            user_name: child.usernameComment,
-                            imageComment: child.imageComment ? child.imageComment : '',
-                          }))
-                        : [],
-                    }))
-                  : [],
-              });
-
-              await post.save();
-              await postdetail.save();
+              let trash = await Trash.find();
+              let id = await trash[0].ids.find((id) => id == results.idPost);
+              if (id) {
+                console.log(id);
+              } else {
+                Post_filter_no.findOne(
+                  { post_link: result[i].post_link, posttype: Posttype_id },
+                  async function (err, post) {
+                    if (err) {
+                      console.log(err);
+                    } else {
+                      if (post === null) {
+                        let posts = new Post_filter_no({
+                          basic_fields: JSON.stringify(basic_fields),
+                          custom_fields: JSON.stringify(custom_fields),
+                          post_link: result[i].post_link,
+                          group_page_id: page_id,
+                          posttype: Posttype_id,
+                          length_comments: parseInt(cmt_length),
+                          title: titles,
+                          create_at: new Date(),
+                          status: 'active',
+                          filter: false,
+                        });
+                        await posts.save();
+                        console.log(posts._id);
+                        if (results.linkImgs.length > 0) {
+                          let image = new Images({
+                            link_img: Image_id,
+                            idPost: posts._id,
+                            link_post: result[i].post_link,
+                            update_at: new Date(),
+                          });
+                          await image.save();
+                        }
+                      } else {
+                        await Post_filter_no.findByIdAndUpdate(
+                          post._id,
+                          {
+                            basic_fields: JSON.stringify(basic_fields),
+                            custom_fields: JSON.stringify(custom_fields),
+                            title: titles,
+                            create_at: new Date(),
+                            length_comments: parseInt(cmt_length),
+                            status: 'update',
+                            filter: false,
+                          },
+                          { new: true }
+                        );
+                        console.log(post._id);
+                        if (results.linkImgs.length > 0) {
+                          await Images.findByIdAndUpdate(
+                            post._id,
+                            {
+                              link_img: Image_id,
+                              update_at: new Date(),
+                            },
+                            { new: true }
+                          );
+                        }
+                      }
+                    }
+                  }
+                );
+              }
             } catch (e) {
               console.log(e);
             }
-
-            // await set(postListRef, {
-            //   basic_fields: basic_fields,
-            //   custom_fields: custom_fields,
-            // });
-            // const postListRefss = ref(
-            //   database,
-            //   '/Listpost/' + name.replace(/[#:.,$]/g, '') + '/' + url.split('/')[6]
-            // );
-
-            // await set(postListRefss, {
-            //   user: results.user,
-            //   videos: results.videos,
-            //   contentList: results.contentList,
-            //   countComment: results.countComment,
-            //   countLike: results.countLike,
-            //   countShare: results.countShare,
-            //   user_id: results.user_id,
-            //   idPost: result[i].post_link.split('/')[5],
-            //   linkPost: result[i].post_link,
-            //   linkImgs: results.linkImgs,
-            //   commentList: results.commentList,
-            //   token: results.token,
-            //   count_comments_config: results.count_comments_config,
-            //   statusbar: 'active',
-            //   create_at: Date.now(),
-            // });
-            // const postListRefs = ref(
-            //   database,
-            //   '/craw_list/' + name.replace(/[#:.,$]/g, '') + '/' + craw_id
-            // );
-            // const newPostRef = push(postListRefs);
-            // await set(newPostRef, {
-            //   id: i,
-            //   post_link: result[i].post_link,
-            //   statusbar: 'active',
-            //   countComment: results.countComment,
-            //   countLike: results.countLike,
-            //   countShare: results.countShare,
-            //   count_comments_config: results.count_comments_config,
-            //   create_at: Date.now(),
-            // });
           });
         } catch (e) {
           console.log(e);
           console.log('lỗi error');
-
-          // const postListRefss = ref(
-          //   database,
-          //   '/Listpost_error/' + name.replace(/[#:.,$]/g, '') + '/' + url.split('/')[6]
-          // );
-          // await set(postListRefss, {
-          //   post_link: url,
-          //   error: 'error' + e,
-          // });
-          // const postListRefs = ref(
-          //   database,
-          //   '/craw_list/' + name.replace(/[#:.,$]/g, '') + '/' + craw_id
-          // );
-          // const newPostRef = push(postListRefs);
-          // await set(newPostRef, {
-          //   id: i,
-          //   post_link: result[i].post_link,
-          //   statusbar: 'error' + e,
-          // });
         }
       }
 
@@ -772,7 +647,6 @@ async function getlink(page, conten_length, like, comment, share, url) {
       }
 
       let newpost = Array.prototype.slice.call(post).filter((el) => el.childNodes.length === 15);
-      console.log(newpost);
       let data_link = [];
       newpost.forEach(async (el) => {
         let likes = '';
