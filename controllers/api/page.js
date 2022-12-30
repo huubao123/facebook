@@ -36,14 +36,17 @@ async function autoScroll(page, lengthss, like, comment, share, url) {
           totalHeight += distance;
 
           if (
-            window.performance.memory.jsHeapSizeLimit - window.performance.memory.jsHeapSizeLimit / 10 <
+            window.performance.memory.jsHeapSizeLimit -
+              window.performance.memory.jsHeapSizeLimit / 10 <
             window.performance.memory.totalJSHeapSize
           ) {
             clearInterval(timer);
             resolve();
           }
           let post = document.querySelectorAll('div');
-          let newpost = Array.prototype.slice.call(post).filter((el) => el.childNodes.length === 15);
+          let newpost = Array.prototype.slice
+            .call(post)
+            .filter((el) => el.childNodes.length === 15);
           try {
             newpost.forEach(async (el) => {
               el.childNodes[7].childNodes[0].childNodes[0].childNodes[2]
@@ -251,15 +254,7 @@ module.exports = async function main(req) {
       await page.goto('https://www.facebook.com', {
         waitUntil: 'load',
       });
-      let ramdom = Math.floor(Math.random() * 2);
-      let username = '';
-      console.log(username);
-      if (ramdom == 1) {
-        username = process.env.user_name_scrool1;
-      } else {
-        username = process.env.user_name_scrool1;
-      }
-      await page.type('#email', username);
+      await page.type('#email', process.env.username_get_data2);
       await page.type('#pass', 'huubao123');
       await page.keyboard.press('Enter');
 
@@ -345,14 +340,7 @@ module.exports = async function main(req) {
       await page1.goto('https://www.facebook.com', {
         waitUntil: 'load',
       });
-      let ramdom = Math.floor(Math.random() * 2);
-      let username = '';
-      if (ramdom == 1) {
-        username = process.env.username_get_data1;
-      } else {
-        username = process.env.username_get_data2;
-      }
-      await page1.type('#email', username);
+      await page1.type('#email', process.env.username_get_data2);
       await page1.type('#pass', 'huubao123');
       await page1.keyboard.press('Enter');
 
@@ -380,7 +368,10 @@ module.exports = async function main(req) {
           await page1.evaluate(async () => {
             let div = document.querySelectorAll('[role = "button"]');
             for (let i = 0; i < div.length; i++) {
-              if (div[i].innerText.indexOf('Phù hợp nhất') !== -1 || div[i].innerText.indexOf('Mới nhất') !== -1) {
+              if (
+                div[i].innerText.indexOf('Phù hợp nhất') !== -1 ||
+                div[i].innerText.indexOf('Mới nhất') !== -1
+              ) {
                 await div[i].click();
                 break;
               }
@@ -409,7 +400,9 @@ module.exports = async function main(req) {
 
             let titles = '';
             let short_descriptions = '';
-            let short_description = results.contentList ? results.contentList.replaceAll(/(<([^>]+)>)/gi, '') : '';
+            let short_description = results.contentList
+              ? results.contentList.replaceAll(/(<([^>]+)>)/gi, '')
+              : '';
             for (let i = 0; i < 100; i++) {
               let lengths = short_description.split(' ').length;
               short_descriptions += short_description.split(' ')[i] + ' ';
@@ -433,7 +426,10 @@ module.exports = async function main(req) {
             }
             if (results.commentList.length > 0) {
               for (let i = 0; i < results.commentList.length; i++) {
-                if (results.commentList[i].imageComment && results.commentList[i].imageComment != '') {
+                if (
+                  results.commentList[i].imageComment &&
+                  results.commentList[i].imageComment != ''
+                ) {
                   const imageid = crypto.randomBytes(10).toString('hex');
                   let datas = {
                     link: results.commentList[i].imageComment,
@@ -457,7 +453,9 @@ module.exports = async function main(req) {
                       };
                       image.add({ data: datas });
 
-                      results.commentList[i].children[j].imageComment = `images/${post_type}/${imageid}`;
+                      results.commentList[i].children[
+                        j
+                      ].imageComment = `images/${post_type}/${imageid}`;
                     }
                   }
                 }
@@ -496,17 +494,31 @@ module.exports = async function main(req) {
               user_name: results.user ? results.user : 'undefined',
               count_like: results.countLike
                 ? results.countLike.toString().split(' ')[0].indexOf(',') > -1
-                  ? parseInt(results.countLike.toString().split(' ')[0].replace('K', '00').replace(',', ''))
+                  ? parseInt(
+                      results.countLike.toString().split(' ')[0].replace('K', '00').replace(',', '')
+                    )
                   : parseInt(results.countLike.toString().split(' ')[0].replace('K', '000'))
                 : 0,
               count_comment: results.countComment
                 ? results.countComment.toString().split(' ')[0].indexOf(',') > -1
-                  ? parseInt(results.countComment.toString().split(' ')[0].replace('K', '00').replace(',', ''))
+                  ? parseInt(
+                      results.countComment
+                        .toString()
+                        .split(' ')[0]
+                        .replace('K', '00')
+                        .replace(',', '')
+                    )
                   : parseInt(results.countComment.toString().split(' ')[0].replace('K', '000'))
                 : 0,
               count_share: results.countShare
                 ? results.countShare.toString().split(' ')[0].indexOf(',') > -1
-                  ? parseInt(results.countShare.toString().split(' ')[0].replace('K', '00').replace(',', ''))
+                  ? parseInt(
+                      results.countShare
+                        .toString()
+                        .split(' ')[0]
+                        .replace('K', '00')
+                        .replace(',', '')
+                    )
                   : parseInt(results.countShare.toString().split(' ')[0].replace('K', '000'))
                 : 0,
               featured_image: Image_id[0] ? Image_id[0] : [],
@@ -516,7 +528,13 @@ module.exports = async function main(req) {
                     content: item.contentComment,
                     count_like: item.countLike
                       ? item.countLike.toString().split(' ')[0].indexOf(',') > -1
-                        ? parseInt(item.countLike.toString().split(' ')[0].replace('K', '00').replace(',', ''))
+                        ? parseInt(
+                            item.countLike
+                              .toString()
+                              .split(' ')[0]
+                              .replace('K', '00')
+                              .replace(',', '')
+                          )
                         : parseInt(item.countLike.toString().split(' ')[0].replace('K', '000'))
                       : 0,
                     user_id: item.userIDComment,
@@ -528,8 +546,16 @@ module.exports = async function main(req) {
                           content: child.contentComment,
                           count_like: child.countLike
                             ? child.countLike.toString().split(' ')[0].indexOf(',') > -1
-                              ? parseInt(child.countLike.toString().split(' ')[0].replace('K', '00').replace(',', ''))
-                              : parseInt(child.countLike.toString().split(' ')[0].replace('K', '000'))
+                              ? parseInt(
+                                  child.countLike
+                                    .toString()
+                                    .split(' ')[0]
+                                    .replace('K', '00')
+                                    .replace(',', '')
+                                )
+                              : parseInt(
+                                  child.countLike.toString().split(' ')[0].replace('K', '000')
+                                )
                             : 0,
                           user_id: child.userIDComment,
                           user_name: child.usernameComment,
@@ -657,13 +683,13 @@ async function getlink(page, conten_length, like, comment, share, url) {
         likes =
           el.childNodes[7].childNodes[0].childNodes[0].childNodes[
             el.childNodes[7].childNodes[0].childNodes[0].childNodes.length - 1
-          ].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-            .childNodes[1].innerText;
+          ].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+            .childNodes[0].childNodes[1].innerText;
         if (
           el.childNodes[7].childNodes[0].childNodes[0].childNodes[
             el.childNodes[7].childNodes[0].childNodes[0].childNodes.length - 1
-          ].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[1].childNodes
-            .length == 3
+          ].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+            .childNodes[1].childNodes.length == 3
         ) {
           comments =
             el.childNodes[7].childNodes[0].childNodes[0].childNodes[
@@ -681,8 +707,8 @@ async function getlink(page, conten_length, like, comment, share, url) {
           if (
             el.childNodes[7].childNodes[0].childNodes[0].childNodes[
               el.childNodes[7].childNodes[0].childNodes[0].childNodes.length - 1
-            ].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[1]
-              .childNodes[0].innerText.length > 1
+            ].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+              .childNodes[1].childNodes[0].innerText.length > 1
           ) {
             comments =
               el.childNodes[7].childNodes[0].childNodes[0].childNodes[
@@ -703,7 +729,8 @@ async function getlink(page, conten_length, like, comment, share, url) {
 
         comments = (await filternumber(comments)) ? await filternumber(comments) : 0;
         shares = (await filternumber(shares)) ? await filternumber(shares) : 0;
-        contents = el.childNodes[7].childNodes[0].childNodes[0].childNodes[2].innerText.split(' ').length;
+        contents =
+          el.childNodes[7].childNodes[0].childNodes[0].childNodes[2].innerText.split(' ').length;
         el.querySelectorAll('[role="link"]').forEach(async (link) => {
           if (link.href.indexOf(`${url}/posts`) > -1) {
             href = link.href.split('?comment_id')[0];

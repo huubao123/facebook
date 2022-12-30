@@ -215,14 +215,7 @@ module.exports = async function main(req) {
       await page.goto('https://www.facebook.com', {
         waitUntil: 'load',
       });
-      let ramdom = Math.floor(Math.random() * 2);
-      let username = '';
-      if (ramdom == 1) {
-        username = process.env.user_name_scrool1;
-      } else {
-        username = process.env.user_name_scrool1;
-      }
-      await page.type('#email', username);
+      await page.type('#email', process.env.user_name_scrool1);
       await page.type('#pass', 'huubao123');
       await page.keyboard.press('Enter');
 
@@ -300,14 +293,8 @@ module.exports = async function main(req) {
       await page1.goto('https://www.facebook.com', {
         waitUntil: 'load',
       });
-      let ramdom = Math.floor(Math.random() * 2);
-      let username = '';
-      if (ramdom == 1) {
-        username = process.env.user_name_scrool1;
-      } else {
-        username = process.env.user_name_scrool1;
-      }
-      await page1.type('#email', username);
+   
+      await page1.type('#email', process.env.user_name_scrool1);
       await page1.type('#pass', 'huubao123');
       await page1.keyboard.press('Enter');
       await new Promise((r) => setTimeout(r, 4000));
