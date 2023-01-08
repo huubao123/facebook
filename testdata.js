@@ -121,8 +121,7 @@ async function main(req) {
 
     for (let i = 0; i < link_page.split(',').length; i++) {
       if (
-        link_page.split(',')[i].indexOf('posts') > -1 ||
-        link_page.split(',')[i].indexOf('photos') > -1 ||
+        link_page.split(',')[i].indexOf('photo') > -1 ||
         link_page.split(',')[i].indexOf('?locale=de_DE') > -1 ||
         link_page.split(',')[i].indexOf('videos') > -1
       ) {
@@ -140,11 +139,19 @@ async function main(req) {
           ] !== '/'
         ) {
           new_link_page.push(
-            'http://www.' + name_page.replace(/(?:http[s]*\:\/\/)*(.*?)\.(?=[^\/]*\..{2,5})/i, '') + '/'
+            'https://www.' + name_page.replace(/(?:http[s]*\:\/\/)*(.*?)\.(?=[^\/]*\..{2,5})/i, '') + '/'
           );
         } else {
-          new_link_page.push('http://www.' + name_page.replace(/(?:http[s]*\:\/\/)*(.*?)\.(?=[^\/]*\..{2,5})/i, ''));
+          new_link_page.push('https://www.' + name_page.replace(/(?:http[s]*\:\/\/)*(.*?)\.(?=[^\/]*\..{2,5})/i, ''));
         }
+      } else if (
+        link_page.split(',')[i].indexOf('posts') > -1 ||
+        link_page.split(',')[i].indexOf('groups') > -1 ||
+        link_page.split(',')[i].indexOf('media') > -1 ||
+        link_page.split(',')[i].indexOf('profile.php') > -1 ||
+        link_page.split(',')[i].indexOf('hashtag') > -1
+      ) {
+        continue;
       } else {
         if (
           link_page.split(',')[i].replace(/(?:http[s]*\:\/\/)*(.*?)\.(?=[^\/]*\..{2,5})/i, '')[
@@ -152,11 +159,11 @@ async function main(req) {
           ] !== '/'
         ) {
           new_link_page.push(
-            'http://www.' + link_page.split(',')[i].replace(/(?:http[s]*\:\/\/)*(.*?)\.(?=[^\/]*\..{2,5})/i, '') + '/'
+            'https://www.' + link_page.split(',')[i].replace(/(?:http[s]*\:\/\/)*(.*?)\.(?=[^\/]*\..{2,5})/i, '') + '/'
           );
         } else {
           new_link_page.push(
-            'http://www.' + link_page.split(',')[i].replace(/(?:http[s]*\:\/\/)*(.*?)\.(?=[^\/]*\..{2,5})/i, '')
+            'https://www.' + link_page.split(',')[i].replace(/(?:http[s]*\:\/\/)*(.*?)\.(?=[^\/]*\..{2,5})/i, '')
           );
         }
       }
@@ -166,6 +173,7 @@ async function main(req) {
       if (err) throw err;
       console.log('The file has been saved!');
     });
+    return;
     const browser = await puppeteer.launch({
       ignoreHTTPSErrors: true,
       ignoreDefaultArgs: ['--disable-extensions'],
@@ -246,6 +254,22 @@ async function main(req) {
         const link = await page.evaluate(() => {
           return window.location.href;
         });
+        if (
+          link.indexOf('photos') > -1 ||
+          link.indexOf('photo') > -1 ||
+          link.indexOf('?locale=de_DE') > -1 ||
+          link.indexOf('videos') > -1
+        ) {
+          let link_real = '';
+          for (let j = 0; j < 4; j++) {
+            link_real += link.split('/')[j] + '/';
+          }
+          link = link_real;
+          await page.goto(new_link_page[i], {
+            waitUntil: 'load',
+          });
+          await new Promise((r) => setTimeout(r, 2000));
+        }
 
         const result = await page.evaluate(() => {
           return document.querySelectorAll('[dir="auto"]')

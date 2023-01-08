@@ -119,11 +119,10 @@ module.exports = async function main(req) {
     const comment = req.data.data.comment ? req.data.data.comment : 0;
     const share = req.data.data.share ? req.data.data.share : 0;
     const post_type = req.data.data.post_type ? req.data.data.post_type : '';
-    const craw_id = crypto.randomBytes(16).toString('hex');
     let page_id = '';
     let Posttype_id = '';
 
-    Posttype.findOne({ url: url }, async function (err, posttype) {
+    Posttype.findOne({ name: post_type }, async function (err, posttype) {
       if (posttype) {
         group_id = posttype._id;
       } else {

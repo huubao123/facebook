@@ -121,22 +121,9 @@ module.exports = async function getdata(page, cmt_lengths) {
       console.log('érroe main');
     }
     console.log(contens);
-    // if(contens = ''){
-    //   post.forEach((e)=>{
-    //     if(e.childNodes.length >13){
-    //         contens = e.childNodes[7].childNodes[0]
-    //     }
-    // })
-    // }
+
     try {
-      // contens.childNodes[1].childNodes[0].childNodes[1].childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes.forEach(
-      //   (ele) => {
-      //     if (ele.className == '') {
-      //       posthref = ele.childNodes[0].childNodes[0].href;
-      //       post_id = ele.childNodes[0].childNodes[0].href.split('/')[6];
-      //     }
-      //   }
-      // );
+  
       try {
         if (
           contens.childNodes[1].childNodes[0].childNodes[1].childNodes[0].childNodes[0]
@@ -570,7 +557,7 @@ module.exports = async function getdata(page, cmt_lengths) {
                       if (cmt_old.nodeName == 'UL') {
                         for (let m = 0; m < cmt_old.childNodes.length; m++) {
                           date_cmtchild =
-                            ('cmt ne', cmt_old.childNodes[m].childNodes[0].childNodes[1]);
+                            (cmt_old.childNodes[m].childNodes[0].childNodes[1]);
                           try {
                             cmt_old.childNodes[
                               m
