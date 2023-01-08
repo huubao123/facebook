@@ -26,9 +26,14 @@ async function autoScroll(page, lengthss, like, comment, share, url) {
         let totalHeight = 0;
         let distance = 1000;
         let length_feed = 0;
+        let scroll = 0;
         let timer = setInterval(async () => {
           console.log(lengthss, like, comment, share);
-
+          scroll += 1;
+          if (scroll == 30) {
+            clearInterval(timer);
+            resolve();
+          }
           let scrollHeight = document.body.scrollHeight;
           window.scrollBy({
             top: distance,
@@ -44,25 +49,16 @@ async function autoScroll(page, lengthss, like, comment, share, url) {
             clearInterval(timer);
             resolve();
           }
-          let post = document.querySelectorAll('div');
-          let newpost = Array.prototype.slice.call(post).filter((el) => el.childNodes.length === 15);
+
           try {
-            newpost.forEach(async (el) => {
-              el.childNodes[7].childNodes[0].childNodes[0].childNodes[2]
-                .querySelectorAll('[role="button"]')
-                .forEach(async (button) => {
-                  if (button.innerText.indexOf('Xem thêm') > -1) {
-                    button.click();
-                  }
-                });
-            });
-          } catch (e) {
-            console.log('lỗi 1');
-          }
-          try {
-            document.querySelectorAll('[role="link"]').forEach(async (link) => {
-              if (link.href.indexOf(`${url}posts`) > -1) {
-                length_feed += 1;
+            let post = document.querySelectorAll('div');
+            let newpost = Array.prototype.slice.call(post).filter((el) => el.childNodes.length === 15);
+            newpost.forEach((post) => {
+              for (const link of post.querySelectorAll('[role="link"]')) {
+                if (link.href.indexOf(`posts`) > -1) {
+                  length_feed += 1;
+                  break;
+                }
               }
             });
           } catch (e) {
@@ -223,15 +219,15 @@ async function main(req) {
     //     request.continue();
     //   }
     // });
+    await page.goto('https://www.facebook.com', {
+      waitUntil: 'load',
+    });
+    await page.type('#email', process.env.username_get_data2);
+    await page.type('#pass', 'huubao123');
+    await page.keyboard.press('Enter');
+    await new Promise((r) => setTimeout(r, 4000));
     for (let i = 0; i < new_link_page.length; i++) {
       try {
-        await page.goto('https://www.facebook.com', {
-          waitUntil: 'load',
-        });
-        await page.type('#email', process.env.username_get_data2);
-        await page.type('#pass', 'huubao123');
-        await page.keyboard.press('Enter');
-        await new Promise((r) => setTimeout(r, 4000));
         await page.goto(new_link_page[i], {
           waitUntil: 'load',
         });
@@ -251,8 +247,8 @@ async function main(req) {
           }
         });
         const result = await page.evaluate(() => {
-          return document.querySelector('h2[dir="auto"] [dir="auto"]')
-            ? document.querySelector('h2[dir="auto"] [dir="auto"]').textContent
+          return document.querySelectorAll('[dir="auto"]')
+            ? document.querySelectorAll('[dir="auto"]')[1].innerText
             : document.querySelectorAll('h2')[0].textContent;
         });
         const page1 = await browser.newPage();
@@ -260,7 +256,7 @@ async function main(req) {
           waitUntil: 'load',
         });
         await new Promise((r) => setTimeout(r, 4000));
-        const info = await page1.evaluate(() => {
+        let info = await page1.evaluate(() => {
           try {
             let a = {};
             function aaa(text) {
@@ -302,6 +298,35 @@ async function main(req) {
             return '';
           }
         });
+        await page1.close();
+        if (info == {} || info == '') {
+          console.log('......................');
+          info = await page.evaluate(() => {
+            try {
+              let string = '';
+              for (const el of document.querySelector('[role="contentinfo"]').parentNode.childNodes) {
+                if (el.nodeName == 'DIV') {
+                  el.querySelectorAll('[role="button"]').forEach((button) => {
+                    if (button.innerText == 'Xem thêm') {
+                      button.click();
+                    }
+                  });
+                }
+              }
+              for (const el of document.querySelector('[role="contentinfo"]').parentNode.childNodes) {
+                if (el.nodeName == 'DIV') {
+                  string = el.innerText;
+                  break;
+                }
+              }
+              return string;
+            } catch (e) {
+              console.log(e);
+              return '';
+            }
+          });
+        }
+        await new Promise((r) => setTimeout(r, 4000));
         Page.findOne({ url: link }, async function (err, page) {
           if (page) {
             page_id = page._id;
@@ -316,7 +341,6 @@ async function main(req) {
             group_id = pages._id;
           }
         });
-        await page1.close();
         await autoScroll(page, lengths, like, comment, share, link);
         await getlink(page, lengths, conten_length, like, comment, share, link).then(async function (result) {
           fs.writeFile('item1.txt', JSON.stringify(result, null, 2), (err) => {
@@ -596,16 +620,23 @@ async function getlink(page, lengths, conten_length, like, comment, share, url) 
   const dimension = await page.evaluate(
     async (lengths, conten_length, like, comment, share, url) => {
       let data_link = [];
-      for (let i = 0; i < lengths; i++) {
-        document.querySelectorAll('[role="link"]').forEach(async (link) => {
-          if (link.href.indexOf(`${url}posts`) > -1) {
-            href = link.href.split('?comment_id')[0];
+
+      let post = document.querySelectorAll('div');
+      let newpost = Array.prototype.slice.call(post).filter((el) => el.childNodes.length === 15);
+      for (const post of newpost) {
+        for (const link of post.querySelectorAll('[role="link"]')) {
+          if (link.href.indexOf(`posts`) > -1) {
+            let href = link.href.split('?comment_id')[0];
             data_link.push({
               id: data_link.length > 0 ? data_link.length : 0,
               post_link: href,
             });
+            break;
           }
-        });
+        }
+        if (data_link.length + 1 > lengths) {
+          break;
+        }
       }
 
       console.log(data_link);
