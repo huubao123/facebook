@@ -219,6 +219,18 @@ async function main(req) {
     //     request.continue();
     //   }
     // });
+    Posttype.findOne({ name: post_type }, async function (err, posttype) {
+      if (posttype) {
+        group_id = posttype._id;
+      } else {
+        let Posttypes = new Posttype({
+          name: post_type,
+          create_at: new Date(),
+        });
+        await Posttypes.save();
+        Posttype_id = Posttypes._id;
+      }
+    });
     await page.goto('https://www.facebook.com', {
       waitUntil: 'load',
     });
@@ -234,18 +246,7 @@ async function main(req) {
         const link = await page.evaluate(() => {
           return window.location.href;
         });
-        Posttype.findOne({ url: link }, async function (err, posttype) {
-          if (posttype) {
-            group_id = posttype._id;
-          } else {
-            let Posttypes = new Posttype({
-              name: post_type,
-              create_at: new Date(),
-            });
-            await Posttypes.save();
-            Posttype_id = Posttypes._id;
-          }
-        });
+
         const result = await page.evaluate(() => {
           return document.querySelectorAll('[dir="auto"]')
             ? document.querySelectorAll('[dir="auto"]')[1].innerText
