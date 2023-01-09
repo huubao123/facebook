@@ -124,7 +124,7 @@ module.exports = async function main(req) {
 
     Posttype.findOne({ name: post_type }, async function (err, posttype) {
       if (posttype) {
-        group_id = posttype._id;
+        Posttype_id = posttype._id;
       } else {
         let Posttypes = new Posttype({
           name: post_type,
@@ -265,29 +265,89 @@ module.exports = async function main(req) {
     } catch (e) {
       console.log(e);
     }
-
-    const info = await page.evaluate(() => {
-      try {
-        document
-          .querySelector('[role="contentinfo"]')
-          .parentNode.childNodes[0].querySelectorAll('[role="button"]')
-          .forEach((el) => {
-            if (el.innerText == 'Xem thêm') {
-              el.click();
-            }
-          });
-        return document.querySelector('[role="contentinfo"]')
-          ? document.querySelector('[role="contentinfo"]').parentNode.childNodes[0].innerText
-          : '';
-      } catch (e) {
-        return '';
-      }
-    });
     const result = await page.evaluate(() => {
       return document.querySelector('h2[dir="auto"] [dir="auto"]')
         ? document.querySelector('h2[dir="auto"] [dir="auto"]').textContent
         : document.querySelectorAll('h2')[0].textContent;
     });
+    const page1 = await browser.newPage();
+    await page1.goto(`${link}about`, {
+      waitUntil: 'load',
+    });
+
+    await new Promise((r) => setTimeout(r, 4000));
+    let info = await page1.evaluate(() => {
+      try {
+        let a = {};
+        function aaa(text) {
+          text = text
+            .toLowerCase()
+            .replace(/à|á|ạ|ả|ã|â|ầ|ấ|ậ|ẩ|ẫ|ă|ằ|ắ|ặ|ẳ|ẵ/g, 'a')
+            .replace(/è|é|ẹ|ẻ|ẽ|ê|ề|ế|ệ|ể|ễ/g, 'e')
+            .replace(/ì|í|ị|ỉ|ĩ/g, 'i')
+            .replace(/ò|ó|ọ|ỏ|õ|ô|ồ|ố|ộ|ổ|ỗ|ơ|ờ|ớ|ợ|ở|ỡ/g, 'o')
+            .replace(/ù|ú|ụ|ủ|ũ|ư|ừ|ứ|ự|ử|ữ/g, 'u')
+            .replace(/ỳ|ý|ỵ|ỷ|ỹ/g, 'y')
+            .replace(/đ/g, 'd')
+            .replace(/\s+/g, '-')
+            .replace(/[^A-Za-z0-9_-]/g, '')
+            .replace(/-+/g, '-');
+          return text;
+        }
+        document.querySelectorAll('[role="main"] [role="button"]').forEach((el) => {
+          if (el.innerText == 'Xem thêm') {
+            el.click();
+          }
+        });
+
+        document
+          .querySelectorAll('[role="main"]')[1]
+          .childNodes[3].childNodes[0].childNodes[0].childNodes.forEach((el) => {
+            if (el.className === '') {
+              let string = '';
+              for (let i = 1; i < el.childNodes[0].childNodes.length; i++) {
+                string += el.childNodes[0].childNodes[i].innerText;
+              }
+              a[aaa(el.childNodes[0].childNodes[0].innerText)] = string;
+            }
+          });
+        console.log(a);
+        return a;
+      } catch (e) {
+        console.log(e);
+        return '';
+      }
+    });
+    await page1.close();
+    if (info == {} || info == '') {
+      console.log('......................');
+      info = await page.evaluate(() => {
+        try {
+          let string = '';
+          for (const el of document.querySelector('[role="contentinfo"]').parentNode.childNodes) {
+            if (el.nodeName == 'DIV') {
+              el.querySelectorAll('[role="button"]').forEach((button) => {
+                if (button.innerText == 'Xem thêm') {
+                  button.click();
+                }
+              });
+            }
+          }
+          for (const el of document.querySelector('[role="contentinfo"]').parentNode.childNodes) {
+            if (el.nodeName == 'DIV') {
+              string = el.innerText;
+              break;
+            }
+          }
+          return string;
+        } catch (e) {
+          console.log(e);
+          return '';
+        }
+      });
+    }
+    await new Promise((r) => setTimeout(r, 4000));
+
     Page.findOne({ url: url }, async function (err, page) {
       if (page) {
         page_id = page._id;
@@ -295,11 +355,11 @@ module.exports = async function main(req) {
         let pages = new Page({
           name: result,
           url: url,
-          info: info,
+          info: JSON.stringify(info),
           create_at: new Date(),
         });
         await pages.save();
-        group_id = pages._id;
+        page_id = pages._id;
       }
     });
     Posttype.findOne({ name: post_type }, async function (err, posttype) {
@@ -360,26 +420,12 @@ module.exports = async function main(req) {
       await page1.keyboard.press('Enter');
 
       await new Promise((r) => setTimeout(r, 4000));
-      for (let i = 0; i < 1; i++) {
+      for (let i = 0; i < result.length; i++) {
         try {
           await page1.goto(result[i].post_link, {
             waitUntil: 'networkidle2',
           });
-          try {
-            await page1.evaluate(async () => {
-              let div = document.querySelectorAll('[role = "button"]');
-              for (let i = 0; i < div.length; i++) {
-                if (
-                  div[i].innerText.indexOf('Phù hợp nhất') !== -1 ||
-                  div[i].innerText.indexOf('Mới nhất') !== -1 ||
-                  div[i].innerText.indexOf('Tất cả bình luận') !== -1
-                ) {
-                  await div[i].scrollIntoView();
-                  break;
-                }
-              }
-            });
-          } catch (err) {}
+
           await page1.evaluate(async () => {
             let div = document.querySelectorAll('[role = "button"]');
             for (let i = 0; i < div.length; i++) {

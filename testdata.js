@@ -49,7 +49,11 @@ async function autoScroll(page, lengthss, like, comment, share, url) {
             clearInterval(timer);
             resolve();
           }
-
+          try {
+            document.querySelectorAll('[aria-label="Đóng đoạn chat"]').forEach((el) => {
+              el.click();
+            });
+          } catch (e) {}
           try {
             let post = document.querySelectorAll('div');
             let newpost = Array.prototype.slice.call(post).filter((el) => el.childNodes.length === 15);
@@ -115,7 +119,7 @@ async function main(req) {
     const share = -1;
     const post_type = 'page-jenacare';
     const craw_id = crypto.randomBytes(16).toString('hex');
-    let page_id = '';
+
     let Posttype_id = '';
     let new_link_page = [];
 
@@ -173,7 +177,6 @@ async function main(req) {
       if (err) throw err;
       console.log('The file has been saved!');
     });
-    return;
     const browser = await puppeteer.launch({
       ignoreHTTPSErrors: true,
       ignoreDefaultArgs: ['--disable-extensions'],
@@ -219,17 +222,9 @@ async function main(req) {
     if (pages.length > 1) {
       await pages[0].close();
     }
-    // await page.setRequestInterception(true);
-    // page.on('request', (request) => {
-    //   if (/google|cloudflare/.test(request.url())) {
-    //     request.abort();
-    //   } else {
-    //     request.continue();
-    //   }
-    // });
     Posttype.findOne({ name: post_type }, async function (err, posttype) {
       if (posttype) {
-        group_id = posttype._id;
+        Posttype_id = posttype._id;
       } else {
         let Posttypes = new Posttype({
           name: post_type,
@@ -247,6 +242,7 @@ async function main(req) {
     await page.keyboard.press('Enter');
     await new Promise((r) => setTimeout(r, 4000));
     for (let i = 0; i < new_link_page.length; i++) {
+      let page_id = '';
       try {
         await page.goto(new_link_page[i], {
           waitUntil: 'load',
@@ -363,7 +359,7 @@ async function main(req) {
               create_at: new Date(),
             });
             await pages.save();
-            group_id = pages._id;
+            page_id = pages._id;
           }
         });
         await autoScroll(page, lengths, like, comment, share, link);
@@ -377,21 +373,6 @@ async function main(req) {
               await page.goto(result[i].post_link, {
                 waitUntil: 'networkidle2',
               });
-              try {
-                await page.evaluate(async () => {
-                  let div = document.querySelectorAll('[role = "button"]');
-                  for (let i = 0; i < div.length; i++) {
-                    if (
-                      div[i].innerText.indexOf('Phù hợp nhất') !== -1 ||
-                      div[i].innerText.indexOf('Mới nhất') !== -1 ||
-                      div[i].innerText.indexOf('Tất cả bình luận') !== -1
-                    ) {
-                      await div[i].scrollIntoView();
-                      break;
-                    }
-                  }
-                });
-              } catch (err) {}
               await page.evaluate(async () => {
                 let div = document.querySelectorAll('[role = "button"]');
                 for (let i = 0; i < div.length; i++) {
@@ -583,15 +564,6 @@ async function main(req) {
                             });
                             await posts.save();
                             console.log(posts._id);
-                            if (results.linkImgs.length > 0) {
-                              let image = new Images({
-                                link_img: Image_id,
-                                idPost: posts._id,
-                                link_post: result[i].post_link,
-                                update_at: new Date(),
-                              });
-                              await image.save();
-                            }
                           } else {
                             await Post_filter_no.findByIdAndUpdate(
                               post._id,
@@ -607,16 +579,6 @@ async function main(req) {
                               { new: true }
                             );
                             console.log(post._id);
-                            if (results.linkImgs.length > 0) {
-                              await Images.findByIdAndUpdate(
-                                post._id,
-                                {
-                                  link_img: Image_id,
-                                  update_at: new Date(),
-                                },
-                                { new: true }
-                              );
-                            }
                           }
                         }
                       }
@@ -631,8 +593,6 @@ async function main(req) {
               console.log('lỗi error');
             }
           }
-
-          // // await browser2.close();
         });
       } catch (e) {}
     }
