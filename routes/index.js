@@ -35,6 +35,8 @@ router.get('/', async function (req, res, next) {
   res.send('ok');
 });
 router.get('/images/:posttype/:id', async (req, res) => {
+  let id = req.params.id.split('.')[0] ? req.params.id.split('.')[0] : req.params.id;
+  console.log(id);
   fs.readdir(`${testFolder}${req.params.posttype}/`, (err, files) => {
     if (err) console.log(err);
     files.forEach((file) => {
@@ -55,8 +57,6 @@ router.get('/crawl', startserver);
 router.post('/auto', async function (req, res, next) {
   if (req.body.status) {
     console.log(req.body.status);
-    await api.add({}, { repeat: { cron: '0 0 * * *' } });
-    await api1.add({}, { repeat: { cron: '0 0 * * *' } });
 
     await update.add(
       {},
