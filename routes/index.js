@@ -36,11 +36,10 @@ router.get('/', async function (req, res, next) {
 });
 router.get('/images/:posttype/:id', async (req, res) => {
   let id = req.params.id.split('.')[0] ? req.params.id.split('.')[0] : req.params.id;
-  console.log(id);
   fs.readdir(`${testFolder}${req.params.posttype}/`, (err, files) => {
     if (err) console.log(err);
     files.forEach((file) => {
-      if (file.split('.')[0] == req.params.id.split('.')[0]) {
+      if (file.split('.')[0] == id) {
         try {
           res.sendFile(process.cwd() + '/public/images/' + req.params.posttype + '/' + file);
         } catch (err) {
