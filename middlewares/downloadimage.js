@@ -12,9 +12,6 @@ module.exports = async function downloadImage(url, post_type, id) {
     let result = await fetch(url);
     result = await result.blob();
     let type = result.type.split('/')[1];
-    if (type.indexOf('html') > -1) {
-      return;
-    }
     const path = Path.resolve(__dirname, `../public/images/${post_type}`, `${imageid}.${type}`);
     const writer = Fs.createWriteStream(path);
     const response = await Axios({

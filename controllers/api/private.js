@@ -293,7 +293,7 @@ module.exports = async function main(req) {
       await page1.goto('https://www.facebook.com', {
         waitUntil: 'load',
       });
-   
+
       await page1.type('#email', process.env.user_name_scrool1);
       await page1.type('#pass', 'huubao123');
       await page1.keyboard.press('Enter');
@@ -475,7 +475,7 @@ module.exports = async function main(req) {
                         imageid: imageid,
                       };
                       image.add({ data: datas });
-                      results.commentList[i].children[j].imageComment = `images/${post_type}/${imageid}`;
+                      results.commentList[i].children[j].imageComment = `images/${post_type}/${imageid}.jpeg`;
                     }
                   }
                 }
