@@ -399,28 +399,30 @@ module.exports = async function main(req) {
                 break;
               }
             }
-            if (results.commentList.length > 0) {
-              for (let i = 0; i < results.commentList.length; i++) {
-                if (results.commentList[i].imageComment && results.commentList[i].imageComment != '') {
-                  let result_id_image = await downloadImage(results.commentList[i].children[j].imageComment, post_type);
-                  results.commentList[i].imageComment = result_id_image;
-                }
-                if (results.commentList[i].children.length > 0) {
-                  for (let j = 0; j < results.commentList[i].children.length; j++) {
-                    if (
-                      results.commentList[i].children[j].imageComment &&
-                      results.commentList[i].children[j].imageComment !== ''
-                    ) {
-                      let result_id_images = await downloadImage(
-                        results.commentList[i].children[j].imageComment,
-                        post_type
-                      );
-                      results.commentList[i].children[j].imageComment = result_id_images;
+            try {
+              if (results.commentList.length > 0) {
+                for (let i = 0; i < results.commentList.length; i++) {
+                  if (results.commentList[i].imageComment && results.commentList[i].imageComment != '') {
+                    let result_id_image = await downloadImage(results.commentList[i].imageComment, post_type);
+                    results.commentList[i].imageComment = result_id_image;
+                  }
+                  if (results.commentList[i].children.length > 0) {
+                    for (let j = 0; j < results.commentList[i].children.length; j++) {
+                      if (
+                        results.commentList[i].children[j].imageComment &&
+                        results.commentList[i].children[j].imageComment !== ''
+                      ) {
+                        let result_id_images = await downloadImage(
+                          results.commentList[i].children[j].imageComment,
+                          post_type
+                        );
+                        results.commentList[i].children[j].imageComment = result_id_images;
+                      }
                     }
                   }
                 }
               }
-            }
+            } catch (e) {}
 
             if (results.linkImgs.length > 0) {
               for (let i = 0; i < results.linkImgs.length; i++) {
@@ -475,7 +477,7 @@ module.exports = async function main(req) {
                   ? parseInt(results.countShare.toString().split(' ')[0].replace('K', '00').replace(',', ''))
                   : parseInt(results.countShare.toString().split(' ')[0].replace('K', '000'))
                 : 0,
-              featured_image: Image_id ? Image_id : [],
+              featured_image: Image_id[0] ? Image_id : [],
               comments: results.commentList
                 ? results.commentList.map((item) => ({
                     date: item.date,
