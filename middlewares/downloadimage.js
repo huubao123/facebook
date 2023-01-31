@@ -2,9 +2,9 @@ const Fs = require('fs');
 const Path = require('path');
 const Axios = require('axios');
 const crypto = require('crypto');
-module.exports = async function downloadImage(url, post_type, id) {
+module.exports = async function downloadImage(url, post_type) {
   try {
-    const imageid = id ? id : crypto.randomBytes(10).toString('hex');
+    const imageid = crypto.randomBytes(10).toString('hex');
     const path_posttype = Path.resolve(__dirname, `../public/images/${post_type}`);
     if (!Fs.existsSync(path_posttype)) {
       Fs.mkdirSync(path_posttype);
