@@ -3,6 +3,7 @@ const pageSchema = mongoose.Schema({
   name: String,
   url: String,
   info: {
+    name: String,
     like: String,
     follow: String,
     mail: String,
