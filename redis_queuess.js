@@ -43,7 +43,7 @@ const private = require('././controllers/api/private');
 const dayjs = require('dayjs');
 const downloadImage = require('./middlewares/downloadimage');
 const headers = {
-  Authorization: '4HaAMLk0p4pLHosvdGUzkw4qsMLs0DLY',
+  Authorization: 'hOfI8sQwFU5arjAoVqhzkXRogD8QUXPF',
 };
 
 queue.process(async (job, done) => {
@@ -146,11 +146,11 @@ del.process(async (job, done) => {
   for (element of post.data.data) {
     if (element.is_active == 3) {
       console.log(element.short_description);
-      if (element.session_tags.type_crawl[0]?.title == 'Youtube') {
+      if (element.session_tags.title[0]?.title == 'Youtube') {
         await deletejob(element.short_description.split('search_query=')[1]);
-      } else if (element?.session_tags?.type_crawl[0]?.title == 'Facebook') {
+      } else if (element.session_tags.title[0]?.title == 'Facebook') {
         await deletejob(element.short_description.split('/')[4]);
-      } else if (element.session_tags.type_crawl[0]?.title == 'Page facebook') {
+      } else if (element.session_tags.title[0]?.title == 'Page facebook') {
         await deletejob(element.short_description.split('/')[3]);
       }
     }
@@ -169,53 +169,52 @@ update.process(async (job, done) => {
     console.log(e);
     return done(e);
   }
-
   for (element of post.data.data) {
     if (element.is_active == 1) {
-      if (element.session_tags.type_crawl[0]?.title == 'Youtube') {
-        let update = new Date(element.updated_at).getTime();
-        let today = dayjs().format('YYYY-MM-DD HH:mm:ss');
-        let pass = dayjs(new Date(today).getTime() - 60 * 60000).format('YYYY-MM-DD HH:mm:ss');
-        if (new Date(pass).getTime() < update && update < new Date(today).getTime()) {
+      if (element.session_tags.title[0]?.title == 'Youtube') {
+        let update = new Date(element.updated_at).getTime() - 7 * 60 * 60000;
+        let today = new Date().getTime();
+        let pass = new Date(today).getTime() - 60 * 60000;
+        if (pass < update && update < today) {
           const detail = await axios({
             method: 'get',
             url: 'https://mgs-api-v2.internal.mangoads.com.vn/api/v1/posts/' + element.id,
             headers: headers,
           });
-          let schedules = detail.data.data.formData.custom_fields.schedule
-            ? detail.data.data.formData.custom_fields.schedule
+          let schedules = detail.data.data.formdata.custom_fields.schedule
+            ? detail.data.data.formdata.custom_fields.schedule
             : 0;
           const datas = {
             data: {
               data: {
                 link: element.short_description ? element.short_description : '',
-                lengths: detail.data.data.formData.custom_fields.count
-                  ? detail.data.data.formData.custom_fields.count
+                lengths: detail.data.data.formdata.custom_fields.count
+                  ? detail.data.data.formdata.custom_fields.count
                   : 1,
-                length_comment: detail.data.data.formData.custom_fields.filter.length_comment
-                  ? detail.data.data.formData.custom_fields.filter.length_comment
+                length_comment: detail.data.data.formdata.custom_fields.filter.length_comment
+                  ? detail.data.data.formdata.custom_fields.filter.length_comment
                   : 1,
-                length_content: detail.data.data.formData.custom_fields.filter.length_content
-                  ? detail.data.data.formData.custom_fields.filter.length_content
+                length_content: detail.data.data.formdata.custom_fields.filter.length_content
+                  ? detail.data.data.formdata.custom_fields.filter.length_content
                   : 1,
-                like: detail.data.data.formData.custom_fields.filter.like
-                  ? detail.data.data.formData.custom_fields.filter.like
+                like: detail.data.data.formdata.custom_fields.filter.like
+                  ? detail.data.data.formdata.custom_fields.filter.like
                   : 1,
-                comment: detail.data.data.formData.custom_fields.filter.comment
-                  ? detail.data.data.formData.custom_fields.filter.comment
+                comment: detail.data.data.formdata.custom_fields.filter.comment
+                  ? detail.data.data.formdata.custom_fields.filter.comment
                   : 1,
-                share: detail.data.data.formData.custom_fields.filter.share
-                  ? detail.data.data.formData.custom_fields.filter.share
+                share: detail.data.data.formdata.custom_fields.filter.share
+                  ? detail.data.data.formdata.custom_fields.filter.share
                   : 1,
-                post_type: detail.data.data.formData.custom_fields.posttype[0].key
-                  ? detail.data.data.formData.custom_fields.posttype[0].key
+                post_type: detail.data.data.formdata.custom_fields.posttype[0].key
+                  ? detail.data.data.formdata.custom_fields.posttype[0].key
                   : '',
               },
             },
           };
           const currentTime = new Date().getTime();
-          const processAt = detail.data.data.formData.custom_fields.datetime
-            ? new Date(detail.data.data.formData.custom_fields.datetime).getTime()
+          const processAt = detail.data.data.formdata.custom_fields.datetime
+            ? new Date(detail.data.data.formdata.custom_fields.datetime).getTime()
             : new Date().getTime();
 
           const delay = processAt - currentTime;
@@ -282,51 +281,52 @@ update.process(async (job, done) => {
             );
           }
         }
-      } else if (element?.session_tags?.type_crawl[0]?.title == 'Facebook') {
-        let update = new Date(element.updated_at).getTime();
+      } else if (element.session_tags.title[0]?.title == 'facebook') {
+        let update = new Date(element.updated_at).getTime() - 7 * 60 * 60000;
+        let today = new Date().getTime();
+        let pass = new Date(today).getTime() - 60 * 60000;
 
-        let today = dayjs().format('YYYY-MM-DD HH:mm:ss');
-        let pass = dayjs(new Date(today).getTime() - 15 * 60000).format('YYYY-MM-DD HH:mm:ss');
-        if (new Date(pass).getTime() < update && update < new Date(today).getTime()) {
+        if (pass < update && update < today) {
           const detail = await axios({
             method: 'get',
             url: 'https://mgs-api-v2.internal.mangoads.com.vn/api/v1/posts/' + element.id,
             headers: headers,
           });
-          let schedules = detail.data.data.formData.custom_fields.schedule
-            ? detail.data.data.formData.custom_fields.schedule
+          console.log(detail.data.data);
+          let schedules = detail.data.data.formdata.custom_fields.schedule
+            ? detail.data.data.formdata.custom_fields.schedule
             : 0;
           const datas = {
             data: {
               data: {
                 link: element.short_description ? element.short_description : '',
-                lengths: detail.data.data.formData.custom_fields.count
-                  ? detail.data.data.formData.custom_fields.count
+                lengths: detail.data.data.formdata.custom_fields.count
+                  ? detail.data.data.formdata.custom_fields.count
                   : 1,
-                length_comment: detail.data.data.formData.custom_fields.filter.length_comment
-                  ? detail.data.data.formData.custom_fields.filter.length_comment
+                length_comment: detail.data.data.formdata.custom_fields.filter.length_comment
+                  ? detail.data.data.formdata.custom_fields.filter.length_comment
                   : 1,
-                length_content: detail.data.data.formData.custom_fields.filter.length_content
-                  ? detail.data.data.formData.custom_fields.filter.length_content
+                length_content: detail.data.data.formdata.custom_fields.filter.length_content
+                  ? detail.data.data.formdata.custom_fields.filter.length_content
                   : 1,
-                like: detail.data.data.formData.custom_fields.filter.like
-                  ? detail.data.data.formData.custom_fields.filter.like
+                like: detail.data.data.formdata.custom_fields.filter.like
+                  ? detail.data.data.formdata.custom_fields.filter.like
                   : 1,
-                comment: detail.data.data.formData.custom_fields.filter.comment
-                  ? detail.data.data.formData.custom_fields.filter.comment
+                comment: detail.data.data.formdata.custom_fields.filter.comment
+                  ? detail.data.data.formdata.custom_fields.filter.comment
                   : 1,
-                share: detail.data.data.formData.custom_fields.filter.share
-                  ? detail.data.data.formData.custom_fields.filter.share
+                share: detail.data.data.formdata.custom_fields.filter.share
+                  ? detail.data.data.formdata.custom_fields.filter.share
                   : 1,
-                post_type: detail.data.data.formData.custom_fields.posttype[0].key
-                  ? detail.data.data.formData.custom_fields.posttype[0].key
+                post_type: detail.data.data.formdata.custom_fields.posttype[0].key
+                  ? detail.data.data.formdata.custom_fields.posttype[0].key
                   : '',
               },
             },
           };
           const currentTime = new Date().getTime();
-          const processAt = detail.data.data.formData.custom_fields.datetime
-            ? new Date(detail.data.data.formData.custom_fields.datetime).getTime()
+          const processAt = detail.data.data.formdata.custom_fields.datetime
+            ? new Date(detail.data.data.formdata.custom_fields.datetime).getTime()
             : new Date().getTime();
 
           const delay = processAt - currentTime;
@@ -447,50 +447,50 @@ update.process(async (job, done) => {
             }
           }
         }
-      } else if (element.session_tags.type_crawl[0]?.title == 'Page facebook') {
-        let update = new Date(element.updated_at).getTime();
-        let today = dayjs().format('YYYY-MM-DD HH:mm:ss');
-        let pass = dayjs(new Date(today).getTime() - 60 * 60000).format('YYYY-MM-DD HH:mm:ss');
-        if (new Date(pass).getTime() < update && update < new Date(today).getTime()) {
+      } else if (element.session_tags.title[0]?.title == 'Page facebook') {
+        let update = new Date(element.updated_at).getTime() - 7 * 60 * 60000;
+        let today = new Date().getTime();
+        let pass = new Date(today).getTime() - 60 * 60000;
+        if (pass < update && update < today) {
           const detail = await axios({
             method: 'get',
             url: 'https://mgs-api-v2.internal.mangoads.com.vn/api/v1/posts/' + element.id,
             headers: headers,
           });
-          let schedules = detail.data.data.formData.custom_fields.schedule
-            ? detail.data.data.formData.custom_fields.schedule
+          let schedules = detail.data.data.formdata.custom_fields.schedule
+            ? detail.data.data.formdata.custom_fields.schedule
             : 0;
           const datas = {
             data: {
               data: {
                 link: element.short_description ? element.short_description : '',
-                lengths: detail.data.data.formData.custom_fields.count
-                  ? detail.data.data.formData.custom_fields.count
+                lengths: detail.data.data.formdata.custom_fields.count
+                  ? detail.data.data.formdata.custom_fields.count
                   : 1,
-                length_comment: detail.data.data.formData.custom_fields.filter.length_comment
-                  ? detail.data.data.formData.custom_fields.filter.length_comment
+                length_comment: detail.data.data.formdata.custom_fields.filter.length_comment
+                  ? detail.data.data.formdata.custom_fields.filter.length_comment
                   : 1,
-                length_content: detail.data.data.formData.custom_fields.filter.length_content
-                  ? detail.data.data.formData.custom_fields.filter.length_content
+                length_content: detail.data.data.formdata.custom_fields.filter.length_content
+                  ? detail.data.data.formdata.custom_fields.filter.length_content
                   : 1,
-                like: detail.data.data.formData.custom_fields.filter.like
-                  ? detail.data.data.formData.custom_fields.filter.like
+                like: detail.data.data.formdata.custom_fields.filter.like
+                  ? detail.data.data.formdata.custom_fields.filter.like
                   : 1,
-                comment: detail.data.data.formData.custom_fields.filter.comment
-                  ? detail.data.data.formData.custom_fields.filter.comment
+                comment: detail.data.data.formdata.custom_fields.filter.comment
+                  ? detail.data.data.formdata.custom_fields.filter.comment
                   : 1,
-                share: detail.data.data.formData.custom_fields.filter.share
-                  ? detail.data.data.formData.custom_fields.filter.share
+                share: detail.data.data.formdata.custom_fields.filter.share
+                  ? detail.data.data.formdata.custom_fields.filter.share
                   : 1,
-                post_type: detail.data.data.formData.custom_fields.posttype[0].key
-                  ? detail.data.data.formData.custom_fields.posttype[0].key
+                post_type: detail.data.data.formdata.custom_fields.posttype[0].key
+                  ? detail.data.data.formdata.custom_fields.posttype[0].key
                   : '',
               },
             },
           };
           const currentTime = new Date().getTime();
-          const processAt = detail.data.data.formData.custom_fields.datetime
-            ? new Date(detail.data.data.formData.custom_fields.datetime).getTime()
+          const processAt = detail.data.data.formdata.custom_fields.datetime
+            ? new Date(detail.data.data.formdata.custom_fields.datetime).getTime()
             : new Date().getTime();
 
           const delay = processAt - currentTime;
