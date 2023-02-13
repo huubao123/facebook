@@ -357,7 +357,12 @@ module.exports = async function getdata(page, cmt_lengths) {
           let likecomshares = likecomshare.childNodes[0].childNodes[0].childNodes;
           likecomshares.forEach((element, index) => {
             if (index == 0) {
-              likes = element.childNodes ? element.childNodes[1].textContent.split(' ')[0] : '0';
+              element.childNodes[1].querySelectorAll('span').forEach((el) => {
+                if (el.textContent.split(' ')[0].indexOf('Tất') < 0) {
+                  likes = el.textContent.split(' ')[0];
+                  return;
+                }
+              });
             }
             if (index == 1) {
               count_comments = element.childNodes[1] ? element.childNodes[1].textContent.split(' ')[0] : '0';

@@ -273,7 +273,12 @@ module.exports = async function getdata(page, cmt_lengths) {
           let likecomshares = likecomshare.childNodes[0].childNodes[0].childNodes;
           likecomshares.forEach((element, index) => {
             if (index == 0) {
-              likes = element.childNodes ? element.childNodes[1].textContent.split(' ')[0] : '0';
+              element.childNodes[1].querySelectorAll('span').forEach((el) => {
+                if (el.textContent.split(' ')[0].indexOf('Tất') < 0) {
+                  likes = el.textContent.split(' ')[0];
+                  return;
+                }
+              });
             }
             if (index == 1) {
               count_comments = element.childNodes[1] ? element.childNodes[1].textContent.split(' ')[0] : '0';
@@ -304,723 +309,723 @@ module.exports = async function getdata(page, cmt_lengths) {
             console.log('error post href');
           }
 
-          element.childNodes.forEach((elementss) => {
-            try {
-              if (elementss.childNodes[0].childNodes.length == 2) {
-                date_cmt =
-                  elementss.childNodes[0].querySelectorAll('a[role="link"]')[
-                    elementss.childNodes[0].querySelectorAll('a[role="link"]').length - 1
-                  ].innerText;
-                if (
-                  elementss.childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes[0].children[0]
-                    .childNodes[0].childNodes[0].childNodes &&
-                  elementss.childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes[0].children[0]
-                    .childNodes[0].childNodes[0].childNodes.nodeName == 'SPAN'
-                ) {
-                  console.log('abc', elementss.childNodes[0].childNodes);
-                  elementss.childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes[0].children[0].childNodes[0].childNodes[0].childNodes.forEach(
-                    (elementsss, index) => {
-                      if (elementsss.nodeName == 'SPAN' && index == 0) {
-                        console.log(elementsss);
-                        user_cmt_href = elementsss.childNodes[0].href;
-                        user_name_cmt = elementsss.childNodes[0].innerText;
-                        user_cmt_id = elementsss.childNodes[0].href.split('/')[3];
-                      } else if (elementsss.nodeName == 'DIV') {
-                        for (let l = 0; l < elementsss.childNodes[0].childNodes.length; l++) {
-                          cotent_cmt += elementsss.childNodes[0].childNodes[l].innerText
-                            .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
-                            .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
-                            .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
-                        }
-                      }
-                    }
-                  );
-                }
-                // comment mới
-                elementss.childNodes[0].childNodes[1].childNodes[1].childNodes.forEach((element, index) => {
-                  if (index == 1 && element.className == '') {
-                    diw_newcmt = elementss.childNodes[0].childNodes[1].childNodes[1].childNodes[1];
-                  } else if (index == 1 && element.className !== '') {
-                    diw_newcmt = elementss.childNodes[0].childNodes[1].childNodes[1].childNodes[0];
-                  }
-                });
+          // element.childNodes.forEach((elementss) => {
+          //   try {
+          //     if (elementss.childNodes[0].childNodes.length == 2) {
+          //       date_cmt =
+          //         elementss.childNodes[0].querySelectorAll('a[role="link"]')[
+          //           elementss.childNodes[0].querySelectorAll('a[role="link"]').length - 1
+          //         ].innerText;
+          //       if (
+          //         elementss.childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes[0].children[0]
+          //           .childNodes[0].childNodes[0].childNodes &&
+          //         elementss.childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes[0].children[0]
+          //           .childNodes[0].childNodes[0].childNodes.nodeName == 'SPAN'
+          //       ) {
+          //         console.log('abc', elementss.childNodes[0].childNodes);
+          //         elementss.childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes[0].children[0].childNodes[0].childNodes[0].childNodes.forEach(
+          //           (elementsss, index) => {
+          //             if (elementsss.nodeName == 'SPAN' && index == 0) {
+          //               console.log(elementsss);
+          //               user_cmt_href = elementsss.childNodes[0].href;
+          //               user_name_cmt = elementsss.childNodes[0].innerText;
+          //               user_cmt_id = elementsss.childNodes[0].href.split('/')[3];
+          //             } else if (elementsss.nodeName == 'DIV') {
+          //               for (let l = 0; l < elementsss.childNodes[0].childNodes.length; l++) {
+          //                 cotent_cmt += elementsss.childNodes[0].childNodes[l].innerText
+          //                   .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
+          //                   .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
+          //                   .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
+          //               }
+          //             }
+          //           }
+          //         );
+          //       }
+          //       // comment mới
+          //       elementss.childNodes[0].childNodes[1].childNodes[1].childNodes.forEach((element, index) => {
+          //         if (index == 1 && element.className == '') {
+          //           diw_newcmt = elementss.childNodes[0].childNodes[1].childNodes[1].childNodes[1];
+          //         } else if (index == 1 && element.className !== '') {
+          //           diw_newcmt = elementss.childNodes[0].childNodes[1].childNodes[1].childNodes[0];
+          //         }
+          //       });
 
-                if (
-                  diw_newcmt.childNodes[0].childNodes[0].childNodes[0].childNodes.length > 1 &&
-                  elementss.childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes[0].children[0]
-                    .childNodes[0].childNodes[0].childNodes[0].nodeName !== 'SPAN'
-                ) {
-                  console.log('asd', elementss.childNodes[0].childNodes);
-                  // cũ có hình ảnh
-                  elementss.childNodes[0].childNodes[1].childNodes[1].childNodes.forEach((elementsss, index) => {
-                    if (elementsss.nodeName == 'DIV' && index == 1) {
-                      if (elementsss.childNodes[0].childNodes.length > 1) {
-                        count_like_cmt =
-                          elementsss.childNodes[0].childNodes[1].textContent == ''
-                            ? 1
-                            : elementsss.childNodes[0].childNodes[1].textContent;
-                      }
-                      imgComment = elementsss.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                        .childNodes[0]
-                        ? elementsss.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                            .currentSrc
-                        : '';
-                    }
-                  });
-                  // đếm like comment
-                  console.log('diw_newcmt', diw_newcmt);
-                  if (diw_newcmt.childNodes[0].childNodes[0].childNodes[1]) {
-                    count_like_cmt =
-                      diw_newcmt.childNodes[0].childNodes[0].childNodes[1].textContent == ''
-                        ? 1
-                        : diw_newcmt.childNodes[0].childNodes[0].childNodes[1].textContent;
-                  }
-                  diw_newcmt.childNodes[0].childNodes[0].childNodes[0].childNodes.forEach((cmt, index) => {
-                    if (cmt.nodeName == 'SPAN' && index == 1) {
-                      console.log('user1: ', cmt);
-                      user_cmt_href = cmt.childNodes[0].href;
-                      user_name_cmt = cmt.childNodes[0].innerText;
-                      user_cmt_id = cmt.childNodes[0].href.split('/')[3];
-                    }
-                    if (cmt.nodeName == 'SPAN' && index == 0) {
-                      console.log('user1: ', cmt);
-                      user_cmt_href = cmt.childNodes[0].href;
-                      user_name_cmt = cmt.childNodes[0].innerText;
-                      user_cmt_id = cmt.childNodes[0].href.split('/')[3];
-                    } else if (cmt.nodeName == 'DIV' && index > 1) {
-                      if (cmt.childNodes.length > 3) {
-                        user_cmt_href = cmt.childNodes[1].childNodes[0].href;
-                        user_name_cmt = cmt.childNodes[1].childNodes[0].innerText;
-                        user_cmt_id = cmt.childNodes[1].childNodes[0].href.split('/')[3];
-                      }
-                      for (let l = 0; l < cmt.childNodes[0].childNodes.length; l++) {
-                        cotent_cmt += cmt.childNodes[0].childNodes[l].innerText
-                          .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
-                          .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
-                          .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
-                      }
-                    }
-                  });
-                } else if (
-                  diw_newcmt.childNodes[0].childNodes[0].childNodes[0].childNodes.length == 1 &&
-                  elementss.childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes[0].children[0]
-                    .childNodes[0].childNodes[0].childNodes[0].nodeName !== 'SPAN'
-                ) {
-                  console.log('qwe', diw_newcmt.childNodes);
-                  // đếm like comment
-                  if (diw_newcmt.childNodes[0].childNodes[0].childNodes.length > 1) {
-                    console.log(diw_newcmt.childNodes[0].childNodes[0].childNodes[1].textContent);
-                    count_like_cmt =
-                      diw_newcmt.childNodes[0].childNodes[0].childNodes[1].textContent == ''
-                        ? 1
-                        : diw_newcmt.childNodes[0].childNodes[0].childNodes[1].textContent;
-                  }
+          //       if (
+          //         diw_newcmt.childNodes[0].childNodes[0].childNodes[0].childNodes.length > 1 &&
+          //         elementss.childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes[0].children[0]
+          //           .childNodes[0].childNodes[0].childNodes[0].nodeName !== 'SPAN'
+          //       ) {
+          //         console.log('asd', elementss.childNodes[0].childNodes);
+          //         // cũ có hình ảnh
+          //         elementss.childNodes[0].childNodes[1].childNodes[1].childNodes.forEach((elementsss, index) => {
+          //           if (elementsss.nodeName == 'DIV' && index == 1) {
+          //             if (elementsss.childNodes[0].childNodes.length > 1) {
+          //               count_like_cmt =
+          //                 elementsss.childNodes[0].childNodes[1].textContent == ''
+          //                   ? 1
+          //                   : elementsss.childNodes[0].childNodes[1].textContent;
+          //             }
+          //             imgComment = elementsss.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+          //               .childNodes[0]
+          //               ? elementsss.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+          //                   .currentSrc
+          //               : '';
+          //           }
+          //         });
+          //         // đếm like comment
+          //         console.log('diw_newcmt', diw_newcmt);
+          //         if (diw_newcmt.childNodes[0].childNodes[0].childNodes[1]) {
+          //           count_like_cmt =
+          //             diw_newcmt.childNodes[0].childNodes[0].childNodes[1].textContent == ''
+          //               ? 1
+          //               : diw_newcmt.childNodes[0].childNodes[0].childNodes[1].textContent;
+          //         }
+          //         diw_newcmt.childNodes[0].childNodes[0].childNodes[0].childNodes.forEach((cmt, index) => {
+          //           if (cmt.nodeName == 'SPAN' && index == 1) {
+          //             console.log('user1: ', cmt);
+          //             user_cmt_href = cmt.childNodes[0].href;
+          //             user_name_cmt = cmt.childNodes[0].innerText;
+          //             user_cmt_id = cmt.childNodes[0].href.split('/')[3];
+          //           }
+          //           if (cmt.nodeName == 'SPAN' && index == 0) {
+          //             console.log('user1: ', cmt);
+          //             user_cmt_href = cmt.childNodes[0].href;
+          //             user_name_cmt = cmt.childNodes[0].innerText;
+          //             user_cmt_id = cmt.childNodes[0].href.split('/')[3];
+          //           } else if (cmt.nodeName == 'DIV' && index > 1) {
+          //             if (cmt.childNodes.length > 3) {
+          //               user_cmt_href = cmt.childNodes[1].childNodes[0].href;
+          //               user_name_cmt = cmt.childNodes[1].childNodes[0].innerText;
+          //               user_cmt_id = cmt.childNodes[1].childNodes[0].href.split('/')[3];
+          //             }
+          //             for (let l = 0; l < cmt.childNodes[0].childNodes.length; l++) {
+          //               cotent_cmt += cmt.childNodes[0].childNodes[l].innerText
+          //                 .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
+          //                 .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
+          //                 .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
+          //             }
+          //           }
+          //         });
+          //       } else if (
+          //         diw_newcmt.childNodes[0].childNodes[0].childNodes[0].childNodes.length == 1 &&
+          //         elementss.childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes[0].children[0]
+          //           .childNodes[0].childNodes[0].childNodes[0].nodeName !== 'SPAN'
+          //       ) {
+          //         console.log('qwe', diw_newcmt.childNodes);
+          //         // đếm like comment
+          //         if (diw_newcmt.childNodes[0].childNodes[0].childNodes.length > 1) {
+          //           console.log(diw_newcmt.childNodes[0].childNodes[0].childNodes[1].textContent);
+          //           count_like_cmt =
+          //             diw_newcmt.childNodes[0].childNodes[0].childNodes[1].textContent == ''
+          //               ? 1
+          //               : diw_newcmt.childNodes[0].childNodes[0].childNodes[1].textContent;
+          //         }
 
-                  elementss.childNodes[0].childNodes[1].childNodes[1].childNodes.forEach((elementsss, index) => {
-                    if (elementsss.nodeName == 'DIV' && index == 1) {
-                      //console.log('1', elementsss);
-                      imgComment =
-                        elementsss.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                          .currentSrc;
-                    }
-                  });
-                  diw_newcmt.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes.forEach(
-                    (child, index) => {
-                      if (child.nodeName == 'SPAN' && index == 1) {
-                        console.log('user12 ', child);
-                        user_cmt_href = child.childNodes[0].href;
-                        user_name_cmt = child.childNodes[0].innerText;
-                        user_cmt_id = child.childNodes[0].href.split('/')[3];
-                      }
-                      if (child.nodeName == 'SPAN' && index == 0) {
-                        console.log('user12 ', child);
-                        user_cmt_href = child.childNodes[0].href;
-                        user_name_cmt = child.childNodes[0].innerText;
-                        user_cmt_id = child.childNodes[0].href.split('/')[3];
-                      } else if (child.nodeName == 'DIV' && index > 0) {
-                        for (let l = 0; l < child.childNodes[0].childNodes.length; l++) {
-                          cotent_cmt += child.childNodes[0].childNodes[l].innerText
-                            .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
-                            .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
-                            .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
-                        }
-                      } else if (child.nodeName == 'A') {
-                        console.log('child', child);
-                        user_cmt_href = child.href;
-                        user_name_cmt = child.innerText;
-                        user_cmt_id = child.href.split('/')[3];
-                        cotent_cmt = 'Icon Facebook';
-                      }
-                    }
-                  );
-                }
-                if (
-                  elementss.childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes[0].children[0]
-                    .childNodes[0].childNodes[0].childNodes[0].nodeName == 'SPAN'
-                ) {
-                  if (elementss.childNodes[1].childNodes[0].childNodes.length > 0) {
-                    elementss.childNodes[1].childNodes[0].childNodes.forEach((cmt_old) => {
-                      if (cmt_old.nodeName == 'UL') {
-                        for (let m = 0; m < cmt_old.childNodes.length; m++) {
-                          date_cmtchild = cmt_old.childNodes[m].childNodes[0].childNodes[1];
-                          try {
-                            cmt_old.childNodes[
-                              m
-                            ].childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes.forEach(
-                              (child, index) => {
-                                if (child.nodeName == 'SPAN' && index == 1) {
-                                  console.log(child);
-                                  user_cmtchild_href = child.childNodes[0].href;
-                                  user_name_cmtchild = child.childNodes[0].innerText;
-                                  user_cmtchild_id = child.childNodes[0].href.split('/')[3];
-                                }
-                                if (child.nodeName == 'SPAN' && index == 0) {
-                                  console.log(child);
-                                  user_cmtchild_href = child.childNodes[0].href;
-                                  user_name_cmtchild = child.childNodes[0].innerText;
-                                  user_cmtchild_id = child.childNodes[0].href.split('/')[3];
-                                } else if (child.nodeName == 'DIV' && index > 0) {
-                                  for (let l = 0; l < child.childNodes[0].childNodes.length; l++) {
-                                    cotent_cmtchild += child.childNodes[0].childNodes[l].innerText
-                                      .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
-                                      .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
-                                      .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
-                                  }
-                                }
-                              }
-                            );
+          //         elementss.childNodes[0].childNodes[1].childNodes[1].childNodes.forEach((elementsss, index) => {
+          //           if (elementsss.nodeName == 'DIV' && index == 1) {
+          //             //console.log('1', elementsss);
+          //             imgComment =
+          //               elementsss.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+          //                 .currentSrc;
+          //           }
+          //         });
+          //         diw_newcmt.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes.forEach(
+          //           (child, index) => {
+          //             if (child.nodeName == 'SPAN' && index == 1) {
+          //               console.log('user12 ', child);
+          //               user_cmt_href = child.childNodes[0].href;
+          //               user_name_cmt = child.childNodes[0].innerText;
+          //               user_cmt_id = child.childNodes[0].href.split('/')[3];
+          //             }
+          //             if (child.nodeName == 'SPAN' && index == 0) {
+          //               console.log('user12 ', child);
+          //               user_cmt_href = child.childNodes[0].href;
+          //               user_name_cmt = child.childNodes[0].innerText;
+          //               user_cmt_id = child.childNodes[0].href.split('/')[3];
+          //             } else if (child.nodeName == 'DIV' && index > 0) {
+          //               for (let l = 0; l < child.childNodes[0].childNodes.length; l++) {
+          //                 cotent_cmt += child.childNodes[0].childNodes[l].innerText
+          //                   .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
+          //                   .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
+          //                   .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
+          //               }
+          //             } else if (child.nodeName == 'A') {
+          //               console.log('child', child);
+          //               user_cmt_href = child.href;
+          //               user_name_cmt = child.innerText;
+          //               user_cmt_id = child.href.split('/')[3];
+          //               cotent_cmt = 'Icon Facebook';
+          //             }
+          //           }
+          //         );
+          //       }
+          //       if (
+          //         elementss.childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes[0].children[0]
+          //           .childNodes[0].childNodes[0].childNodes[0].nodeName == 'SPAN'
+          //       ) {
+          //         if (elementss.childNodes[1].childNodes[0].childNodes.length > 0) {
+          //           elementss.childNodes[1].childNodes[0].childNodes.forEach((cmt_old) => {
+          //             if (cmt_old.nodeName == 'UL') {
+          //               for (let m = 0; m < cmt_old.childNodes.length; m++) {
+          //                 date_cmtchild = cmt_old.childNodes[m].childNodes[0].childNodes[1];
+          //                 try {
+          //                   cmt_old.childNodes[
+          //                     m
+          //                   ].childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes.forEach(
+          //                     (child, index) => {
+          //                       if (child.nodeName == 'SPAN' && index == 1) {
+          //                         console.log(child);
+          //                         user_cmtchild_href = child.childNodes[0].href;
+          //                         user_name_cmtchild = child.childNodes[0].innerText;
+          //                         user_cmtchild_id = child.childNodes[0].href.split('/')[3];
+          //                       }
+          //                       if (child.nodeName == 'SPAN' && index == 0) {
+          //                         console.log(child);
+          //                         user_cmtchild_href = child.childNodes[0].href;
+          //                         user_name_cmtchild = child.childNodes[0].innerText;
+          //                         user_cmtchild_id = child.childNodes[0].href.split('/')[3];
+          //                       } else if (child.nodeName == 'DIV' && index > 0) {
+          //                         for (let l = 0; l < child.childNodes[0].childNodes.length; l++) {
+          //                           cotent_cmtchild += child.childNodes[0].childNodes[l].innerText
+          //                             .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
+          //                             .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
+          //                             .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
+          //                         }
+          //                       }
+          //                     }
+          //                   );
 
-                            // if (
-                            //   elementsss.childNodes[m].childNodes[1]
-                            //     .className == ''
-                            // ) {
-                            //   children2 =
-                            //     elementsss.childNodes[m].childNodes[1]
-                            //       .childNodes[0].childNodes;
-                            //   for (let n = 0; n < children2.length; n++) {
-                            //     children2[n].childNodes[0].childNodes[
-                            //       children2[n].childNodes[0].childNodes.length -
-                            //         1
-                            //     ].childNodes[1].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes.forEach(
-                            //       (child) => {
-                            //         if (child.nodeName == 'SPAN') {
-                            //           user_cmtchild_href =
-                            //             child.childNodes[0].childNodes[0].href;
-                            //           user_name_cmtchild =
-                            //             child.childNodes[0].childNodes[0]
-                            //               .innerText;
-                            //           user_cmtchild_id =
-                            //             child.childNodes[0].childNodes[0].href.split(
-                            //               '/'
-                            //             )[6];
-                            //         } else if (child.nodeName == 'DIV') {
-                            //           cotent_cmtchild =
-                            //             child.childNodes[0].childNodes[0]
-                            //               .innerHTML;
-                            //         }
-                            //       }
-                            //     );
-                            //   }
-                            // }
-                            children.push({
-                              usernameComment: user_name_cmtchild,
-                              userIDComment: user_cmtchild_id.split('&')[0].split('id=')[1],
-                              contentComment: cotent_cmtchild,
-                              date: date_cmtchild,
-                              imageComment: imgComment_cmt == '' ? null : imgComment_cmt,
-                              countLike: count_like_cmtchild,
-                            });
-                            count_comments_config += 1;
-                            user_cmtchild_href =
-                              user_name_cmtchild =
-                              user_cmtchild_id =
-                              cotent_cmtchild =
-                              imgComment_cmt =
-                              date_cmtchild =
-                                '';
-                            count_like_cmtchild = 0;
-                          } catch (e) {
-                            console.log('children error');
-                            console.log(e);
-                          }
-                        }
-                      }
-                    });
-                  }
-                } else {
-                  elementss.childNodes[1].childNodes[0].childNodes.forEach((elementsss) => {
-                    if (elementsss.nodeName == 'UL') {
-                      for (let m = 0; m < elementsss.childNodes.length; m++) {
-                        console.log('child1', elementsss.childNodes[m].childNodes);
-                        try {
-                          let children_div = '';
-                          // thử comment_child1 mới có thêm 1 thẻ div
-                          if (elementsss.childNodes[m].childNodes.length == 3) {
-                            children_div = elementsss.childNodes[m].childNodes[1].childNodes[
-                              elementsss.childNodes[m].childNodes[0].childNodes.length - 1
-                            ].childNodes[1].childNodes[0].childNodes[0]
-                              ? elementsss.childNodes[m].childNodes[1].childNodes[
-                                  elementsss.childNodes[m].childNodes[0].childNodes.length - 1
-                                ].childNodes[1].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes
-                              : elementsss.childNodes[m].childNodes[1].childNodes[
-                                  elementsss.childNodes[m].childNodes[0].childNodes.length - 1
-                                ].childNodes[1].childNodes[1].childNodes[0].childNodes[0].childNodes[0].childNodes;
-                          } else {
-                            children_div = elementsss.childNodes[m].childNodes[0].childNodes[
-                              elementsss.childNodes[m].childNodes[0].childNodes.length - 1
-                            ].childNodes[1].childNodes[0].childNodes[0]
-                              ? elementsss.childNodes[m].childNodes[0].childNodes[
-                                  elementsss.childNodes[m].childNodes[0].childNodes.length - 1
-                                ].childNodes[1].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes
-                              : elementsss.childNodes[m].childNodes[0].childNodes[
-                                  elementsss.childNodes[m].childNodes[0].childNodes.length - 1
-                                ].childNodes[1].childNodes[1].childNodes[0].childNodes[0].childNodes[0].childNodes;
-                          }
-                          // cmtchild1 mới  cũ có hình ảnh
-                          console.log('children_div', children_div);
-                          date_cmtchild =
-                            elementsss.childNodes[m].childNodes[0].querySelectorAll('a[role="link"]')[
-                              elementsss.childNodes[m].childNodes[0].querySelectorAll('a[role="link"]').length - 1
-                            ].innerText;
-                          if (
-                            children_div[0].parentNode.parentNode.parentNode.parentNode.parentNode.childNodes.length ==
-                            3
-                          ) {
-                            imgComment_cmt =
-                              children_div[0].parentNode.parentNode.parentNode.parentNode.parentNode.childNodes[1]
-                                .childNodes[0].childNodes[0].childNodes[0].childNodes.length > 2
-                                ? children_div[0].parentNode.parentNode.parentNode.parentNode.parentNode.childNodes[1]
-                                    .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                                    .currentSrc
-                                : '';
-                            if (
-                              children_div[0].parentNode.parentNode.parentNode.parentNode.parentNode.childNodes[1]
-                                .childNodes[0].childNodes[1]
-                            ) {
-                              count_like_cmtchild =
-                                children_div[0].parentNode.parentNode.parentNode.parentNode.parentNode.childNodes[1]
-                                  .childNodes[0].childNodes[1].textContent == ''
-                                  ? 1
-                                  : children_div[0].parentNode.parentNode.parentNode.parentNode.parentNode.childNodes[1]
-                                      .childNodes[0].childNodes[1].textContent;
-                            }
-                            // cmtchild1 mới có hình ảnh
-                          } else if (
-                            children_div[0].parentNode.parentNode.parentNode.parentNode.parentNode.childNodes.length ==
-                            4
-                          ) {
-                            imgComment_cmt =
-                              children_div[0].parentNode.parentNode.parentNode.parentNode.parentNode.childNodes[2]
-                                .childNodes[0].childNodes[0].childNodes[0].childNodes.length > 2
-                                ? children_div[0].parentNode.parentNode.parentNode.parentNode.parentNode.childNodes[2]
-                                    .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                                    .currentSrc
-                                : '';
-                            if (
-                              children_div[0].parentNode.parentNode.parentNode.parentNode.parentNode.childNodes[2]
-                                .childNodes[0].childNodes[1]
-                            ) {
-                              count_like_cmtchild =
-                                children_div[0].parentNode.parentNode.parentNode.parentNode.parentNode.childNodes[2]
-                                  .childNodes[0].childNodes[1].textContent == ''
-                                  ? 1
-                                  : children_div[0].parentNode.parentNode.parentNode.parentNode.parentNode.childNodes[2]
-                                      .childNodes[0].childNodes[1].textContent;
-                            }
-                            // đếm like khi cmtchild1 cũ không có hình
-                          }
-                          if (children_div[0].parentNode.parentNode.childNodes[1]) {
-                            count_like_cmtchild =
-                              children_div[0].parentNode.parentNode.childNodes[1].textContent == ''
-                                ? 1
-                                : children_div[0].parentNode.parentNode.childNodes[1].textContent;
-                          } else if (
-                            children_div[0].parentNode.parentNode.parentNode.parentNode.parentNode.childNodes[1]
-                              .childNodes[0].childNodes[0].childNodes[1]
-                          ) {
-                            //đếm like khi cmtchild1 mới không có hình
-                            count_like_cmtchild =
-                              children_div[0].parentNode.parentNode.parentNode.parentNode.parentNode.childNodes[1]
-                                .childNodes[0].childNodes[0].childNodes[1].textContent == ''
-                                ? 1
-                                : children_div[0].parentNode.parentNode.parentNode.parentNode.parentNode.childNodes[1]
-                                    .childNodes[0].childNodes[0].childNodes[1].textContent;
-                          }
+          //                   // if (
+          //                   //   elementsss.childNodes[m].childNodes[1]
+          //                   //     .className == ''
+          //                   // ) {
+          //                   //   children2 =
+          //                   //     elementsss.childNodes[m].childNodes[1]
+          //                   //       .childNodes[0].childNodes;
+          //                   //   for (let n = 0; n < children2.length; n++) {
+          //                   //     children2[n].childNodes[0].childNodes[
+          //                   //       children2[n].childNodes[0].childNodes.length -
+          //                   //         1
+          //                   //     ].childNodes[1].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes.forEach(
+          //                   //       (child) => {
+          //                   //         if (child.nodeName == 'SPAN') {
+          //                   //           user_cmtchild_href =
+          //                   //             child.childNodes[0].childNodes[0].href;
+          //                   //           user_name_cmtchild =
+          //                   //             child.childNodes[0].childNodes[0]
+          //                   //               .innerText;
+          //                   //           user_cmtchild_id =
+          //                   //             child.childNodes[0].childNodes[0].href.split(
+          //                   //               '/'
+          //                   //             )[6];
+          //                   //         } else if (child.nodeName == 'DIV') {
+          //                   //           cotent_cmtchild =
+          //                   //             child.childNodes[0].childNodes[0]
+          //                   //               .innerHTML;
+          //                   //         }
+          //                   //       }
+          //                   //     );
+          //                   //   }
+          //                   // }
+          //                   children.push({
+          //                     usernameComment: user_name_cmtchild,
+          //                     userIDComment: user_cmtchild_id.split('&')[0].split('id=')[1],
+          //                     contentComment: cotent_cmtchild,
+          //                     date: date_cmtchild,
+          //                     imageComment: imgComment_cmt == '' ? null : imgComment_cmt,
+          //                     countLike: count_like_cmtchild,
+          //                   });
+          //                   count_comments_config += 1;
+          //                   user_cmtchild_href =
+          //                     user_name_cmtchild =
+          //                     user_cmtchild_id =
+          //                     cotent_cmtchild =
+          //                     imgComment_cmt =
+          //                     date_cmtchild =
+          //                       '';
+          //                   count_like_cmtchild = 0;
+          //                 } catch (e) {
+          //                   console.log('children error');
+          //                   console.log(e);
+          //                 }
+          //               }
+          //             }
+          //           });
+          //         }
+          //       } else {
+          //         elementss.childNodes[1].childNodes[0].childNodes.forEach((elementsss) => {
+          //           if (elementsss.nodeName == 'UL') {
+          //             for (let m = 0; m < elementsss.childNodes.length; m++) {
+          //               console.log('child1', elementsss.childNodes[m].childNodes);
+          //               try {
+          //                 let children_div = '';
+          //                 // thử comment_child1 mới có thêm 1 thẻ div
+          //                 if (elementsss.childNodes[m].childNodes.length == 3) {
+          //                   children_div = elementsss.childNodes[m].childNodes[1].childNodes[
+          //                     elementsss.childNodes[m].childNodes[0].childNodes.length - 1
+          //                   ].childNodes[1].childNodes[0].childNodes[0]
+          //                     ? elementsss.childNodes[m].childNodes[1].childNodes[
+          //                         elementsss.childNodes[m].childNodes[0].childNodes.length - 1
+          //                       ].childNodes[1].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes
+          //                     : elementsss.childNodes[m].childNodes[1].childNodes[
+          //                         elementsss.childNodes[m].childNodes[0].childNodes.length - 1
+          //                       ].childNodes[1].childNodes[1].childNodes[0].childNodes[0].childNodes[0].childNodes;
+          //                 } else {
+          //                   children_div = elementsss.childNodes[m].childNodes[0].childNodes[
+          //                     elementsss.childNodes[m].childNodes[0].childNodes.length - 1
+          //                   ].childNodes[1].childNodes[0].childNodes[0]
+          //                     ? elementsss.childNodes[m].childNodes[0].childNodes[
+          //                         elementsss.childNodes[m].childNodes[0].childNodes.length - 1
+          //                       ].childNodes[1].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes
+          //                     : elementsss.childNodes[m].childNodes[0].childNodes[
+          //                         elementsss.childNodes[m].childNodes[0].childNodes.length - 1
+          //                       ].childNodes[1].childNodes[1].childNodes[0].childNodes[0].childNodes[0].childNodes;
+          //                 }
+          //                 // cmtchild1 mới  cũ có hình ảnh
+          //                 console.log('children_div', children_div);
+          //                 date_cmtchild =
+          //                   elementsss.childNodes[m].childNodes[0].querySelectorAll('a[role="link"]')[
+          //                     elementsss.childNodes[m].childNodes[0].querySelectorAll('a[role="link"]').length - 1
+          //                   ].innerText;
+          //                 if (
+          //                   children_div[0].parentNode.parentNode.parentNode.parentNode.parentNode.childNodes.length ==
+          //                   3
+          //                 ) {
+          //                   imgComment_cmt =
+          //                     children_div[0].parentNode.parentNode.parentNode.parentNode.parentNode.childNodes[1]
+          //                       .childNodes[0].childNodes[0].childNodes[0].childNodes.length > 2
+          //                       ? children_div[0].parentNode.parentNode.parentNode.parentNode.parentNode.childNodes[1]
+          //                           .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+          //                           .currentSrc
+          //                       : '';
+          //                   if (
+          //                     children_div[0].parentNode.parentNode.parentNode.parentNode.parentNode.childNodes[1]
+          //                       .childNodes[0].childNodes[1]
+          //                   ) {
+          //                     count_like_cmtchild =
+          //                       children_div[0].parentNode.parentNode.parentNode.parentNode.parentNode.childNodes[1]
+          //                         .childNodes[0].childNodes[1].textContent == ''
+          //                         ? 1
+          //                         : children_div[0].parentNode.parentNode.parentNode.parentNode.parentNode.childNodes[1]
+          //                             .childNodes[0].childNodes[1].textContent;
+          //                   }
+          //                   // cmtchild1 mới có hình ảnh
+          //                 } else if (
+          //                   children_div[0].parentNode.parentNode.parentNode.parentNode.parentNode.childNodes.length ==
+          //                   4
+          //                 ) {
+          //                   imgComment_cmt =
+          //                     children_div[0].parentNode.parentNode.parentNode.parentNode.parentNode.childNodes[2]
+          //                       .childNodes[0].childNodes[0].childNodes[0].childNodes.length > 2
+          //                       ? children_div[0].parentNode.parentNode.parentNode.parentNode.parentNode.childNodes[2]
+          //                           .childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+          //                           .currentSrc
+          //                       : '';
+          //                   if (
+          //                     children_div[0].parentNode.parentNode.parentNode.parentNode.parentNode.childNodes[2]
+          //                       .childNodes[0].childNodes[1]
+          //                   ) {
+          //                     count_like_cmtchild =
+          //                       children_div[0].parentNode.parentNode.parentNode.parentNode.parentNode.childNodes[2]
+          //                         .childNodes[0].childNodes[1].textContent == ''
+          //                         ? 1
+          //                         : children_div[0].parentNode.parentNode.parentNode.parentNode.parentNode.childNodes[2]
+          //                             .childNodes[0].childNodes[1].textContent;
+          //                   }
+          //                   // đếm like khi cmtchild1 cũ không có hình
+          //                 }
+          //                 if (children_div[0].parentNode.parentNode.childNodes[1]) {
+          //                   count_like_cmtchild =
+          //                     children_div[0].parentNode.parentNode.childNodes[1].textContent == ''
+          //                       ? 1
+          //                       : children_div[0].parentNode.parentNode.childNodes[1].textContent;
+          //                 } else if (
+          //                   children_div[0].parentNode.parentNode.parentNode.parentNode.parentNode.childNodes[1]
+          //                     .childNodes[0].childNodes[0].childNodes[1]
+          //                 ) {
+          //                   //đếm like khi cmtchild1 mới không có hình
+          //                   count_like_cmtchild =
+          //                     children_div[0].parentNode.parentNode.parentNode.parentNode.parentNode.childNodes[1]
+          //                       .childNodes[0].childNodes[0].childNodes[1].textContent == ''
+          //                       ? 1
+          //                       : children_div[0].parentNode.parentNode.parentNode.parentNode.parentNode.childNodes[1]
+          //                           .childNodes[0].childNodes[0].childNodes[1].textContent;
+          //                 }
 
-                          // lấy thông tin cmt
-                          if (children_div.length > 1) {
-                            children_div.forEach((child, index) => {
-                              if (child.nodeName == 'SPAN' && index === 1) {
-                                console.log('userchild :', child);
-                                user_cmtchild_href = child.childNodes[0].href;
-                                user_name_cmtchild = child.childNodes[0].innerText;
-                                user_cmtchild_id = child.childNodes[0].href.split('/')[3];
-                              }
-                              if (child.nodeName == 'SPAN' && index === 0) {
-                                console.log('userchild :', child);
-                                user_cmtchild_href = child.childNodes[0].href;
-                                user_name_cmtchild = child.childNodes[0].innerText;
-                                user_cmtchild_id = child.childNodes[0].href.split('/')[3];
-                              } else if (child.nodeName == 'DIV' && index > 0) {
-                                for (let l = 0; l < child.childNodes[0].childNodes.length; l++) {
-                                  cotent_cmtchild += child.childNodes[0].childNodes[l].innerText
-                                    .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
-                                    .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
-                                    .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
-                                }
-                              }
-                            });
-                          } else {
-                            children_div[0].childNodes[0].childNodes.forEach((child, index) => {
-                              if (child.nodeName == 'SPAN' && index == 1) {
-                                console.log('userchild2 :', child);
-                                user_cmtchild_href = child.childNodes[0].href;
-                                user_name_cmtchild = child.childNodes[0].innerText;
-                                user_cmtchild_id = child.childNodes[0].href.split('/')[3];
-                              }
-                              if (child.nodeName == 'SPAN' && index == 0) {
-                                console.log('userchild2 :', child);
-                                user_cmtchild_href = child.childNodes[0].href;
-                                user_name_cmtchild = child.childNodes[0].innerText;
-                                user_cmtchild_id = child.childNodes[0].href.split('/')[3];
-                              } else if (child.nodeName == 'DIV' && index > 0) {
-                                for (let l = 0; l < child.childNodes[0].childNodes.length; l++) {
-                                  cotent_cmtchild += child.childNodes[0].childNodes[l].innerText
-                                    .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
-                                    .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
-                                    .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
-                                }
-                              }
-                            });
-                          }
+          //                 // lấy thông tin cmt
+          //                 if (children_div.length > 1) {
+          //                   children_div.forEach((child, index) => {
+          //                     if (child.nodeName == 'SPAN' && index === 1) {
+          //                       console.log('userchild :', child);
+          //                       user_cmtchild_href = child.childNodes[0].href;
+          //                       user_name_cmtchild = child.childNodes[0].innerText;
+          //                       user_cmtchild_id = child.childNodes[0].href.split('/')[3];
+          //                     }
+          //                     if (child.nodeName == 'SPAN' && index === 0) {
+          //                       console.log('userchild :', child);
+          //                       user_cmtchild_href = child.childNodes[0].href;
+          //                       user_name_cmtchild = child.childNodes[0].innerText;
+          //                       user_cmtchild_id = child.childNodes[0].href.split('/')[3];
+          //                     } else if (child.nodeName == 'DIV' && index > 0) {
+          //                       for (let l = 0; l < child.childNodes[0].childNodes.length; l++) {
+          //                         cotent_cmtchild += child.childNodes[0].childNodes[l].innerText
+          //                           .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
+          //                           .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
+          //                           .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
+          //                       }
+          //                     }
+          //                   });
+          //                 } else {
+          //                   children_div[0].childNodes[0].childNodes.forEach((child, index) => {
+          //                     if (child.nodeName == 'SPAN' && index == 1) {
+          //                       console.log('userchild2 :', child);
+          //                       user_cmtchild_href = child.childNodes[0].href;
+          //                       user_name_cmtchild = child.childNodes[0].innerText;
+          //                       user_cmtchild_id = child.childNodes[0].href.split('/')[3];
+          //                     }
+          //                     if (child.nodeName == 'SPAN' && index == 0) {
+          //                       console.log('userchild2 :', child);
+          //                       user_cmtchild_href = child.childNodes[0].href;
+          //                       user_name_cmtchild = child.childNodes[0].innerText;
+          //                       user_cmtchild_id = child.childNodes[0].href.split('/')[3];
+          //                     } else if (child.nodeName == 'DIV' && index > 0) {
+          //                       for (let l = 0; l < child.childNodes[0].childNodes.length; l++) {
+          //                         cotent_cmtchild += child.childNodes[0].childNodes[l].innerText
+          //                           .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
+          //                           .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
+          //                           .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
+          //                       }
+          //                     }
+          //                   });
+          //                 }
 
-                          children.push({
-                            usernameComment: user_name_cmtchild,
-                            userIDComment: user_cmtchild_id.split('&')[0].split('id=')[1],
-                            contentComment: cotent_cmtchild,
-                            date: date_cmtchild,
-                            imageComment: imgComment_cmt == '' ? null : imgComment_cmt,
-                            countLike: count_like_cmtchild,
-                          });
-                          count_comments_config += 1;
-                          user_cmtchild_href =
-                            user_name_cmtchild =
-                            user_cmtchild_id =
-                            cotent_cmtchild =
-                            date_cmtchild =
-                            imgComment_cmt =
-                              '';
-                          count_like_cmtchild = 0;
+          //                 children.push({
+          //                   usernameComment: user_name_cmtchild,
+          //                   userIDComment: user_cmtchild_id.split('&')[0].split('id=')[1],
+          //                   contentComment: cotent_cmtchild,
+          //                   date: date_cmtchild,
+          //                   imageComment: imgComment_cmt == '' ? null : imgComment_cmt,
+          //                   countLike: count_like_cmtchild,
+          //                 });
+          //                 count_comments_config += 1;
+          //                 user_cmtchild_href =
+          //                   user_name_cmtchild =
+          //                   user_cmtchild_id =
+          //                   cotent_cmtchild =
+          //                   date_cmtchild =
+          //                   imgComment_cmt =
+          //                     '';
+          //                 count_like_cmtchild = 0;
 
-                          if (
-                            elementsss.childNodes[m].childNodes[1] &&
-                            elementsss.childNodes[m].childNodes[1].className == ''
-                          ) {
-                            children2 = elementsss.childNodes[m].childNodes[1].childNodes[0].childNodes;
-                            console.log(children2);
-                            for (let n = 0; n < children2.length; n++) {
-                              date_cmtchild =
-                                children2[0].querySelectorAll('a[role="link"]')[
-                                  children2[0].querySelectorAll('a[role="link"]').length - 1
-                                ].innerText;
-                              try {
-                                children22 =
-                                  children2[n].childNodes[0].childNodes[
-                                    children2[n].childNodes[0].childNodes.length - 1
-                                  ].childNodes[1].childNodes;
-                                children22.forEach((element, index) => {
-                                  // kiểm tra comments mới có thì index = 1
-                                  if (element.className == '' && index == 1) {
-                                    // lấy thông tin child2 cmt
-                                    element.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes.forEach(
-                                      (child, index) => {
-                                        if (child.nodeName == 'SPAN' && index === 1) {
-                                          console.log('userchild3 :', child);
-                                          user_cmtchild_href = child.childNodes[0].href;
-                                          user_name_cmtchild = child.childNodes[0].innerText;
-                                          user_cmtchild_id = child.childNodes[0].href.split('/')[3];
-                                        }
-                                        if (child.nodeName == 'SPAN' && index === 0) {
-                                          console.log('userchild3 :', child);
-                                          user_cmtchild_href = child.childNodes[0].href;
-                                          user_name_cmtchild = child.childNodes[0].innerText;
-                                          user_cmtchild_id = child.childNodes[0].href.split('/')[3];
-                                        } else if (child.nodeName == 'DIV' && index > 0) {
-                                          for (let l = 0; i < child.childNodes[0].childNodes.length; l++) {
-                                            cotent_cmtchild += child.childNodes[0].childNodes[l].innerText
-                                              .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
-                                              .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
-                                              .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
-                                          }
-                                        }
-                                      }
-                                    );
-                                    // đếm like khi có hình
-                                    console.log('cmt child2 new ', element);
-                                    if (element.nodeName == 'DIV' && index == 2) {
-                                      if (children22[2].childNodes[0].childNodes.length > 1) {
-                                        count_like_cmtchild2 =
-                                          children22[2].childNodes[0].childNodes[1].textContent == ''
-                                            ? 1
-                                            : children22[1].childNodes[0].childNodes[1].textContent;
-                                      }
+          //                 if (
+          //                   elementsss.childNodes[m].childNodes[1] &&
+          //                   elementsss.childNodes[m].childNodes[1].className == ''
+          //                 ) {
+          //                   children2 = elementsss.childNodes[m].childNodes[1].childNodes[0].childNodes;
+          //                   console.log(children2);
+          //                   for (let n = 0; n < children2.length; n++) {
+          //                     date_cmtchild =
+          //                       children2[0].querySelectorAll('a[role="link"]')[
+          //                         children2[0].querySelectorAll('a[role="link"]').length - 1
+          //                       ].innerText;
+          //                     try {
+          //                       children22 =
+          //                         children2[n].childNodes[0].childNodes[
+          //                           children2[n].childNodes[0].childNodes.length - 1
+          //                         ].childNodes[1].childNodes;
+          //                       children22.forEach((element, index) => {
+          //                         // kiểm tra comments mới có thì index = 1
+          //                         if (element.className == '' && index == 1) {
+          //                           // lấy thông tin child2 cmt
+          //                           element.childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes.forEach(
+          //                             (child, index) => {
+          //                               if (child.nodeName == 'SPAN' && index === 1) {
+          //                                 console.log('userchild3 :', child);
+          //                                 user_cmtchild_href = child.childNodes[0].href;
+          //                                 user_name_cmtchild = child.childNodes[0].innerText;
+          //                                 user_cmtchild_id = child.childNodes[0].href.split('/')[3];
+          //                               }
+          //                               if (child.nodeName == 'SPAN' && index === 0) {
+          //                                 console.log('userchild3 :', child);
+          //                                 user_cmtchild_href = child.childNodes[0].href;
+          //                                 user_name_cmtchild = child.childNodes[0].innerText;
+          //                                 user_cmtchild_id = child.childNodes[0].href.split('/')[3];
+          //                               } else if (child.nodeName == 'DIV' && index > 0) {
+          //                                 for (let l = 0; i < child.childNodes[0].childNodes.length; l++) {
+          //                                   cotent_cmtchild += child.childNodes[0].childNodes[l].innerText
+          //                                     .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
+          //                                     .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
+          //                                     .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
+          //                                 }
+          //                               }
+          //                             }
+          //                           );
+          //                           // đếm like khi có hình
+          //                           console.log('cmt child2 new ', element);
+          //                           if (element.nodeName == 'DIV' && index == 2) {
+          //                             if (children22[2].childNodes[0].childNodes.length > 1) {
+          //                               count_like_cmtchild2 =
+          //                                 children22[2].childNodes[0].childNodes[1].textContent == ''
+          //                                   ? 1
+          //                                   : children22[1].childNodes[0].childNodes[1].textContent;
+          //                             }
 
-                                      imgComment_cmt =
-                                        children22[2].childNodes[0].childNodes[1].childNodes[0].childNodes[0]
-                                          .childNodes[0].childNodes.length > 2
-                                          ? children22[2].childNodes[0].childNodes[1].childNodes[0].childNodes[0]
-                                              .childNodes[0].childNodes[0].childNodes[0].childNodes[0].currentSrc
-                                          : '';
-                                    } else {
-                                      // đếm like khi không có hình
-                                      if (children22[1].childNodes[0].childNodes[0].childNodes[1]) {
-                                        count_like_cmtchild2 =
-                                          children22[1].childNodes[0].childNodes[0].childNodes[1].textContent == ''
-                                            ? 1
-                                            : children22[1].childNodes[0].childNodes[0].childNodes[1].textContent;
-                                      }
-                                    }
-                                    // kiểm tra comments child 2 cũ thì làm dưới
-                                  } else if (index == 1 && element.className !== '') {
-                                    // đếm like khi có hình
-                                    if (children22.length > 2) {
-                                      if (children22[1].childNodes[0].childNodes.length > 1) {
-                                        count_like_cmtchild2 =
-                                          children22[1].childNodes[0].childNodes[1].textContent == ''
-                                            ? 1
-                                            : children22[1].childNodes[0].childNodes[1].textContent;
-                                      }
-                                      imgComment_cmt = children22[1].childNodes[0].childNodes[0].childNodes[0]
-                                        .childNodes[0].childNodes[0]
-                                        ? children22[1].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                                            .childNodes[0].childNodes[0].currentSrc
-                                        : '';
-                                      // lấy thông tin khi có hình
-                                      children22[0].childNodes[0].childNodes[0].childNodes[0].childNodes.forEach(
-                                        (child, index) => {
-                                          if (child.nodeName == 'SPAN' && index == 1) {
-                                            console.log('userchild4 :', child);
-                                            user_cmtchild_href = child.childNodes[0].href;
-                                            user_name_cmtchild = child.childNodes[0].innerText;
-                                            user_cmtchild_id = child.childNodes[0].href.split('/')[3];
-                                          }
-                                          if (child.nodeName == 'SPAN' && index == 0) {
-                                            console.log('userchild4 :', child);
-                                            user_cmtchild_href = child.childNodes[0].href;
-                                            user_name_cmtchild = child.childNodes[0].innerText;
-                                            user_cmtchild_id = child.childNodes[0].href.split('/')[3];
-                                          } else if (child.nodeName == 'DIV' && index > 0) {
-                                            for (let l = 0; l < child.childNodes[0].childNodes.length; l++) {
-                                              cotent_cmtchild += child.childNodes[0].childNodes[l].innerText
-                                                .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
-                                                .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
-                                                .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
-                                            }
-                                          }
-                                        }
-                                      );
-                                    } else {
-                                      // đếm like khi không có hình
+          //                             imgComment_cmt =
+          //                               children22[2].childNodes[0].childNodes[1].childNodes[0].childNodes[0]
+          //                                 .childNodes[0].childNodes.length > 2
+          //                                 ? children22[2].childNodes[0].childNodes[1].childNodes[0].childNodes[0]
+          //                                     .childNodes[0].childNodes[0].childNodes[0].childNodes[0].currentSrc
+          //                                 : '';
+          //                           } else {
+          //                             // đếm like khi không có hình
+          //                             if (children22[1].childNodes[0].childNodes[0].childNodes[1]) {
+          //                               count_like_cmtchild2 =
+          //                                 children22[1].childNodes[0].childNodes[0].childNodes[1].textContent == ''
+          //                                   ? 1
+          //                                   : children22[1].childNodes[0].childNodes[0].childNodes[1].textContent;
+          //                             }
+          //                           }
+          //                           // kiểm tra comments child 2 cũ thì làm dưới
+          //                         } else if (index == 1 && element.className !== '') {
+          //                           // đếm like khi có hình
+          //                           if (children22.length > 2) {
+          //                             if (children22[1].childNodes[0].childNodes.length > 1) {
+          //                               count_like_cmtchild2 =
+          //                                 children22[1].childNodes[0].childNodes[1].textContent == ''
+          //                                   ? 1
+          //                                   : children22[1].childNodes[0].childNodes[1].textContent;
+          //                             }
+          //                             imgComment_cmt = children22[1].childNodes[0].childNodes[0].childNodes[0]
+          //                               .childNodes[0].childNodes[0]
+          //                               ? children22[1].childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+          //                                   .childNodes[0].childNodes[0].currentSrc
+          //                               : '';
+          //                             // lấy thông tin khi có hình
+          //                             children22[0].childNodes[0].childNodes[0].childNodes[0].childNodes.forEach(
+          //                               (child, index) => {
+          //                                 if (child.nodeName == 'SPAN' && index == 1) {
+          //                                   console.log('userchild4 :', child);
+          //                                   user_cmtchild_href = child.childNodes[0].href;
+          //                                   user_name_cmtchild = child.childNodes[0].innerText;
+          //                                   user_cmtchild_id = child.childNodes[0].href.split('/')[3];
+          //                                 }
+          //                                 if (child.nodeName == 'SPAN' && index == 0) {
+          //                                   console.log('userchild4 :', child);
+          //                                   user_cmtchild_href = child.childNodes[0].href;
+          //                                   user_name_cmtchild = child.childNodes[0].innerText;
+          //                                   user_cmtchild_id = child.childNodes[0].href.split('/')[3];
+          //                                 } else if (child.nodeName == 'DIV' && index > 0) {
+          //                                   for (let l = 0; l < child.childNodes[0].childNodes.length; l++) {
+          //                                     cotent_cmtchild += child.childNodes[0].childNodes[l].innerText
+          //                                       .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
+          //                                       .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
+          //                                       .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
+          //                                   }
+          //                                 }
+          //                               }
+          //                             );
+          //                           } else {
+          //                             // đếm like khi không có hình
 
-                                      if (children22[0].childNodes[0].childNodes[0].childNodes.length > 1) {
-                                        console.log('children22', children22);
-                                        count_like_cmtchild2 =
-                                          children22[0].childNodes[0].childNodes[0].childNodes[1].textContent == ''
-                                            ? 1
-                                            : children22[0].childNodes[0].childNodes[0].childNodes[1].textContent;
-                                      }
-                                      // lấy thông tin cmt child 2
-                                      children22[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes.forEach(
-                                        (child, index) => {
-                                          if (child.nodeName == 'SPAN' && index == 1) {
-                                            console.log('userchild5 :', child);
-                                            user_cmtchild_href = child.childNodes[0].href;
-                                            user_name_cmtchild = child.childNodes[0].innerText;
-                                            user_cmtchild_id = child.childNodes[0].href.split('/')[3];
-                                          }
-                                          if (child.nodeName == 'SPAN' && index == 0) {
-                                            console.log('userchild5 :', child);
-                                            user_cmtchild_href = child.childNodes[0].href;
-                                            user_name_cmtchild = child.childNodes[0].innerText;
-                                            user_cmtchild_id = child.childNodes[0].href.split('/')[3];
-                                          } else if (child.nodeName == 'DIV' && index > 0) {
-                                            for (var l = 0; l < child.childNodes[0].childNodes.length; l++) {
-                                              cotent_cmtchild += child.childNodes[0].childNodes[l].innerText
-                                                .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
-                                                .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
-                                                .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
-                                            }
-                                          }
-                                        }
-                                      );
-                                    }
-                                  }
-                                });
+          //                             if (children22[0].childNodes[0].childNodes[0].childNodes.length > 1) {
+          //                               console.log('children22', children22);
+          //                               count_like_cmtchild2 =
+          //                                 children22[0].childNodes[0].childNodes[0].childNodes[1].textContent == ''
+          //                                   ? 1
+          //                                   : children22[0].childNodes[0].childNodes[0].childNodes[1].textContent;
+          //                             }
+          //                             // lấy thông tin cmt child 2
+          //                             children22[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes[0].childNodes.forEach(
+          //                               (child, index) => {
+          //                                 if (child.nodeName == 'SPAN' && index == 1) {
+          //                                   console.log('userchild5 :', child);
+          //                                   user_cmtchild_href = child.childNodes[0].href;
+          //                                   user_name_cmtchild = child.childNodes[0].innerText;
+          //                                   user_cmtchild_id = child.childNodes[0].href.split('/')[3];
+          //                                 }
+          //                                 if (child.nodeName == 'SPAN' && index == 0) {
+          //                                   console.log('userchild5 :', child);
+          //                                   user_cmtchild_href = child.childNodes[0].href;
+          //                                   user_name_cmtchild = child.childNodes[0].innerText;
+          //                                   user_cmtchild_id = child.childNodes[0].href.split('/')[3];
+          //                                 } else if (child.nodeName == 'DIV' && index > 0) {
+          //                                   for (var l = 0; l < child.childNodes[0].childNodes.length; l++) {
+          //                                     cotent_cmtchild += child.childNodes[0].childNodes[l].innerText
+          //                                       .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
+          //                                       .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
+          //                                       .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
+          //                                   }
+          //                                 }
+          //                               }
+          //                             );
+          //                           }
+          //                         }
+          //                       });
 
-                                children.push({
-                                  usernameComment: user_name_cmtchild,
-                                  userIDComment: user_cmtchild_id.split('&')[0].split('id=')[1],
-                                  contentComment: cotent_cmtchild,
-                                  date: date_cmtchild,
-                                  imageComment: imgComment_cmt == '' ? null : imgComment_cmt,
-                                  countLike: count_like_cmtchild2,
-                                });
-                                count_comments_config += 1;
-                                user_cmtchild_href =
-                                  user_name_cmtchild =
-                                  user_cmtchild_id =
-                                  cotent_cmtchild =
-                                  date_cmtchild =
-                                  imgComment_cmt =
-                                    '';
-                                count_like_cmtchild2 = 0;
-                              } catch (err) {
-                                console.log('children2 error');
-                                console.log(err);
-                              }
-                            }
-                          }
-                        } catch (e) {
-                          console.log('children error');
-                          console.log(e);
-                        }
-                      }
-                    }
-                  });
-                }
-              } else {
-                console.log('cmt _1 ', elementss.childNodes[0].childNodes[0].childNodes[1].childNodes);
-                date_cmt =
-                  elementss.childNodes[0].childNodes[0].childNodes[1].querySelectorAll('[role="link"]')[
-                    elementss.childNodes[0].childNodes[0].childNodes[1].querySelectorAll('[role="link"]').length - 1
-                  ].innerText;
-                // cũ nè
-                if (elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[0].childNodes[0]) {
-                  divcommment =
-                    elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes[0]
-                      .childNodes[0].childNodes;
-                  if (elementss.childNodes[0].childNodes[0].childNodes[1].childNodes.length > 2) {
-                    if (
-                      elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[1].childNodes[0].childNodes
-                        .length > 1
-                    ) {
-                      count_like_cmt =
-                        elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[1].childNodes[0].childNodes[1]
-                          .textContent == ''
-                          ? 1
-                          : elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[1].childNodes[0]
-                              .childNodes[1].textContent;
-                    }
-                    imgComment = elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[1].childNodes[0]
-                      .childNodes[0].childNodes[0].childNodes[0].childNodes[0]
-                      ? elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[1].childNodes[0].childNodes[0]
-                          .childNodes[0].childNodes[0].childNodes[0].childNodes[0].currentSrc
-                      : '';
-                  }
-                  if (
-                    elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes[0]
-                      .childNodes.length == 2
-                  ) {
-                    count_like_cmt =
-                      elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes[0]
-                        .childNodes[1].textContent == ''
-                        ? 1
-                        : elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes[0]
-                            .childNodes[1].textContent;
-                  }
-                } else {
-                  // cmt mới
-                  divcommment =
-                    elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[1].childNodes[0].childNodes[0]
-                      .childNodes[0].childNodes;
-                  if (elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[2].nodeName == 'DIV') {
-                    imgComment =
-                      elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[2].childNodes[0].childNodes[0]
-                        .childNodes[0].childNodes[0].childNodes[0].childNodes[0].currentSrc;
-                    if (elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[2].childNodes[0].childNodes[1]) {
-                      count_like_cmt =
-                        elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[2].childNodes[0].childNodes[1]
-                          .textContent == ''
-                          ? 1
-                          : elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[2].childNodes[0]
-                              .childNodes[1].textContent;
-                    }
-                  } else {
-                    if (
-                      elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[1].childNodes[0].childNodes[0]
-                        .childNodes[1]
-                    ) {
-                      count_like_cmt =
-                        elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[1].childNodes[0].childNodes[0]
-                          .childNodes[1].textContent == ''
-                          ? 1
-                          : elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[1].childNodes[0]
-                              .childNodes[0].childNodes[1].textContent;
-                    }
-                  }
-                }
+          //                       children.push({
+          //                         usernameComment: user_name_cmtchild,
+          //                         userIDComment: user_cmtchild_id.split('&')[0].split('id=')[1],
+          //                         contentComment: cotent_cmtchild,
+          //                         date: date_cmtchild,
+          //                         imageComment: imgComment_cmt == '' ? null : imgComment_cmt,
+          //                         countLike: count_like_cmtchild2,
+          //                       });
+          //                       count_comments_config += 1;
+          //                       user_cmtchild_href =
+          //                         user_name_cmtchild =
+          //                         user_cmtchild_id =
+          //                         cotent_cmtchild =
+          //                         date_cmtchild =
+          //                         imgComment_cmt =
+          //                           '';
+          //                       count_like_cmtchild2 = 0;
+          //                     } catch (err) {
+          //                       console.log('children2 error');
+          //                       console.log(err);
+          //                     }
+          //                   }
+          //                 }
+          //               } catch (e) {
+          //                 console.log('children error');
+          //                 console.log(e);
+          //               }
+          //             }
+          //           }
+          //         });
+          //       }
+          //     } else {
+          //       console.log('cmt _1 ', elementss.childNodes[0].childNodes[0].childNodes[1].childNodes);
+          //       date_cmt =
+          //         elementss.childNodes[0].childNodes[0].childNodes[1].querySelectorAll('[role="link"]')[
+          //           elementss.childNodes[0].childNodes[0].childNodes[1].querySelectorAll('[role="link"]').length - 1
+          //         ].innerText;
+          //       // cũ nè
+          //       if (elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[0].childNodes[0]) {
+          //         divcommment =
+          //           elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes[0]
+          //             .childNodes[0].childNodes;
+          //         if (elementss.childNodes[0].childNodes[0].childNodes[1].childNodes.length > 2) {
+          //           if (
+          //             elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[1].childNodes[0].childNodes
+          //               .length > 1
+          //           ) {
+          //             count_like_cmt =
+          //               elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[1].childNodes[0].childNodes[1]
+          //                 .textContent == ''
+          //                 ? 1
+          //                 : elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[1].childNodes[0]
+          //                     .childNodes[1].textContent;
+          //           }
+          //           imgComment = elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[1].childNodes[0]
+          //             .childNodes[0].childNodes[0].childNodes[0].childNodes[0]
+          //             ? elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[1].childNodes[0].childNodes[0]
+          //                 .childNodes[0].childNodes[0].childNodes[0].childNodes[0].currentSrc
+          //             : '';
+          //         }
+          //         if (
+          //           elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes[0]
+          //             .childNodes.length == 2
+          //         ) {
+          //           count_like_cmt =
+          //             elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes[0]
+          //               .childNodes[1].textContent == ''
+          //               ? 1
+          //               : elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[0].childNodes[0].childNodes[0]
+          //                   .childNodes[1].textContent;
+          //         }
+          //       } else {
+          //         // cmt mới
+          //         divcommment =
+          //           elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[1].childNodes[0].childNodes[0]
+          //             .childNodes[0].childNodes;
+          //         if (elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[2].nodeName == 'DIV') {
+          //           imgComment =
+          //             elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[2].childNodes[0].childNodes[0]
+          //               .childNodes[0].childNodes[0].childNodes[0].childNodes[0].currentSrc;
+          //           if (elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[2].childNodes[0].childNodes[1]) {
+          //             count_like_cmt =
+          //               elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[2].childNodes[0].childNodes[1]
+          //                 .textContent == ''
+          //                 ? 1
+          //                 : elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[2].childNodes[0]
+          //                     .childNodes[1].textContent;
+          //           }
+          //         } else {
+          //           if (
+          //             elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[1].childNodes[0].childNodes[0]
+          //               .childNodes[1]
+          //           ) {
+          //             count_like_cmt =
+          //               elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[1].childNodes[0].childNodes[0]
+          //                 .childNodes[1].textContent == ''
+          //                 ? 1
+          //                 : elementss.childNodes[0].childNodes[0].childNodes[1].childNodes[1].childNodes[0]
+          //                     .childNodes[0].childNodes[1].textContent;
+          //           }
+          //         }
+          //       }
 
-                if (divcommment.length > 1) {
-                  divcommment.forEach((element, index) => {
-                    if (element.nodeName == 'SPAN' && index == 0) {
-                      console.log('user6', element);
-                      user_cmt_href = element.childNodes[0].href;
-                      user_name_cmt = element.childNodes[0].innerText;
-                      user_cmt_id = element.childNodes[0].href.split('/')[3];
-                    } else if (element.nodeName == 'DIV') {
-                      for (let l = 0; l < element.childNodes[0].childNodes.length; l++) {
-                        cotent_cmt += element.childNodes[0].childNodes[l].innerText
-                          .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
-                          .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
-                          .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
-                      }
-                    }
-                  });
-                } else if (divcommment.length == 1) {
-                  divcommment[0].childNodes[0].childNodes.forEach((element, index) => {
-                    if (element.nodeName == 'SPAN' && index == 1) {
-                      console.log(element);
-                      user_cmt_href = element.childNodes[0].href;
-                      user_name_cmt = element.childNodes[0].innerText;
-                      user_cmt_id = element.childNodes[0].href.split('/')[3];
-                    }
-                    if (element.nodeName == 'SPAN' && index == 0) {
-                      console.log(element);
-                      user_cmt_href = element.childNodes[0].href;
-                      user_name_cmt = element.childNodes[0].innerText;
-                      user_cmt_id = element.childNodes[0].href.split('/')[3];
-                    } else if (element.nodeName == 'DIV' && index > 0) {
-                      for (let l = 0; l < element.childNodes[0].childNodes.length; l++) {
-                        cotent_cmt += element.childNodes[0].childNodes[l].innerText
-                          .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
-                          .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
-                          .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
-                      }
-                    }
-                  });
-                }
-              }
-              comments.push({
-                contentComment: cotent_cmt,
-                usernameComment: user_name_cmt,
-                userIDComment: user_cmt_id.split('&')[0].split('id=')[1],
-                //user_cmt_href: user_cmt_href,
-                imageComment: imgComment == '' ? null : imgComment,
-                countLike: count_like_cmt,
-                children: children,
-                date: date_cmt,
-              });
-              count_comments_config += 1;
-              date_cmt = cotent_cmt = user_cmt_id = user_name_cmt = user_cmt_href = imgComment = '';
-              count_like_cmt = 0;
-              children = [];
-              console.log(comments);
-            } catch (error) {
-              console.log('error cmt');
-              iscomment = false;
-              console.log(error);
-            }
-          });
+          //       if (divcommment.length > 1) {
+          //         divcommment.forEach((element, index) => {
+          //           if (element.nodeName == 'SPAN' && index == 0) {
+          //             console.log('user6', element);
+          //             user_cmt_href = element.childNodes[0].href;
+          //             user_name_cmt = element.childNodes[0].innerText;
+          //             user_cmt_id = element.childNodes[0].href.split('/')[3];
+          //           } else if (element.nodeName == 'DIV') {
+          //             for (let l = 0; l < element.childNodes[0].childNodes.length; l++) {
+          //               cotent_cmt += element.childNodes[0].childNodes[l].innerText
+          //                 .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
+          //                 .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
+          //                 .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
+          //             }
+          //           }
+          //         });
+          //       } else if (divcommment.length == 1) {
+          //         divcommment[0].childNodes[0].childNodes.forEach((element, index) => {
+          //           if (element.nodeName == 'SPAN' && index == 1) {
+          //             console.log(element);
+          //             user_cmt_href = element.childNodes[0].href;
+          //             user_name_cmt = element.childNodes[0].innerText;
+          //             user_cmt_id = element.childNodes[0].href.split('/')[3];
+          //           }
+          //           if (element.nodeName == 'SPAN' && index == 0) {
+          //             console.log(element);
+          //             user_cmt_href = element.childNodes[0].href;
+          //             user_name_cmt = element.childNodes[0].innerText;
+          //             user_cmt_id = element.childNodes[0].href.split('/')[3];
+          //           } else if (element.nodeName == 'DIV' && index > 0) {
+          //             for (let l = 0; l < element.childNodes[0].childNodes.length; l++) {
+          //               cotent_cmt += element.childNodes[0].childNodes[l].innerText
+          //                 .replace(/([^.@\s]+)(\.[^.@\s]+)*@([^.@\s]+\.)+([^.@\s]+)/, '')
+          //                 .replace(/^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/, '')
+          //                 .replace(/^\+?([0-9]{3})\)?[-. ]?([0-9]{4})[-. ]?([0-9]{4})$/, '');
+          //             }
+          //           }
+          //         });
+          //       }
+          //     }
+          //     comments.push({
+          //       contentComment: cotent_cmt,
+          //       usernameComment: user_name_cmt,
+          //       userIDComment: user_cmt_id.split('&')[0].split('id=')[1],
+          //       //user_cmt_href: user_cmt_href,
+          //       imageComment: imgComment == '' ? null : imgComment,
+          //       countLike: count_like_cmt,
+          //       children: children,
+          //       date: date_cmt,
+          //     });
+          //     count_comments_config += 1;
+          //     date_cmt = cotent_cmt = user_cmt_id = user_name_cmt = user_cmt_href = imgComment = '';
+          //     count_like_cmt = 0;
+          //     children = [];
+          //     console.log(comments);
+          //   } catch (error) {
+          //     console.log('error cmt');
+          //     iscomment = false;
+          //     console.log(error);
+          //   }
+          // });
         }
       });
       post_id = posthref.split('?comment_id')[0].split('/')[5];
