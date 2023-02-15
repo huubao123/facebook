@@ -146,11 +146,11 @@ del.process(async (job, done) => {
   for (element of post.data.data) {
     if (element.is_active == 3) {
       console.log(element.short_description);
-      if (element.session_tags.title[0]?.title == 'Youtube') {
+      if (element.session_tags.title_tag[0]?.title == 'Youtube') {
         await deletejob(element.short_description.split('search_query=')[1]);
-      } else if (element.session_tags.title[0]?.title == 'Facebook') {
+      } else if (element.session_tags.title_tag[0]?.title == 'Facebook') {
         await deletejob(element.short_description.split('/')[4]);
-      } else if (element.session_tags.title[0]?.title == 'Page facebook') {
+      } else if (element.session_tags.title_tag[0]?.title == 'Page facebook') {
         await deletejob(element.short_description.split('/')[3]);
       }
     }
@@ -171,10 +171,10 @@ update.process(async (job, done) => {
   }
   for (element of post.data.data) {
     if (element.is_active == 1) {
-      if (element.session_tags.title[0]?.title == 'Youtube') {
+      if (element.session_tags.title_tag[0]?.title == 'Youtube') {
         let update = new Date(element.updated_at).getTime() - 7 * 60 * 60000;
         let today = new Date().getTime();
-        let pass = new Date(today).getTime() - 60 * 60000;
+        let pass = new Date(today).getTime() - 30 * 60000;
         if (pass < update && update < today) {
           const detail = await axios({
             method: 'get',
@@ -281,10 +281,10 @@ update.process(async (job, done) => {
             );
           }
         }
-      } else if (element.session_tags.title[0]?.title == 'facebook') {
+      } else if (element.session_tags.title_tag[0]?.title == 'facebook') {
         let update = new Date(element.updated_at).getTime() - 7 * 60 * 60000;
         let today = new Date().getTime();
-        let pass = new Date(today).getTime() - 60 * 60000;
+        let pass = new Date(today).getTime() - 30 * 60000;
 
         if (pass < update && update < today) {
           const detail = await axios({
@@ -447,10 +447,10 @@ update.process(async (job, done) => {
             }
           }
         }
-      } else if (element.session_tags.title[0]?.title == 'Page facebook') {
+      } else if (element.session_tags.title_tag[0]?.title == 'Page facebook') {
         let update = new Date(element.updated_at).getTime() - 7 * 60 * 60000;
         let today = new Date().getTime();
-        let pass = new Date(today).getTime() - 60 * 60000;
+        let pass = new Date(today).getTime() - 30 * 60000;
         if (pass < update && update < today) {
           const detail = await axios({
             method: 'get',

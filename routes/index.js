@@ -62,13 +62,13 @@ router.post('/auto', async function (req, res, next) {
     await update.add(
       {},
       {
-        repeat: { cron: '*/15 * * * *' },
+        repeat: { cron: '*/30 * * * *' },
       }
     );
     await del.add(
       {},
       {
-        repeat: { cron: '*/15 * * * *' },
+        repeat: { cron: '*/30 * * * *' },
       }
     );
   } else {
